@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proceso de Cotización</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+        }
+
+        .container {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            max-width: 1200px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 60px;
+            right: -45px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #b8936a, #b8936a 50%, transparent 50%, transparent);
+            background-size: 12px 3px;
+        }
+
+        .icon-container {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .icon-container svg {
+            width: 100px;
+            height: 100px;
+        }
+
+        .step-number {
+            color: #b8936a;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .step-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .step-description {
+            color: #a0a0a0;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 220px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Paso 1 -->
+        <div class="step">
+            <div class="icon-container">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Formulario/Documento -->
+                    <rect x="20" y="10" width="60" height="80" rx="4" fill="#b8936a"/>
+                    <rect x="30" y="25" width="30" height="4" rx="2" fill="#000"/>
+                    <rect x="30" y="38" width="40" height="4" rx="2" fill="#000"/>
+                    <rect x="30" y="51" width="35" height="4" rx="2" fill="#000"/>
+                    <rect x="30" y="64" width="25" height="4" rx="2" fill="#000"/>
+                    <!-- Imagen pequeña -->
+                    <rect x="55" y="60" width="18" height="14" rx="2" fill="#8a6f4e"/>
+                    <circle cx="60" cy="66" r="2" fill="#b8936a"/>
+                    <polygon points="56,72 62,67 68,72 72,72 72,60 56,60" fill="#9a7f5e" opacity="0.5"/>
+                </svg>
+            </div>
+            <div class="step-number">Paso 1</div>
+            <div class="step-title">Completa el Formulario</div>
+            <div class="step-description">
+                Ingresa el metraje del espacio y sube imágenes de apoyo del área a trabajar
+            </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="step">
+            <div class="icon-container">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Cerebro/IA -->
+                    <ellipse cx="50" cy="50" rx="35" ry="32" fill="#b8936a"/>
+                    <!-- Líneas del cerebro -->
+                    <path d="M30 45 Q40 35 50 45 Q60 55 70 45" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <path d="M35 55 Q45 65 55 55 Q65 45 75 55" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <path d="M50 30 L50 40" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M40 35 L45 42" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M60 35 L55 42" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Circuitos -->
+                    <circle cx="30" cy="65" r="4" fill="#8a6f4e"/>
+                    <circle cx="70" cy="65" r="4" fill="#8a6f4e"/>
+                    <circle cx="50" cy="70" r="4" fill="#8a6f4e"/>
+                </svg>
+            </div>
+            <div class="step-number">Paso 2</div>
+            <div class="step-title">Procesamiento con IA</div>
+            <div class="step-description">
+                La inteligencia artificial analiza los datos y aplica parámetros predeterminados para calcular
+            </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="step">
+            <div class="icon-container">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Documento de cotización -->
+                    <rect x="22" y="12" width="56" height="76" rx="4" fill="#b8936a"/>
+                    <!-- Símbolo de dinero/precio -->
+                    <circle cx="50" cy="40" r="15" fill="#8a6f4e"/>
+                    <text x="50" y="46" text-anchor="middle" fill="#000" font-size="18" font-weight="bold">$</text>
+                    <!-- Líneas de detalle -->
+                    <rect x="32" y="62" width="36" height="4" rx="2" fill="#000"/>
+                    <rect x="32" y="72" width="28" height="4" rx="2" fill="#000"/>
+                    <!-- Check mark -->
+                    <circle cx="68" cy="22" r="8" fill="#6b8a4e"/>
+                    <path d="M64 22 L67 25 L73 19" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="step-number">Paso 3</div>
+            <div class="step-title">Recibe tu Cotización</div>
+            <div class="step-description">
+                Obtén automáticamente un presupuesto detallado listo para revisar y aprobar
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASTON — Evidence-Based Pitch Deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           CSS CUSTOM PROPERTIES
+           ======================================== */
+        :root {
+            --bg: #000000;
+            --gold: #C18A68;
+            --gold-dark: #8a6f4e;
+            --gold-muted: #a0a0a0;
+            --white: #FFFFFF;
+            --light: #F4F4F4;
+            --muted: #a0a0a0;
+            --surface: #111111;
+            --surface-light: #1a1a1a;
+            --font-heading: 'Oswald', 'Now', 'Gotham', sans-serif;
+            --font-body: 'Inter', 'Now', 'Gotham', sans-serif;
+            --slide-transition: 0.4s ease;
+        }
+
+        /* ========================================
+           RESET & BASE
+           ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========================================
+           TYPOGRAPHY
+           ======================================== */
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.15;
+        }
+
+        h1 { font-size: clamp(2.8rem, 5vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 3.5vw, 3.2rem); }
+        h3 { font-size: clamp(1.3rem, 2vw, 1.8rem); }
+        h4 { font-size: clamp(1rem, 1.5vw, 1.3rem); }
+
+        p {
+            font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+            color: var(--light);
+        }
+
+        .gold { color: var(--gold); }
+        .muted { color: var(--muted); }
+        .light { color: var(--light); }
+
+        /* ========================================
+           SLIDE SYSTEM
+           ======================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 36px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-inner {
+            max-width: 1200px;
+            width: 100%;
+            z-index: 1;
+            transform-origin: top center;
+        }
+
+        .slide-label {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .slide-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
+            margin: 24px 0;
+        }
+
+        /* ========================================
+           PLACEHOLDER SYSTEM
+           ======================================== */
+        .placeholder {
+            border: 2px dashed var(--gold);
+            background: rgba(193, 138, 104, 0.06);
+            border-radius: 8px;
+            padding: 20px 24px;
+            position: relative;
+            margin: 8px 0;
+        }
+
+        .placeholder::after {
+            content: 'PLACEHOLDER';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-family: var(--font-heading);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            opacity: 0.7;
+        }
+
+        .placeholder p {
+            font-style: italic;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* ========================================
+           DOT NAVIGATION
+           ======================================== */
+        .dot-nav {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .dot-nav a {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dot-nav a:hover {
+            background: rgba(193, 138, 104, 0.5);
+            transform: scale(1.3);
+        }
+
+        .dot-nav a.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            transform: scale(1.3);
+        }
+
+        /* ========================================
+           SLIDE COUNTER
+           ======================================== */
+        .slide-counter {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: var(--muted);
+            z-index: 100;
+            opacity: 0.7;
+        }
+
+        /* ========================================
+           CARD COMPONENTS
+           ======================================== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.2);
+            border-radius: 12px;
+            padding: 32px 28px;
+            transition: border-color var(--slide-transition);
+        }
+
+        .card:hover {
+            border-color: var(--gold);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 20px;
+        }
+
+        .card h4 {
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ========================================
+           FEATURE BULLETS
+           ======================================== */
+        .feature-list {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .feature-list li {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .feature-list li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            min-width: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            margin-top: 8px;
+        }
+
+        .feature-list li strong {
+            color: var(--white);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-list li span {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        /* ========================================
+           COMPETITION TABLE
+           ======================================== */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+            font-size: 0.88rem;
+        }
+
+        .comp-table th,
+        .comp-table td {
+            padding: 14px 16px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .comp-table th {
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: var(--muted);
+            padding-bottom: 16px;
+        }
+
+        .comp-table th.kaston-col {
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .comp-table td:first-child {
+            text-align: left;
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        .comp-table .kaston-col {
+            background: rgba(193, 138, 104, 0.08);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .comp-table td {
+            color: var(--muted);
+        }
+
+        .comp-table .check { color: #6b8a4e; }
+        .comp-table .cross { color: #8a4e4e; }
+
+        /* ========================================
+           TWO-COLUMN LAYOUT
+           ======================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .two-col-60-40 {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ========================================
+           DONUT CHART
+           ======================================== */
+        .donut-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .donut-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .donut-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .donut-legend-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        /* ========================================
+           TIMELINE
+           ======================================== */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin-top: 32px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--gold), var(--gold-dark), transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 28px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg);
+        }
+
+        .timeline-item:last-child .timeline-item::before {
+            border-style: dashed;
+        }
+
+        .timeline-date {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+
+        .timeline-text {
+            color: var(--light);
+            font-size: 0.95rem;
+        }
+
+        /* ========================================
+           TEAM SECTION
+           ======================================== */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .team-card {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.15);
+            border-radius: 12px;
+            padding: 36px 28px;
+            text-align: center;
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            color: var(--bg);
+            font-weight: 700;
+        }
+
+        .team-card h4 {
+            color: var(--white);
+            margin-bottom: 4px;
+            text-transform: none;
+            letter-spacing: 0;
+            font-family: var(--font-body);
+            font-weight: 600;
+        }
+
+        .team-card .team-role {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .team-card p {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           QUOTE / TESTIMONIAL
+           ======================================== */
+        .quote-card {
+            background: var(--surface);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 12px 12px 0;
+            padding: 28px 32px;
+            margin: 16px 0;
+        }
+
+        .quote-card blockquote {
+            font-size: 1.05rem;
+            font-style: italic;
+            color: var(--light);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .quote-card cite {
+            font-style: normal;
+            font-size: 0.85rem;
+            color: var(--gold);
+        }
+
+        /* ========================================
+           STAT BOXES
+           ======================================== */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 28px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 24px 16px;
+            background: var(--surface);
+            border-radius: 10px;
+            border: 1px solid rgba(193, 138, 104, 0.12);
+        }
+
+        .stat-box .stat-number {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            color: var(--gold);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-box .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========================================
+           COLOR SWATCHES (ADDENDUM)
+           ======================================== */
+        .swatch-row {
+            display: flex;
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .swatch {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .swatch-color {
+            height: 80px;
+            position: relative;
+        }
+
+        .swatch-color.star::after {
+            content: '\u2605';
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .swatch-info {
+            padding: 14px 16px;
+            background: var(--surface);
+        }
+
+        .swatch-info h4 {
+            font-size: 0.85rem;
+            color: var(--white);
+            margin-bottom: 4px;
+            text-transform: none;
+            letter-spacing: 0.5px;
+        }
+
+        .swatch-info p {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           GTM STEPS
+           ======================================== */
+        .gtm-phases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .gtm-phase {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.15);
+            border-radius: 12px;
+            padding: 28px 24px;
+            position: relative;
+        }
+
+        .gtm-phase::before {
+            content: attr(data-phase);
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .gtm-phase h4 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .gtm-phase ul {
+            list-style: none;
+        }
+
+        .gtm-phase ul li {
+            padding: 4px 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .gtm-phase ul li::before {
+            content: '>';
+            color: var(--gold);
+            margin-right: 8px;
+            font-weight: 600;
+        }
+
+        /* ========================================
+           INSTALLATION STEPS
+           ======================================== */
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .install-step {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 24px 20px;
+            position: relative;
+            border: 1px solid rgba(193, 138, 104, 0.1);
+        }
+
+        .install-step .step-num {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--gold);
+            opacity: 0.4;
+            position: absolute;
+            top: 12px;
+            right: 16px;
+        }
+
+        .install-step p {
+            font-size: 0.9rem;
+            color: var(--light);
+        }
+
+        /* ========================================
+           UNIT ECONOMICS
+           ======================================== */
+        .econ-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .econ-card {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 24px;
+            border: 1px solid rgba(193, 138, 104, 0.12);
+        }
+
+        .econ-card h4 {
+            color: var(--gold);
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+        }
+
+        .econ-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        .econ-row .label { color: var(--muted); }
+        .econ-row .value { color: var(--white); font-weight: 600; }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-in-delay-1 { transition-delay: 0.15s; }
+        .fade-in-delay-2 { transition-delay: 0.3s; }
+        .fade-in-delay-3 { transition-delay: 0.45s; }
+
+        /* ========================================
+           PRINT STYLES
+           ======================================== */
+        @media print {
+            html {
+                scroll-snap-type: none;
+            }
+
+            .slide {
+                page-break-after: always;
+                page-break-inside: avoid;
+                min-height: 100vh;
+                padding: 40px 60px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .dot-nav, .slide-counter {
+                display: none !important;
+            }
+
+            body {
+                background: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .card, .stat-box, .team-card, .comp-table,
+            .gtm-phase, .install-step, .econ-card, .quote-card {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 900px) {
+            .slide { padding: 40px 32px; }
+            .two-col, .two-col-60-40 { grid-template-columns: 1fr; gap: 32px; }
+            .team-grid { grid-template-columns: 1fr; }
+            .gtm-phases { grid-template-columns: 1fr; }
+            .install-steps { grid-template-columns: 1fr; }
+            .econ-grid { grid-template-columns: 1fr; }
+            .comp-table { font-size: 0.78rem; }
+            .comp-table th, .comp-table td { padding: 10px 8px; }
+            .dot-nav { right: 10px; }
+            .swatch-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================
+     DOT NAVIGATION
+     ============================================ -->
+<nav class="dot-nav" id="dotNav" aria-label="Slide navigation"></nav>
+<div class="slide-counter" id="slideCounter">1 / 15</div>
+
+<!-- ============================================
+     SLIDE 1 — COVER
+     ============================================ -->
+<section class="slide" id="slide-1">
+    <div class="slide-inner" style="text-align:center;">
+        <div class="fade-in" style="margin-bottom:32px;">
+            <img src="isotipo.svg" alt="KASTON" style="width:100px; height:100px; object-fit:contain;">
+        </div>
+        <h1 class="fade-in fade-in-delay-1" style="font-size:clamp(3rem,6vw,5.5rem); margin-bottom:16px;">
+            KASTON
+        </h1>
+        <div class="slide-divider fade-in fade-in-delay-2" style="margin:20px auto;"></div>
+        <p class="fade-in fade-in-delay-2" style="font-size:clamp(1.1rem,1.8vw,1.5rem); color:var(--light); max-width:750px; margin:0 auto 20px;">
+            La primera cubierta de polímero recuperado diseñada para durar 500 años.
+        </p>
+        <p class="fade-in fade-in-delay-3" style="font-family:var(--font-heading); font-size:0.85rem; letter-spacing:4px; color:var(--gold); margin-bottom:28px;">
+            INNOVACIÓN PARA SIEMPRE
+        </p>
+        <div class="fade-in fade-in-delay-3" style="display:flex; justify-content:center; gap:32px; flex-wrap:wrap;">
+            <div style="text-align:center;">
+                <div style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">5,500</div>
+                <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">PSI Resistencia</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">0%</div>
+                <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">Absorción Hídrica</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">300g</div>
+                <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">Por Teja</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 2 — PROBLEM
+     ============================================ -->
+<section class="slide" id="slide-2">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 2</div>
+        <h2 class="fade-in">El Problema <span class="gold">Tradicional</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col" style="margin-top:24px;">
+            <div class="fade-in fade-in-delay-1">
+                <p style="font-size:1.15rem; color:var(--white); margin-bottom:20px; line-height:1.7;">
+                    "Todo lo que has comprado en tu vida, todavía existe en la tierra hoy en día."
+                </p>
+                <p style="font-size:1.3rem; color:var(--gold); font-family:var(--font-heading); margin-bottom:12px;">
+                    El plástico es eterno.
+                </p>
+                <p style="color:var(--light);">
+                    En KASTON, decidimos que tu techo también debería serlo.
+                </p>
+                <p style="margin-top:24px; color:var(--muted); font-size:0.95rem;">
+                    Las tejas de barro y fibrocemento tienen una falla de diseño fundamental: <strong style="color:var(--white);">son frágiles.</strong>
+                </p>
+            </div>
+
+            <div class="fade-in fade-in-delay-2">
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Se quiebran con el transporte o granizo</strong>
+                        5–15% de merma antes de instalar. KASTON: <strong style="color:var(--gold);">0% de rotura</strong> — resistencia de 4,200 a 5,500 PSI.</span>
+                    </li>
+                    <li>
+                        <span><strong>Absorben humedad</strong>
+                        Barro y fibrocemento son porosos: moho, goteras, deterioro. KASTON: <strong style="color:var(--gold);">0% absorción hídrica</strong> — inmunidad total.</span>
+                    </li>
+                    <li>
+                        <span><strong>Pesan toneladas</strong>
+                        Una teja de barro pesa 2–3 kg. KASTON: <strong style="color:var(--gold);">300 g</strong> — 85% más liviana. Estructura más simple, obra más económica.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 3 — THE PAYER'S PROBLEM
+     ============================================ -->
+<section class="slide" id="slide-3">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 3</div>
+        <h2 class="fade-in">El Problema del <span class="gold">que Paga</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            Los propietarios y constructores enfrentan costos recurrentes e inesperados por techos que fallan antes de tiempo.
+        </p>
+
+        <div class="card-grid fade-in fade-in-delay-1">
+            <div class="card">
+                <h4>Reemplazo Recurrente</h4>
+                <p>Las tejas tradicionales requieren reemplazo cada 15–25 años, convirtiendo el techo en un gasto cíclico significativo.</p>
+            </div>
+            <div class="card">
+                <h4>Costos Estructurales</h4>
+                <p>El peso de las tejas de barro exige vigas más gruesas y refuerzos adicionales, encareciendo la obra.</p>
+            </div>
+            <div class="card">
+                <h4>Reparaciones de Emergencia</h4>
+                <p>Granizo, vientos y filtraciones generan gastos imprevistos y reclamos a seguros.</p>
+            </div>
+        </div>
+
+        <div class="card fade-in fade-in-delay-2" style="margin-top:28px; border-left:3px solid var(--gold);">
+            <h4 style="color:var(--gold); margin-bottom:12px;">Comparativa de Peso y Costo Estructural</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:4px;">Techo Barro (100 m²)</p>
+                    <p style="font-size:1.3rem; color:var(--white);"><strong>4,500–6,000 kg</strong></p>
+                    <p style="font-size:0.8rem; color:var(--muted);">Requiere vigas reforzadas, cerchas más gruesas, mayor cimentación</p>
+                </div>
+                <div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:4px;">Techo KASTON (100 m²)</p>
+                    <p style="font-size:1.3rem; color:var(--gold);"><strong>1,110 kg</strong></p>
+                    <p style="font-size:0.8rem; color:var(--muted);">37 tejas/m² × 300 g × 100 m². Estructura estándar, sin refuerzos extra</p>
+                </div>
+            </div>
+            <div style="margin-top:16px; border-top:1px solid rgba(193,138,104,0.15); padding-top:16px;">
+                <h4 style="color:var(--gold); font-size:0.9rem; letter-spacing:1.5px; margin-bottom:12px;">COSTO POR M² A 20 AÑOS</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px 12px; color:var(--muted); font-size:0.75rem; letter-spacing:1px; border-bottom:1px solid rgba(193,138,104,0.2);">Concepto</th>
+                            <th style="text-align:center; padding:8px 12px; color:var(--muted); font-size:0.75rem; letter-spacing:1px; border-bottom:1px solid rgba(193,138,104,0.2);">Barro</th>
+                            <th style="text-align:center; padding:8px 12px; color:var(--gold); font-size:0.75rem; letter-spacing:1px; border-bottom:2px solid var(--gold);">KASTON</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Inversión Inicial</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--muted);">$55.000</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--white); font-weight:600; background:rgba(193,138,104,0.08);">$85.000</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Sobrecosto Estructural (peso)</td>
+                            <td style="text-align:center; padding:8px 12px; color:#8a4e4e; font-weight:600;">+30%</td>
+                            <td style="text-align:center; padding:8px 12px; color:#6b8a4e; font-weight:600; background:rgba(193,138,104,0.08);">0%</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Mantenimiento y Reparaciones</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--muted);">$35.000</td>
+                            <td style="text-align:center; padding:8px 12px; color:#6b8a4e; font-weight:600; background:rgba(193,138,104,0.08);">$0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Reemplazo Total (Año 20)</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--muted);">$75.000</td>
+                            <td style="text-align:center; padding:8px 12px; color:#6b8a4e; font-weight:600; background:rgba(193,138,104,0.08);">$0</td>
+                        </tr>
+                        <tr style="border-top:2px solid rgba(193,138,104,0.3);">
+                            <td style="padding:10px 12px; color:var(--white); font-weight:700;">TOTAL ACUMULADO</td>
+                            <td style="text-align:center; padding:10px 12px; color:#8a4e4e; font-weight:700; font-size:1rem;">$165.000</td>
+                            <td style="text-align:center; padding:10px 12px; color:var(--gold); font-weight:700; font-size:1rem; background:rgba(193,138,104,0.08);">$85.000</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:8px; font-size:0.8rem; color:var(--gold); font-style:italic;">El barro parece barato, pero es un "gasto hormiga" gigante. KASTON cuesta la mitad a 20 años.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 4 — TAM / SAM / SOM
+     ============================================ -->
+<section class="slide" id="slide-4">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 4</div>
+        <h2 class="fade-in">Tamaño del <span class="gold">Mercado</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            El mercado de cubiertas para construcción en Colombia y Latinoamérica representa una oportunidad masiva y en crecimiento.
+        </p>
+
+        <div class="stat-row fade-in fade-in-delay-1">
+            <div class="stat-box">
+                <div class="stat-number">$21.8B</div>
+                <div class="stat-label">TAM — Total Addressable Market</div>
+                <p style="margin-top:8px;">Mercado global de cubiertas</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">$250M</div>
+                <div class="stat-label">SAM — Serviceable Available Market</div>
+                <p style="margin-top:8px;">Mercado de cubiertas en Colombia</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">$5M</div>
+                <div class="stat-label">SOM — Serviceable Obtainable Market</div>
+                <p style="margin-top:8px;">Captura en Medellín, Cali y Bogotá</p>
+            </div>
+        </div>
+
+        <div class="card-grid fade-in fade-in-delay-2" style="margin-top:24px;">
+            <div class="card">
+                <h4>Tendencia de Crecimiento</h4>
+                <p>Crecimiento del 2.8% en construcción sostenible en Colombia. Valorización del 10% en edificaciones con certificación verde. Transición hacia materiales de baja huella de carbono.</p>
+            </div>
+            <div class="card">
+                <h4>Problema de Oferta</h4>
+                <p>Oferta dominada por materiales pesados (barro/concreto) de alta fragilidad y mantenimiento. Inexistencia de cubiertas de polímero de alta ingeniería con ensamble mecánico. KASTON: reducción del 75% en peso estructural y vida útil de +500 años.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 5 — SOLUTION
+     ============================================ -->
+<section class="slide" id="slide-5">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 5</div>
+        <h2 class="fade-in">La <span class="gold">Solución</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col" style="margin-top:24px;">
+            <div class="fade-in fade-in-delay-1">
+                <h3 style="margin-bottom:16px;">La Materia Prima</h3>
+                <p style="margin-bottom:16px;">
+                    El plástico es el material más resistente jamás creado por el humano. Irónicamente, lo usamos para cosas desechables.
+                </p>
+                <p style="margin-bottom:16px;">
+                    <strong style="color:var(--gold);">En KASTON corregimos ese error.</strong>
+                </p>
+                <p>
+                    Rescatamos polímeros industriales de alto rendimiento y los transformamos en un sistema de cubierta que no se degrada, no se oxida y es indestructible.
+                </p>
+                <div class="card" style="margin-top:20px; border-left:3px solid var(--gold);">
+                    <h4 style="color:var(--gold);">Dato Clave</h4>
+                    <p><strong>11.1 kg de polímero recuperado</strong> por cada m² de techo KASTON (37 tejas × 300 g). Cada metro cuadrado instalado es plástico industrial rescatado de vertederos y convertido en infraestructura permanente.</p>
+                </div>
+            </div>
+
+            <div class="fade-in fade-in-delay-2">
+                <h3 style="margin-bottom:16px;">Diseño Cola de Castor</h3>
+                <p style="margin-bottom:16px;">
+                    El diseño "Cola de Castor" no es solo estética. Es una solución de ingeniería natural.
+                </p>
+                <p style="margin-bottom:16px;">
+                    Su terminación curva y superficie plana aceleran la evacuación del agua, evitando empozamientos y filtraciones muy comunes en las tejas curvas coloniales.
+                </p>
+                <p>
+                    Además, al ser piezas individuales compactas, crean una "piel" adaptable a cualquier diseño de techo.
+                </p>
+                <div style="text-align:center; margin-top:24px;">
+                    <img src="img-tejas-1.png" alt="Tejas KASTON cola de castor instaladas" style="width:100%; max-width:320px; border-radius:12px; border:1px solid rgba(193,138,104,0.2);">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 6 — HOW IT WORKS
+     ============================================ -->
+<section class="slide" id="slide-6">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 6</div>
+        <h2 class="fade-in">Cómo <span class="gold">Funciona</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col" style="margin-top:20px;">
+            <div class="fade-in fade-in-delay-1">
+                <h3 style="color:var(--gold); margin-bottom:16px;">Sistema K-LOCK</h3>
+                <p style="margin-bottom:8px; font-style:italic; color:var(--muted);">
+                    "Como un LEGO, pero indestructible."
+                </p>
+                <p style="margin-bottom:20px;">
+                    Lo que hace única a KASTON es su ingeniería de conexión. Olvídate de tejas sueltas que vuelan con el viento.
+                </p>
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Sistema Macho/Hembra</strong>
+                        Cada teja tiene una pestaña lateral (macho) y una ranura receptora (hembra). Al unirse, quedan mecánicamente bloqueadas entre sí.</span>
+                    </li>
+                    <li>
+                        <span><strong>Resistencia Eólica</strong>
+                        Gracias al encaje y sus dos puntos de anclaje a la malla, eliminamos el riesgo de desprendimiento por vientos fuertes.</span>
+                    </li>
+                </ul>
+                <div class="card" style="margin-top:16px; border-left:3px solid var(--gold);">
+                    <h4 style="color:var(--gold);">Especificación K-LOCK</h4>
+                    <p>Cada teja pesa solo <strong>300 g</strong> pero resiste cargas de <strong>4,200–5,500 PSI</strong>. El sistema dual de encaje + anclaje mecánico a la malla convierte el techo en una superficie monolítica de <strong>37 piezas/m²</strong> interconectadas.</p>
+                </div>
+            </div>
+
+            <div class="fade-in fade-in-delay-2">
+                <h3 style="margin-bottom:16px;">Indestructible</h3>
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Blindaje Total — 5,500 PSI</strong>
+                        Carga de rotura de 4,200 a 5,500 PSI. ¿Granizo? ¿Pisar el techo? ¿Golpes? Absorben el impacto sin quebrarse. Dureza Shore D 68–72. Cero mermas, cero reemplazos.</span>
+                    </li>
+                    <li>
+                        <span><strong>Aislamiento — Rango Térmico -15°C a 90°C</strong>
+                        A diferencia del Zinc que convierte tu casa en un horno, nuestro polímero denso aísla temperatura y ruido. Opera sin degradación de -15°C a 90°C.</span>
+                    </li>
+                    <li>
+                        <span><strong>Ligereza — 300 g por Teja</strong>
+                        Solo 11.1 kg/m² (vs. barro: 50 kg/m²). Reduce costos en estructura de madera o metal hasta en un 40%.</span>
+                    </li>
+                </ul>
+
+                <h3 style="margin-top:28px; margin-bottom:16px;">Instalación</h3>
+                <div class="install-steps">
+                    <div class="install-step">
+                        <div class="step-num">1</div>
+                        <p>Manto asfáltico sobre la estructura para impermeabilización total.</p>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">2</div>
+                        <p>Malla electrosoldada estándar fijada sobre el manto.</p>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">3</div>
+                        <p>Tejas KASTON aseguradas con alambre a través de sus orificios de anclaje.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 7 — AI-POWERED PROCESSES
+     ============================================ -->
+<section class="slide" id="slide-7">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 7</div>
+        <h2 class="fade-in">Procesos Potenciados <span class="gold">con IA</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:12px;">
+            Integramos inteligencia artificial en tres pilares clave para escalar eficientemente y reducir costos operativos.
+        </p>
+
+        <div class="card-grid fade-in fade-in-delay-1">
+            <!-- Card 1: Smart Quotation -->
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="20" y="10" width="60" height="80" rx="4" fill="#C18A68"/>
+                        <rect x="30" y="25" width="30" height="4" rx="2" fill="#000"/>
+                        <rect x="30" y="38" width="40" height="4" rx="2" fill="#000"/>
+                        <rect x="30" y="51" width="35" height="4" rx="2" fill="#000"/>
+                        <rect x="30" y="64" width="25" height="4" rx="2" fill="#000"/>
+                        <rect x="55" y="60" width="18" height="14" rx="2" fill="#8a6f4e"/>
+                        <circle cx="60" cy="66" r="2" fill="#C18A68"/>
+                    </svg>
+                </div>
+                <h4>Cotización Inteligente</h4>
+                <p>Visión por computadora analiza fotos del techo, calcula metraje automáticamente y genera un presupuesto detallado al instante — sin visitas técnicas iniciales.</p>
+                <div style="margin-top:16px; font-size:0.8rem; color:var(--gold-dark);">
+                    <strong style="color:var(--gold);">Proceso:</strong> Formulario → IA Procesa → Cotización Automática
+                </div>
+            </div>
+
+            <!-- Card 2: Waste Optimization -->
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="50" cy="50" rx="35" ry="32" fill="#C18A68"/>
+                        <path d="M30 45 Q40 35 50 45 Q60 55 70 45" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M35 55 Q45 65 55 55 Q65 45 75 55" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M50 30 L50 40" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M40 35 L45 42" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M60 35 L55 42" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="30" cy="65" r="4" fill="#8a6f4e"/>
+                        <circle cx="70" cy="65" r="4" fill="#8a6f4e"/>
+                        <circle cx="50" cy="70" r="4" fill="#8a6f4e"/>
+                    </svg>
+                </div>
+                <h4>Optimización de Residuos</h4>
+                <p>Modelos predictivos calculan las necesidades de material recuperado según la demanda proyectada, minimizando desperdicios y asegurando suministro constante.</p>
+            </div>
+
+            <!-- Card 3: Global Scalability -->
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="36" fill="none" stroke="#C18A68" stroke-width="3"/>
+                        <ellipse cx="50" cy="50" rx="18" ry="36" fill="none" stroke="#C18A68" stroke-width="2"/>
+                        <line x1="14" y1="50" x2="86" y2="50" stroke="#C18A68" stroke-width="2"/>
+                        <line x1="14" y1="35" x2="86" y2="35" stroke="#8a6f4e" stroke-width="1" opacity="0.5"/>
+                        <line x1="14" y1="65" x2="86" y2="65" stroke="#8a6f4e" stroke-width="1" opacity="0.5"/>
+                        <circle cx="50" cy="50" r="6" fill="#C18A68"/>
+                        <circle cx="50" cy="50" r="3" fill="#000"/>
+                    </svg>
+                </div>
+                <h4>Escalabilidad Global</h4>
+                <p>Vender internacionalmente sin oficinas físicas: automatización con IA para atención al cliente, cotizaciones multi-idioma y logística de distribución.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 8 — COMPETITIVE ANALYSIS
+     ============================================ -->
+<section class="slide" id="slide-8">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 8</div>
+        <h2 class="fade-in">Análisis <span class="gold">Competitivo</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:8px;">
+            KASTON redefine la categoría al combinar la durabilidad del plástico con ingeniería de ensamble y sostenibilidad.
+        </p>
+
+        <div class="fade-in fade-in-delay-1" style="overflow-x:auto;">
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Criterio</th>
+                        <th class="kaston-col">KASTON</th>
+                        <th>Teja de Barro</th>
+                        <th>Zinc</th>
+                        <th>Fibrocemento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Vida útil</td>
+                        <td class="kaston-col">500 años</td>
+                        <td>20–40 años</td>
+                        <td>15–30 años</td>
+                        <td>20–30 años</td>
+                    </tr>
+                    <tr>
+                        <td>Peso por teja</td>
+                        <td class="kaston-col">300 g</td>
+                        <td>2–3 kg</td>
+                        <td>N/A (lámina)</td>
+                        <td>1.5–2 kg</td>
+                    </tr>
+                    <tr>
+                        <td>Resistencia a granizo</td>
+                        <td class="kaston-col"><span class="check">&#10004; Total</span></td>
+                        <td><span class="cross">&#10008; Frágil</span></td>
+                        <td>Abolla</td>
+                        <td><span class="cross">&#10008; Frágil</span></td>
+                    </tr>
+                    <tr>
+                        <td>Absorción de humedad</td>
+                        <td class="kaston-col"><span class="check">&#10004; Cero</span></td>
+                        <td><span class="cross">&#10008; Alta</span></td>
+                        <td>Cero (se oxida)</td>
+                        <td><span class="cross">&#10008; Alta</span></td>
+                    </tr>
+                    <tr>
+                        <td>Rotura en transporte</td>
+                        <td class="kaston-col"><span class="check">&#10004; 0%</span></td>
+                        <td><span class="cross">&#10008; 5–15%</span></td>
+                        <td>0%</td>
+                        <td><span class="cross">&#10008; 5–10%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Aislamiento térmico</td>
+                        <td class="kaston-col"><span class="check">&#10004; Alto</span></td>
+                        <td>Medio</td>
+                        <td><span class="cross">&#10008; Mínimo</span></td>
+                        <td>Medio</td>
+                    </tr>
+                    <tr>
+                        <td>Aislamiento acústico</td>
+                        <td class="kaston-col"><span class="check">&#10004; Alto</span></td>
+                        <td>Medio</td>
+                        <td><span class="cross">&#10008; Ruidoso</span></td>
+                        <td>Medio</td>
+                    </tr>
+                    <tr>
+                        <td>Mantenimiento</td>
+                        <td class="kaston-col">Cero</td>
+                        <td>Reemplazo parcial</td>
+                        <td>Pintura / anticorrosivo</td>
+                        <td>Reemplazo parcial</td>
+                    </tr>
+                    <tr>
+                        <td>Sostenibilidad</td>
+                        <td class="kaston-col"><span class="check">&#10004; Reciclado</span></td>
+                        <td>Alto consumo energía</td>
+                        <td>Minería</td>
+                        <td>Contiene cemento</td>
+                    </tr>
+                    <tr>
+                        <td>Sistema de ensamble</td>
+                        <td class="kaston-col"><span class="check">&#10004; K-LOCK</span></td>
+                        <td>Traslapo simple</td>
+                        <td>Tornillos</td>
+                        <td>Tornillos / gancho</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 9 — REVENUE MODEL & UNIT ECONOMICS
+     ============================================ -->
+<section class="slide" id="slide-9">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 9</div>
+        <h2 class="fade-in">Modelo de Ingresos & <span class="gold">Unit Economics</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col fade-in fade-in-delay-1" style="margin-top:24px;">
+            <div>
+                <h3 style="margin-bottom:16px;">Modelo de Negocio</h3>
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Venta directa B2C</strong>
+                        Propietarios de vivienda a través de plataforma web con cotización IA.</span>
+                    </li>
+                    <li>
+                        <span><strong>Venta B2B</strong>
+                        Constructoras, contratistas y ferreterías especializadas.</span>
+                    </li>
+                    <li>
+                        <span><strong>Instalación</strong>
+                        Red de instaladores certificados KASTON con ingreso por servicio.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:16px;">Unit Economics</h3>
+                <div class="econ-card">
+                    <h4>Costo por Teja</h4>
+                    <div class="econ-row">
+                        <span class="label">Materia prima (polímero)</span>
+                        <span class="value">$533</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Manufactura</span>
+                        <span class="value">$399</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Costo total por teja</span>
+                        <span class="value">$932</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Precio de venta por teja</span>
+                        <span class="value">$2.297</span>
+                    </div>
+                    <div class="econ-row" style="border-bottom:none;">
+                        <span class="label">Margen bruto</span>
+                        <span class="value" style="color:var(--gold);">59.4%</span>
+                    </div>
+                </div>
+
+                <div class="econ-card" style="margin-top:16px;">
+                    <h4>Por Metro Cuadrado</h4>
+                    <div class="econ-row">
+                        <span class="label">Tejas por m²</span>
+                        <span class="value" style="color:var(--gold);">37 uds</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Peso por m²</span>
+                        <span class="value">11.1 kg</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Dimensión por teja</span>
+                        <span class="value">250 × 170 mm</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Costo por m²</span>
+                        <span class="value">$34.500</span>
+                    </div>
+                    <div class="econ-row" style="border-bottom:none;">
+                        <span class="label">Precio de venta por m²</span>
+                        <span class="value" style="color:var(--gold);">$85.000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 10 — GO-TO-MARKET
+     ============================================ -->
+<section class="slide" id="slide-10">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 10</div>
+        <h2 class="fade-in">Estrategia <span class="gold">Go-To-Market</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:8px;">
+            Tres fases para validar, crecer y escalar — desde el primer piloto hasta distribución nacional.
+        </p>
+
+        <div class="gtm-phases fade-in fade-in-delay-1">
+            <div class="gtm-phase" data-phase="Fase 1 — Validación">
+                <h4>Piloto Local (Sede Medellín)</h4>
+                <ul>
+                    <li>Validación histórica: 16 años de instalación real en Medellín (caso de éxito comprobado)</li>
+                    <li>Documentar estado actual con fotos y métricas de durabilidad tras 1.5 décadas</li>
+                    <li>Validar con 5–10 arquitectos y constructores locales</li>
+                    <li>Cotizaciones web vía IA</li>
+                </ul>
+            </div>
+            <div class="gtm-phase" data-phase="Fase 2 — Crecimiento">
+                <h4>Canales Digitales + Alianzas</h4>
+                <ul>
+                    <li>Marketing digital: Instagram, YouTube (instalaciones en video)</li>
+                    <li>Alianzas con ferreterías especializadas</li>
+                    <li>Red de instaladores certificados</li>
+                    <li>Expansión a Cali y Bogotá</li>
+                </ul>
+            </div>
+            <div class="gtm-phase" data-phase="Fase 3 — Escala">
+                <h4>Distribución e Internacionalización</h4>
+                <ul>
+                    <li>Partnerships con constructoras grandes</li>
+                    <li>Catálogo en grandes superficies</li>
+                    <li>Certificaciones nacionales (NTC)</li>
+                    <li>Pendiente expansión a Costa Rica</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 11 — TEAM
+     ============================================ -->
+<section class="slide" id="slide-11">
+    <div class="slide-inner" style="text-align:center;">
+        <div class="slide-label fade-in">Slide 11</div>
+        <h2 class="fade-in">El <span class="gold">Equipo</span></h2>
+        <div class="slide-divider fade-in" style="margin:24px auto;"></div>
+
+        <div class="team-grid fade-in fade-in-delay-1">
+            <div class="team-card">
+                <div class="team-avatar">J</div>
+                <h4>Juanita</h4>
+                <div class="team-role">Producto & Validación</div>
+                <p class="muted" style="font-size:0.85rem; margin-top:8px;">Co-fundadora. Lidera el desarrollo de producto y validación de mercado con arquitectos y constructores en Medellín.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">J</div>
+                <h4>Jerónimo</h4>
+                <div class="team-role">IA & Tecnología</div>
+                <p class="muted" style="font-size:0.85rem; margin-top:8px;">Co-fundador. Desarrolla el sistema de cotización con IA y la infraestructura tecnológica de KASTON.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">J</div>
+                <h4>Julián</h4>
+                <div class="team-role">Finanzas</div>
+                <p class="muted" style="font-size:0.85rem; margin-top:8px;">Co-fundador. Gestiona el modelo de negocio, proyecciones financieras y estrategia de crecimiento.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 12 — ASK + TIMELINE
+     ============================================ -->
+<section class="slide" id="slide-12">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 12</div>
+        <h2 class="fade-in">The Ask & <span class="gold">Timeline</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col fade-in fade-in-delay-1" style="margin-top:20px;">
+            <!-- LEFT: The Ask + Donut -->
+            <div>
+                <h3 style="margin-bottom:20px;">Solicitamos <span class="gold">$10,000 USD</span></h3>
+                <p style="margin-bottom:28px;">Capital semilla para mover KASTON de prototipo a primeras ventas reales.</p>
+
+                <div class="donut-container">
+                    <!-- SVG Donut Chart -->
+                    <svg width="200" height="200" viewBox="0 0 200 200">
+                        <defs>
+                            <!-- 40% Machinery: 0 to 144deg -->
+                            <!-- 30% Marketing: 144 to 252deg -->
+                            <!-- 30% Lab: 252 to 360deg -->
+                        </defs>
+                        <!-- Background circle -->
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="#1a1a1a" stroke-width="30"/>
+                        <!-- 40% Machinery (gold) - dasharray: 0.4 * 2πr = 0.4 * 439.8 = 175.9 -->
+                        <circle cx="100" cy="100" r="70" fill="none"
+                                stroke="#C18A68" stroke-width="30"
+                                stroke-dasharray="175.9 263.9"
+                                stroke-dashoffset="110"
+                                transform="rotate(-90 100 100)"/>
+                        <!-- 30% Marketing (dark gold) - dasharray: 0.3 * 439.8 = 131.9 -->
+                        <circle cx="100" cy="100" r="70" fill="none"
+                                stroke="#8a6f4e" stroke-width="30"
+                                stroke-dasharray="131.9 307.9"
+                                stroke-dashoffset="-65.9"
+                                transform="rotate(-90 100 100)"/>
+                        <!-- 30% Lab Tests (muted) -->
+                        <circle cx="100" cy="100" r="70" fill="none"
+                                stroke="#a0a0a0" stroke-width="30"
+                                stroke-dasharray="131.9 307.9"
+                                stroke-dashoffset="-197.8"
+                                transform="rotate(-90 100 100)"/>
+                        <!-- Center text -->
+                        <text x="100" y="95" text-anchor="middle" fill="#FFFFFF" font-family="Oswald, sans-serif" font-size="22" font-weight="700">$10K</text>
+                        <text x="100" y="115" text-anchor="middle" fill="#a0a0a0" font-family="Inter, sans-serif" font-size="11">ALLOCATION</text>
+                    </svg>
+
+                    <div class="donut-legend">
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-swatch" style="background:#C18A68;"></div>
+                            <span style="color:var(--light);">40% — Maquinaria</span>
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-swatch" style="background:#8a6f4e;"></div>
+                            <span style="color:var(--light);">30% — Marketing Digital</span>
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-swatch" style="background:#a0a0a0;"></div>
+                            <span style="color:var(--light);">30% — Pruebas de Laboratorio</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Timeline -->
+            <div>
+                <h3 style="margin-bottom:8px;">Roadmap 12 Meses</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Marzo 2026</div>
+                        <div class="timeline-text">Registro de empresa + estructura legal</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Junio 2026</div>
+                        <div class="timeline-text">Primera instalación piloto documentada</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Septiembre 2026</div>
+                        <div class="timeline-text">Alianzas de distribución firmadas</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Marzo 2027</div>
+                        <div class="timeline-text placeholder" data-placeholder="true" style="display:inline; border:none; background:none; padding:0;">
+                            <span style="font-style:italic; color:var(--muted);">[Insertar meta de ingresos a 12 meses]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:28px;">
+                    <h4>Hitos Clave</h4>
+                    <ul class="feature-list" style="margin-top:8px;">
+                        <li><span><strong>Mes 1–3:</strong> Legalización, compra de maquinaria, pruebas de laboratorio</span></li>
+                        <li><span><strong>Mes 4–6:</strong> Producción piloto, primera instalación, caso de estudio</span></li>
+                        <li><span><strong>Mes 7–9:</strong> Marketing digital, alianzas con ferreterías y constructoras</span></li>
+                        <li><span><strong>Mes 10–12:</strong> Expansión a segunda ciudad, metas de revenue</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 13 — USER VALIDATION & TESTIMONIALS
+     ============================================ -->
+<section class="slide" id="slide-13">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 13</div>
+        <h2 class="fade-in">Validación de <span class="gold">Usuario</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            Entrevistas en curso con arquitectos, constructores y propietarios de vivienda para validar la propuesta de valor.
+        </p>
+
+        <div class="fade-in fade-in-delay-1" style="margin-bottom:32px;">
+            <h3 style="margin-bottom:20px;">Validación de Mercado <span class="gold">(Voice of the Customer)</span></h3>
+            <div class="two-col" style="gap:24px;">
+                <div class="card" style="text-align:center; border-left:3px solid #8a4e4e;">
+                    <h4 style="color:var(--white); margin-bottom:8px;">El Dolor</h4>
+                    <div style="font-family:var(--font-heading); font-size:3rem; color:#8a4e4e; font-weight:700; line-height:1; margin-bottom:8px;">8/10</div>
+                    <p style="font-size:0.9rem; color:var(--light); line-height:1.6;">8 de cada 10 arquitectos coinciden en que la <strong style="color:var(--white);">fragilidad y el peso del barro</strong> encarecen la obra estructural en un <strong style="color:#8a4e4e;">30%</strong>.</p>
+                </div>
+                <div class="card" style="text-align:center; border-left:3px solid #6b8a4e;">
+                    <h4 style="color:var(--white); margin-bottom:8px;">La Solución</h4>
+                    <div style="font-family:var(--font-heading); font-size:3rem; color:#6b8a4e; font-weight:700; line-height:1; margin-bottom:8px;">100%</div>
+                    <p style="font-size:0.9rem; color:var(--light); line-height:1.6;">100% de los entrevistados mostraron <strong style="color:var(--white);">alta intención de compra</strong> al conocer el Sistema K-LOCK frente a vendavales.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-card fade-in fade-in-delay-2">
+            <blockquote>"El sistema de anclaje de KASTON resuelve el mayor miedo de mis clientes en zonas de vientos fuertes y granizo."</blockquote>
+            <cite>— Arquitecto, Medellín</cite>
+        </div>
+
+        <div class="fade-in fade-in-delay-2" style="margin-top:28px;">
+            <h3 style="margin-bottom:16px;">Datos de Validación Técnica</h3>
+            <div class="card" style="border-left:3px solid var(--gold);">
+                <h4 style="color:var(--gold); margin-bottom:8px;">Ahorro Estructural Real</h4>
+                <p style="font-size:0.95rem; color:var(--light); line-height:1.7;">8 de cada 10 arquitectos confirman que el peso del barro (<strong style="color:var(--white);">50 kg/m²</strong>) obliga a gastar un <strong style="color:#8a4e4e;">30% más</strong> en vigas y columnas. KASTON solo pesa <strong style="color:var(--gold);">11.1 kg/m²</strong>.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 14 — ENVIRONMENTAL IMPACT
+     ============================================ -->
+<section class="slide" id="slide-14">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 14</div>
+        <h2 class="fade-in">Impacto <span class="gold">Ambiental</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            Cada techo KASTON es una declaración contra el desperdicio. Transformamos residuos industriales en infraestructura que dura siglos.
+        </p>
+
+        <!-- Image gallery -->
+        <div class="fade-in" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:32px;">
+            <img src="img-tejas-1.png" alt="KASTON instalado - vista aérea" style="width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid rgba(193,138,104,0.15);">
+            <img src="img-tejas-2.png" alt="KASTON instalado - bosque" style="width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid rgba(193,138,104,0.15);">
+            <img src="img-tejas-3.png" alt="KASTON instalado - moderna" style="width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid rgba(193,138,104,0.15);">
+        </div>
+
+        <div class="two-col fade-in fade-in-delay-1">
+            <div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Recycle arrows -->
+                            <path d="M50 15 L65 35 L55 35 L55 50 L45 50 L45 35 L35 35 Z" fill="#C18A68"/>
+                            <path d="M25 55 L25 70 L40 60 L25 55Z" fill="#C18A68" transform="rotate(120 50 50)"/>
+                            <path d="M75 55 L75 70 L60 60 L75 55Z" fill="#C18A68" transform="rotate(240 50 50)"/>
+                            <circle cx="50" cy="50" r="10" fill="#8a6f4e"/>
+                            <text x="50" y="54" text-anchor="middle" fill="#000" font-size="10" font-weight="bold">♻</text>
+                        </svg>
+                    </div>
+                    <h4>Economía Circular</h4>
+                    <p>Los polímeros industriales que rescatamos evitan toneladas de residuos en vertederos. Cada teja es un ciclo de vida extendido al máximo.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Cero Emisiones de Proceso</h4>
+                    <p>A diferencia de las tejas de barro que requieren hornos a alta temperatura (900°C+), nuestro proceso de moldeo opera a temperaturas significativamente menores.</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:16px;">Métricas de Impacto</h3>
+                <div class="stat-row" style="grid-template-columns: 1fr 1fr;">
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">11.1 kg</div>
+                        <div class="stat-label">Polímero Industrial Rescatado por cada m²</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">37 tejas × 300 g = 11.1 kg de polímero (PP + PEBD) desviados del vertedero.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">0%</div>
+                        <div class="stat-label">Absorción Hídrica = 0% Residuos por Corrosión</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">Sin óxido ni hongos. El material es inerte y no aumenta de peso con la lluvia.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">500 años</div>
+                        <div class="stat-label">Vida Útil = Cero Residuos de Reemplazo</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">Validación real de 16 años en Medellín. Elimina el ciclo de desperdicio del barro.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">18.5 ton</div>
+                        <div class="stat-label">CO₂ Evitado por cada 1,000 m²</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">Impacto positivo por reciclaje y eliminación de la quema de combustibles para arcilla.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 15 — ADDENDUM
+     ============================================ -->
+<section class="slide" id="slide-15">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 15</div>
+        <h2 class="fade-in">Addendum: <span class="gold">La Colección KASTON</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:8px;">
+            Nuestros colores no son pintura superficial. Es el color del polímero fundido, lo que garantiza que no se descascara con el tiempo.
+        </p>
+
+        <div class="fade-in fade-in-delay-1">
+            <h3 style="margin-bottom:12px;">Paleta Mineral</h3>
+            <div class="swatch-row">
+                <div class="swatch">
+                    <div class="swatch-color star" style="background:#2a2a2a;"></div>
+                    <div class="swatch-info">
+                        <h4>Negro Grafito</h4>
+                        <p>Color estrella. Nuestra firma.</p>
+                    </div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background:#5c3d2e;"></div>
+                    <div class="swatch-info">
+                        <h4>Café Wengué</h4>
+                        <p>Calidez natural.</p>
+                    </div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background:#6b6b6b;"></div>
+                    <div class="swatch-info">
+                        <h4>Gris Basalto</h4>
+                        <p>Arquitectura moderna.</p>
+                    </div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background:#4B5320;"></div>
+                    <div class="swatch-info">
+                        <h4>Verde Militar</h4>
+                        <p>Integración natural.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col fade-in fade-in-delay-2" style="margin-top:36px;">
+            <div>
+                <h3 style="margin-bottom:16px;">Especificaciones Técnicas</h3>
+                <div class="econ-card">
+                    <h4>Por Teja</h4>
+                    <div class="econ-row">
+                        <span class="label">Peso</span>
+                        <span class="value">300 g</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Dimensiones</span>
+                        <span class="value">250 × 170 mm</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Espesor</span>
+                        <span class="value">10 mm</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Tejas por m²</span>
+                        <span class="value">37 uds</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Carga de rotura</span>
+                        <span class="value" style="color:var(--gold);">4,200–5,500 PSI</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Material</span>
+                        <span class="value">PP + PE baja densidad recuperado</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Vida útil</span>
+                        <span class="value" style="color:var(--gold);">+500 años</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:16px;">Sistema de Instalación</h3>
+                <div class="econ-card">
+                    <h4>Detalle Técnico</h4>
+                    <div class="econ-row">
+                        <span class="label">Ensamble</span>
+                        <span class="value">K-LOCK macho/hembra</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Anclaje</span>
+                        <span class="value">Dual — amarre mecánico alta tensión</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Base</span>
+                        <span class="value">Malla electrosoldada</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Impermeabilización</span>
+                        <span class="value">Manto asfáltico</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Rango térmico</span>
+                        <span class="value">-15°C a 90°C</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Dureza Shore D</span>
+                        <span class="value">68–72</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Absorción humedad</span>
+                        <span class="value" style="color:var(--gold);">0%</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Pendiente mínima</span>
+                        <span class="value">15%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="fade-in fade-in-delay-3" style="text-align:center; margin-top:40px; padding:28px; background:var(--surface); border-radius:12px; border:1px solid rgba(193,138,104,0.2);">
+            <p style="font-size:1.2rem; color:var(--white); margin-bottom:6px;">
+                ¿Listo para blindar tu hogar?
+            </p>
+            <p style="font-family:var(--font-heading); color:var(--gold); letter-spacing:2px; font-size:0.9rem;">
+                COTIZA TU PROYECTO HOY Y OLVÍDATE DE CAMBIAR EL TECHO POR 500 AÑOS.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     JAVASCRIPT: Navigation System
+     ============================================ -->
+<script>
+(function() {
+    'use strict';
+
+    const TOTAL_SLIDES = 15;
+    let currentSlide = 1;
+
+    // --- Build dot navigation ---
+    const dotNav = document.getElementById('dotNav');
+    for (let i = 1; i <= TOTAL_SLIDES; i++) {
+        const dot = document.createElement('a');
+        dot.href = '#slide-' + i;
+        dot.dataset.slide = i;
+        dot.title = 'Slide ' + i;
+        if (i === 1) dot.classList.add('active');
+        dot.addEventListener('click', function(e) {
+            e.preventDefault();
+            scrollToSlide(i);
+        });
+        dotNav.appendChild(dot);
+    }
+
+    // --- Scroll to slide ---
+    function scrollToSlide(n) {
+        const el = document.getElementById('slide-' + n);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // --- Update UI ---
+    function updateUI(n) {
+        currentSlide = n;
+        // Counter
+        document.getElementById('slideCounter').textContent = n + ' / ' + TOTAL_SLIDES;
+        // Dots
+        dotNav.querySelectorAll('a').forEach(function(dot) {
+            dot.classList.toggle('active', parseInt(dot.dataset.slide) === n);
+        });
+    }
+
+    // --- IntersectionObserver ---
+    const slides = document.querySelectorAll('.slide');
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                const id = entry.target.id;
+                const num = parseInt(id.replace('slide-', ''));
+                if (num) updateUI(num);
+            }
+        });
+    }, {
+        threshold: 0.5
+    });
+
+    slides.forEach(function(slide) {
+        observer.observe(slide);
+    });
+
+    // --- Keyboard navigation ---
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault();
+            if (currentSlide < TOTAL_SLIDES) scrollToSlide(currentSlide + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            if (currentSlide > 1) scrollToSlide(currentSlide - 1);
+        } else if (e.key === ' ' && !e.shiftKey) {
+            e.preventDefault();
+            if (currentSlide < TOTAL_SLIDES) scrollToSlide(currentSlide + 1);
+        } else if (e.key === ' ' && e.shiftKey) {
+            e.preventDefault();
+            if (currentSlide > 1) scrollToSlide(currentSlide - 1);
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            scrollToSlide(1);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            scrollToSlide(TOTAL_SLIDES);
+        }
+    });
+
+    // --- Fade-in animations ---
+    const fadeObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -40px 0px'
+    });
+
+    document.querySelectorAll('.fade-in').forEach(function(el) {
+        fadeObserver.observe(el);
+    });
+
+    // --- Auto-scale slides to fit viewport ---
+    function fitSlides() {
+        document.querySelectorAll('.slide').forEach(function(slide) {
+            var inner = slide.querySelector('.slide-inner');
+            if (!inner) return;
+            // Reset
+            inner.style.transform = 'none';
+            inner.style.marginBottom = '0px';
+            var slideH = slide.clientHeight;
+            var pad = 72;
+            var available = slideH - pad;
+            var contentH = inner.scrollHeight;
+            if (contentH > available) {
+                var scale = Math.max(available / contentH, 0.55);
+                inner.style.transform = 'scale(' + scale + ')';
+                // Compensate layout so justify-content:center works correctly
+                inner.style.marginBottom = -(contentH * (1 - scale)) + 'px';
+            }
+        });
+    }
+    // Run after fonts load for accurate measurement
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(fitSlides);
+    } else {
+        window.addEventListener('load', fitSlides);
+    }
+    window.addEventListener('resize', fitSlides);
+
+})();
+</script>
+
+</body>
+</html>

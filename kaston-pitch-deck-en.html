@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASTON — Evidence-Based Pitch Deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           CSS CUSTOM PROPERTIES
+           ======================================== */
+        :root {
+            --bg: #000000;
+            --gold: #C18A68;
+            --gold-dark: #8a6f4e;
+            --gold-muted: #a0a0a0;
+            --white: #FFFFFF;
+            --light: #F4F4F4;
+            --muted: #a0a0a0;
+            --surface: #111111;
+            --surface-light: #1a1a1a;
+            --font-heading: 'Oswald', 'Now', 'Gotham', sans-serif;
+            --font-body: 'Inter', 'Now', 'Gotham', sans-serif;
+            --slide-transition: 0.4s ease;
+        }
+
+        /* ========================================
+           RESET & BASE
+           ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========================================
+           TYPOGRAPHY
+           ======================================== */
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.15;
+        }
+
+        h1 { font-size: clamp(2.8rem, 5vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 3.5vw, 3.2rem); }
+        h3 { font-size: clamp(1.3rem, 2vw, 1.8rem); }
+        h4 { font-size: clamp(1rem, 1.5vw, 1.3rem); }
+
+        p {
+            font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+            color: var(--light);
+        }
+
+        .gold { color: var(--gold); }
+        .muted { color: var(--muted); }
+        .light { color: var(--light); }
+
+        /* ========================================
+           SLIDE SYSTEM
+           ======================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 36px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-inner {
+            max-width: 1200px;
+            width: 100%;
+            z-index: 1;
+            transform-origin: top center;
+        }
+
+        .slide-label {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .slide-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
+            margin: 24px 0;
+        }
+
+        /* ========================================
+           PLACEHOLDER SYSTEM
+           ======================================== */
+        .placeholder {
+            border: 2px dashed var(--gold);
+            background: rgba(193, 138, 104, 0.06);
+            border-radius: 8px;
+            padding: 20px 24px;
+            position: relative;
+            margin: 8px 0;
+        }
+
+        .placeholder::after {
+            content: 'PLACEHOLDER';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-family: var(--font-heading);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            opacity: 0.7;
+        }
+
+        .placeholder p {
+            font-style: italic;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* ========================================
+           DOT NAVIGATION
+           ======================================== */
+        .dot-nav {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .dot-nav a {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dot-nav a:hover {
+            background: rgba(193, 138, 104, 0.5);
+            transform: scale(1.3);
+        }
+
+        .dot-nav a.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            transform: scale(1.3);
+        }
+
+        /* ========================================
+           SLIDE COUNTER
+           ======================================== */
+        .slide-counter {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: var(--muted);
+            z-index: 100;
+            opacity: 0.7;
+        }
+
+        /* ========================================
+           CARD COMPONENTS
+           ======================================== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.2);
+            border-radius: 12px;
+            padding: 32px 28px;
+            transition: border-color var(--slide-transition);
+        }
+
+        .card:hover {
+            border-color: var(--gold);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 20px;
+        }
+
+        .card h4 {
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ========================================
+           FEATURE BULLETS
+           ======================================== */
+        .feature-list {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .feature-list li {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .feature-list li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            min-width: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            margin-top: 8px;
+        }
+
+        .feature-list li strong {
+            color: var(--white);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-list li span {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        /* ========================================
+           COMPETITION TABLE
+           ======================================== */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+            font-size: 0.88rem;
+        }
+
+        .comp-table th,
+        .comp-table td {
+            padding: 14px 16px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .comp-table th {
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: var(--muted);
+            padding-bottom: 16px;
+        }
+
+        .comp-table th.kaston-col {
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .comp-table td:first-child {
+            text-align: left;
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        .comp-table .kaston-col {
+            background: rgba(193, 138, 104, 0.08);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .comp-table td {
+            color: var(--muted);
+        }
+
+        .comp-table .check { color: #6b8a4e; }
+        .comp-table .cross { color: #8a4e4e; }
+
+        /* ========================================
+           TWO-COLUMN LAYOUT
+           ======================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .two-col-60-40 {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ========================================
+           DONUT CHART
+           ======================================== */
+        .donut-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .donut-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .donut-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .donut-legend-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        /* ========================================
+           TIMELINE
+           ======================================== */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin-top: 32px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--gold), var(--gold-dark), transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 28px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg);
+        }
+
+        .timeline-date {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+
+        .timeline-text {
+            color: var(--light);
+            font-size: 0.95rem;
+        }
+
+        /* ========================================
+           TEAM SECTION
+           ======================================== */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .team-card {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.15);
+            border-radius: 12px;
+            padding: 36px 28px;
+            text-align: center;
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            color: var(--bg);
+            font-weight: 700;
+        }
+
+        .team-card h4 {
+            color: var(--white);
+            margin-bottom: 4px;
+            text-transform: none;
+            letter-spacing: 0;
+            font-family: var(--font-body);
+            font-weight: 600;
+        }
+
+        .team-card .team-role {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .team-card p {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           QUOTE / TESTIMONIAL
+           ======================================== */
+        .quote-card {
+            background: var(--surface);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 12px 12px 0;
+            padding: 28px 32px;
+            margin: 16px 0;
+        }
+
+        .quote-card blockquote {
+            font-size: 1.05rem;
+            font-style: italic;
+            color: var(--light);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .quote-card cite {
+            font-style: normal;
+            font-size: 0.85rem;
+            color: var(--gold);
+        }
+
+        /* ========================================
+           STAT BOXES
+           ======================================== */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 28px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 24px 16px;
+            background: var(--surface);
+            border-radius: 10px;
+            border: 1px solid rgba(193, 138, 104, 0.12);
+        }
+
+        .stat-box .stat-number {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            color: var(--gold);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-box .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========================================
+           COLOR SWATCHES
+           ======================================== */
+        .swatch-row {
+            display: flex;
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .swatch {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .swatch-color {
+            height: 80px;
+            position: relative;
+        }
+
+        .swatch-color.star::after {
+            content: '\2605';
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .swatch-info {
+            padding: 14px 16px;
+            background: var(--surface);
+        }
+
+        .swatch-info h4 {
+            font-size: 0.85rem;
+            color: var(--white);
+            margin-bottom: 4px;
+            text-transform: none;
+            letter-spacing: 0.5px;
+        }
+
+        .swatch-info p {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           GTM STEPS
+           ======================================== */
+        .gtm-phases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .gtm-phase {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.15);
+            border-radius: 12px;
+            padding: 28px 24px;
+            position: relative;
+        }
+
+        .gtm-phase::before {
+            content: attr(data-phase);
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .gtm-phase h4 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .gtm-phase ul { list-style: none; }
+
+        .gtm-phase ul li {
+            padding: 4px 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .gtm-phase ul li::before {
+            content: '>';
+            color: var(--gold);
+            margin-right: 8px;
+            font-weight: 600;
+        }
+
+        /* ========================================
+           INSTALLATION STEPS
+           ======================================== */
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .install-step {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 24px 20px;
+            position: relative;
+            border: 1px solid rgba(193, 138, 104, 0.1);
+        }
+
+        .install-step .step-num {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--gold);
+            opacity: 0.4;
+            position: absolute;
+            top: 12px;
+            right: 16px;
+        }
+
+        .install-step p {
+            font-size: 0.9rem;
+            color: var(--light);
+        }
+
+        /* ========================================
+           UNIT ECONOMICS
+           ======================================== */
+        .econ-card {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 24px;
+            border: 1px solid rgba(193, 138, 104, 0.12);
+        }
+
+        .econ-card h4 {
+            color: var(--gold);
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+        }
+
+        .econ-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        .econ-row .label { color: var(--muted); }
+        .econ-row .value { color: var(--white); font-weight: 600; }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-in-delay-1 { transition-delay: 0.15s; }
+        .fade-in-delay-2 { transition-delay: 0.3s; }
+        .fade-in-delay-3 { transition-delay: 0.45s; }
+
+        /* ========================================
+           PRINT STYLES
+           ======================================== */
+        @media print {
+            html { scroll-snap-type: none; }
+            .slide {
+                page-break-after: always;
+                page-break-inside: avoid;
+                min-height: 100vh;
+                padding: 40px 60px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .dot-nav, .slide-counter { display: none !important; }
+            body { background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .card, .stat-box, .team-card, .comp-table,
+            .gtm-phase, .install-step, .econ-card, .quote-card {
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            @page { size: landscape; margin: 0; }
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 900px) {
+            .slide { padding: 40px 32px; }
+            .two-col, .two-col-60-40 { grid-template-columns: 1fr; gap: 32px; }
+            .team-grid { grid-template-columns: 1fr; }
+            .gtm-phases { grid-template-columns: 1fr; }
+            .install-steps { grid-template-columns: 1fr; }
+            .comp-table { font-size: 0.78rem; }
+            .comp-table th, .comp-table td { padding: 10px 8px; }
+            .dot-nav { right: 10px; }
+            .swatch-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- DOT NAVIGATION -->
+<nav class="dot-nav" id="dotNav" aria-label="Slide navigation"></nav>
+<div class="slide-counter" id="slideCounter">1 / 15</div>
+
+<!-- ============================================
+     SLIDE 1 — COVER
+     ============================================ -->
+<section class="slide" id="slide-1">
+    <div class="slide-inner" style="text-align:center;">
+        <div class="fade-in" style="margin-bottom:32px;">
+            <img src="isotipo.svg" alt="KASTON" style="width:100px; height:100px; object-fit:contain;">
+        </div>
+        <h1 class="fade-in fade-in-delay-1" style="font-size:clamp(3rem,6vw,5.5rem); margin-bottom:16px;">
+            KASTON
+        </h1>
+        <div class="slide-divider fade-in fade-in-delay-2" style="margin:20px auto;"></div>
+        <p class="fade-in fade-in-delay-2" style="font-size:clamp(1.1rem,1.8vw,1.5rem); color:var(--light); max-width:750px; margin:0 auto 20px;">
+            The first recovered polymer roofing tile designed to last 500 years.
+        </p>
+        <p class="fade-in fade-in-delay-3" style="font-family:var(--font-heading); font-size:0.85rem; letter-spacing:4px; color:var(--gold); margin-bottom:28px;">
+            INNOVATION FOREVER
+        </p>
+        <div class="fade-in fade-in-delay-3" style="display:flex; justify-content:center; gap:32px; flex-wrap:wrap;">
+            <div style="text-align:center;">
+                <div style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">5,500</div>
+                <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">PSI Strength</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">0%</div>
+                <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">Water Absorption</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">300g</div>
+                <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">Per Tile</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 2 — PROBLEM
+     ============================================ -->
+<section class="slide" id="slide-2">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 2</div>
+        <h2 class="fade-in">The <span class="gold">Traditional</span> Problem</h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col" style="margin-top:24px;">
+            <div class="fade-in fade-in-delay-1">
+                <p style="font-size:1.15rem; color:var(--white); margin-bottom:20px; line-height:1.7;">
+                    "Everything you've ever bought in your life still exists on Earth today."
+                </p>
+                <p style="font-size:1.3rem; color:var(--gold); font-family:var(--font-heading); margin-bottom:12px;">
+                    Plastic is eternal.
+                </p>
+                <p style="color:var(--light);">
+                    At KASTON, we decided your roof should be too.
+                </p>
+                <p style="margin-top:24px; color:var(--muted); font-size:0.95rem;">
+                    Clay and fiber-cement tiles have a fundamental design flaw: <strong style="color:var(--white);">they're fragile.</strong>
+                </p>
+            </div>
+
+            <div class="fade-in fade-in-delay-2">
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>They break during transport or hail</strong>
+                        5–15% waste before installation. KASTON: <strong style="color:var(--gold);">0% breakage</strong> — 4,200 to 5,500 PSI strength.</span>
+                    </li>
+                    <li>
+                        <span><strong>They absorb moisture</strong>
+                        Clay and fiber-cement are porous: mold, leaks, deterioration. KASTON: <strong style="color:var(--gold);">0% water absorption</strong> — total immunity.</span>
+                    </li>
+                    <li>
+                        <span><strong>They weigh tons</strong>
+                        A clay tile weighs 2–3 kg. KASTON: <strong style="color:var(--gold);">300 g</strong> — 85% lighter. Simpler structure, more affordable construction.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 3 — THE PAYER'S PROBLEM
+     ============================================ -->
+<section class="slide" id="slide-3">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 3</div>
+        <h2 class="fade-in">The <span class="gold">Payer's</span> Problem</h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            Homeowners and builders face recurring, unexpected costs from roofs that fail prematurely.
+        </p>
+
+        <div class="card-grid fade-in fade-in-delay-1">
+            <div class="card">
+                <h4>Recurring Replacement</h4>
+                <p>Traditional tiles require replacement every 15–25 years, turning the roof into a significant cyclical expense.</p>
+            </div>
+            <div class="card">
+                <h4>Structural Costs</h4>
+                <p>The weight of clay tiles demands thicker beams and additional reinforcements, increasing construction costs.</p>
+            </div>
+            <div class="card">
+                <h4>Emergency Repairs</h4>
+                <p>Hail, winds, and leaks generate unforeseen expenses and insurance claims.</p>
+            </div>
+        </div>
+
+        <div class="card fade-in fade-in-delay-2" style="margin-top:28px; border-left:3px solid var(--gold);">
+            <h4 style="color:var(--gold); margin-bottom:12px;">Weight & Structural Cost Comparison</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:4px;">Clay Roof (100 m²)</p>
+                    <p style="font-size:1.3rem; color:var(--white);"><strong>4,500–6,000 kg</strong></p>
+                    <p style="font-size:0.8rem; color:var(--muted);">Requires reinforced beams, thicker trusses, heavier foundations</p>
+                </div>
+                <div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:4px;">KASTON Roof (100 m²)</p>
+                    <p style="font-size:1.3rem; color:var(--gold);"><strong>1,110 kg</strong></p>
+                    <p style="font-size:0.8rem; color:var(--muted);">37 tiles/m² × 300 g × 100 m². Standard structure, no extra reinforcement</p>
+                </div>
+            </div>
+            <div style="margin-top:16px; border-top:1px solid rgba(193,138,104,0.15); padding-top:16px;">
+                <h4 style="color:var(--gold); font-size:0.9rem; letter-spacing:1.5px; margin-bottom:12px;">COST PER M² OVER 20 YEARS</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px 12px; color:var(--muted); font-size:0.75rem; letter-spacing:1px; border-bottom:1px solid rgba(193,138,104,0.2);">Concept</th>
+                            <th style="text-align:center; padding:8px 12px; color:var(--muted); font-size:0.75rem; letter-spacing:1px; border-bottom:1px solid rgba(193,138,104,0.2);">Clay</th>
+                            <th style="text-align:center; padding:8px 12px; color:var(--gold); font-size:0.75rem; letter-spacing:1px; border-bottom:2px solid var(--gold);">KASTON</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Initial Investment</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--muted);">$55,000</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--white); font-weight:600; background:rgba(193,138,104,0.08);">$85,000</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Structural Surcharge (weight)</td>
+                            <td style="text-align:center; padding:8px 12px; color:#8a4e4e; font-weight:600;">+30%</td>
+                            <td style="text-align:center; padding:8px 12px; color:#6b8a4e; font-weight:600; background:rgba(193,138,104,0.08);">0%</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Maintenance & Repairs</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--muted);">$35,000</td>
+                            <td style="text-align:center; padding:8px 12px; color:#6b8a4e; font-weight:600; background:rgba(193,138,104,0.08);">$0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px; color:var(--light);">Full Replacement (Year 20)</td>
+                            <td style="text-align:center; padding:8px 12px; color:var(--muted);">$75,000</td>
+                            <td style="text-align:center; padding:8px 12px; color:#6b8a4e; font-weight:600; background:rgba(193,138,104,0.08);">$0</td>
+                        </tr>
+                        <tr style="border-top:2px solid rgba(193,138,104,0.3);">
+                            <td style="padding:10px 12px; color:var(--white); font-weight:700;">ACCUMULATED TOTAL</td>
+                            <td style="text-align:center; padding:10px 12px; color:#8a4e4e; font-weight:700; font-size:1rem;">$165,000</td>
+                            <td style="text-align:center; padding:10px 12px; color:var(--gold); font-weight:700; font-size:1rem; background:rgba(193,138,104,0.08);">$85,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:8px; font-size:0.8rem; color:var(--gold); font-style:italic;">Clay seems cheap, but it's a massive hidden cost. KASTON costs half over 20 years.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 4 — TAM / SAM / SOM
+     ============================================ -->
+<section class="slide" id="slide-4">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 4</div>
+        <h2 class="fade-in">Market <span class="gold">Size</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            The roofing market in Colombia and Latin America represents a massive and growing opportunity.
+        </p>
+
+        <div class="stat-row fade-in fade-in-delay-1">
+            <div class="stat-box">
+                <div class="stat-number">$21.8B</div>
+                <div class="stat-label">TAM — Total Addressable Market</div>
+                <p style="margin-top:8px;">Global roofing market</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">$250M</div>
+                <div class="stat-label">SAM — Serviceable Available Market</div>
+                <p style="margin-top:8px;">Roofing market in Colombia</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">$5M</div>
+                <div class="stat-label">SOM — Serviceable Obtainable Market</div>
+                <p style="margin-top:8px;">Capture in Medellín, Cali & Bogotá</p>
+            </div>
+        </div>
+
+        <div class="card-grid fade-in fade-in-delay-2" style="margin-top:24px;">
+            <div class="card">
+                <h4>Growth Trend</h4>
+                <p>2.8% growth in sustainable construction in Colombia. 10% property value increase with green certification. Transition toward low carbon footprint, high efficiency materials.</p>
+            </div>
+            <div class="card">
+                <h4>Supply Gap</h4>
+                <p>Market dominated by heavy materials (clay/concrete) with high fragility and maintenance. No high-engineering polymer roofing with mechanical assembly system exists. KASTON: 75% structural weight reduction and 500+ year lifespan.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 5 — SOLUTION
+     ============================================ -->
+<section class="slide" id="slide-5">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 5</div>
+        <h2 class="fade-in">The <span class="gold">Solution</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col" style="margin-top:24px;">
+            <div class="fade-in fade-in-delay-1">
+                <h3 style="margin-bottom:16px;">The Raw Material</h3>
+                <p style="margin-bottom:16px;">
+                    Plastic is the most resistant material ever created by humans. Ironically, we use it for disposable things.
+                </p>
+                <p style="margin-bottom:16px;">
+                    <strong style="color:var(--gold);">At KASTON, we correct that mistake.</strong>
+                </p>
+                <p>
+                    We recover high-performance industrial polymers and transform them into a roofing system that doesn't degrade, doesn't rust, and is indestructible.
+                </p>
+                <div class="card" style="margin-top:20px; border-left:3px solid var(--gold);">
+                    <h4 style="color:var(--gold);">Key Fact</h4>
+                    <p><strong>11.1 kg of recovered polymer</strong> per m² of KASTON roof (37 tiles × 300 g). Every square meter installed is industrial plastic rescued from landfills and converted into permanent infrastructure.</p>
+                </div>
+            </div>
+
+            <div class="fade-in fade-in-delay-2">
+                <h3 style="margin-bottom:16px;">Beaver Tail Design</h3>
+                <p style="margin-bottom:16px;">
+                    The "Beaver Tail" design isn't just aesthetics. It's a natural engineering solution.
+                </p>
+                <p style="margin-bottom:16px;">
+                    Its curved finish and flat surface accelerate water drainage, preventing pooling and leaks common in curved colonial tiles.
+                </p>
+                <p>
+                    As compact individual pieces, they create an adaptable "skin" for any roof design.
+                </p>
+                <div style="text-align:center; margin-top:24px;">
+                    <img src="img-tejas-1.png" alt="KASTON beaver tail tiles installed" style="width:100%; max-width:320px; border-radius:12px; border:1px solid rgba(193,138,104,0.2);">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 6 — HOW IT WORKS
+     ============================================ -->
+<section class="slide" id="slide-6">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 6</div>
+        <h2 class="fade-in">How It <span class="gold">Works</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col" style="margin-top:20px;">
+            <div class="fade-in fade-in-delay-1">
+                <h3 style="color:var(--gold); margin-bottom:16px;">K-LOCK System</h3>
+                <p style="margin-bottom:8px; font-style:italic; color:var(--muted);">
+                    "Like a LEGO, but indestructible."
+                </p>
+                <p style="margin-bottom:20px;">
+                    What makes KASTON unique is its connection engineering. Forget loose tiles that blow away in the wind.
+                </p>
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Male/Female System</strong>
+                        Each tile has a lateral tab (male) and a receiving groove (female). When joined, they become mechanically locked together.</span>
+                    </li>
+                    <li>
+                        <span><strong>Wind Resistance</strong>
+                        Thanks to the interlocking and two anchor points to the mesh, we eliminate the risk of detachment from strong winds.</span>
+                    </li>
+                </ul>
+                <div class="card" style="margin-top:16px; border-left:3px solid var(--gold);">
+                    <h4 style="color:var(--gold);">K-LOCK Specification</h4>
+                    <p>Each tile weighs only <strong>300 g</strong> but withstands loads of <strong>4,200–5,500 PSI</strong>. The dual interlocking + mechanical anchor system turns the roof into a monolithic surface of <strong>37 interconnected pieces/m²</strong>.</p>
+                </div>
+            </div>
+
+            <div class="fade-in fade-in-delay-2">
+                <h3 style="margin-bottom:16px;">Indestructible</h3>
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Total Armor — 5,500 PSI</strong>
+                        Breaking load from 4,200 to 5,500 PSI. Hail? Walking on the roof? Impacts? They absorb the blow without breaking. Shore D hardness 68–72. Zero waste, zero replacements.</span>
+                    </li>
+                    <li>
+                        <span><strong>Insulation — Thermal Range -15°C to 90°C</strong>
+                        Unlike zinc that turns your home into an oven, our dense polymer insulates temperature and noise. Operates without degradation from -15°C to 90°C.</span>
+                    </li>
+                    <li>
+                        <span><strong>Lightweight — 300 g per Tile</strong>
+                        Only 11.1 kg/m² (vs. clay: 50 kg/m²). Reduces wood or metal structure costs by up to 40%.</span>
+                    </li>
+                </ul>
+
+                <h3 style="margin-top:28px; margin-bottom:16px;">Installation</h3>
+                <div class="install-steps">
+                    <div class="install-step">
+                        <div class="step-num">1</div>
+                        <p>Asphalt membrane over the structure for total waterproofing.</p>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">2</div>
+                        <p>Standard welded wire mesh fixed over the membrane.</p>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">3</div>
+                        <p>KASTON tiles secured with wire through their anchor holes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 7 — AI-POWERED PROCESSES
+     ============================================ -->
+<section class="slide" id="slide-7">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 7</div>
+        <h2 class="fade-in"><span class="gold">AI</span>-Powered Processes</h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:12px;">
+            We integrate artificial intelligence across three key pillars to scale efficiently and reduce operational costs.
+        </p>
+
+        <div class="card-grid fade-in fade-in-delay-1">
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="20" y="10" width="60" height="80" rx="4" fill="#C18A68"/>
+                        <rect x="30" y="25" width="30" height="4" rx="2" fill="#000"/>
+                        <rect x="30" y="38" width="40" height="4" rx="2" fill="#000"/>
+                        <rect x="30" y="51" width="35" height="4" rx="2" fill="#000"/>
+                        <rect x="30" y="64" width="25" height="4" rx="2" fill="#000"/>
+                        <rect x="55" y="60" width="18" height="14" rx="2" fill="#8a6f4e"/>
+                        <circle cx="60" cy="66" r="2" fill="#C18A68"/>
+                    </svg>
+                </div>
+                <h4>Smart Quotation</h4>
+                <p>Computer vision analyzes roof photos, automatically calculates footage, and generates a detailed budget instantly — no initial technical visits.</p>
+                <div style="margin-top:16px; font-size:0.8rem; color:var(--gold-dark);">
+                    <strong style="color:var(--gold);">Process:</strong> Form → AI Processes → Automatic Quote
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="50" cy="50" rx="35" ry="32" fill="#C18A68"/>
+                        <path d="M30 45 Q40 35 50 45 Q60 55 70 45" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M35 55 Q45 65 55 55 Q65 45 75 55" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M50 30 L50 40" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M40 35 L45 42" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M60 35 L55 42" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="30" cy="65" r="4" fill="#8a6f4e"/>
+                        <circle cx="70" cy="65" r="4" fill="#8a6f4e"/>
+                        <circle cx="50" cy="70" r="4" fill="#8a6f4e"/>
+                    </svg>
+                </div>
+                <h4>Waste Optimization</h4>
+                <p>Predictive models calculate recovered material needs based on projected demand, minimizing waste and ensuring constant supply.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="36" fill="none" stroke="#C18A68" stroke-width="3"/>
+                        <ellipse cx="50" cy="50" rx="18" ry="36" fill="none" stroke="#C18A68" stroke-width="2"/>
+                        <line x1="14" y1="50" x2="86" y2="50" stroke="#C18A68" stroke-width="2"/>
+                        <line x1="14" y1="35" x2="86" y2="35" stroke="#8a6f4e" stroke-width="1" opacity="0.5"/>
+                        <line x1="14" y1="65" x2="86" y2="65" stroke="#8a6f4e" stroke-width="1" opacity="0.5"/>
+                        <circle cx="50" cy="50" r="6" fill="#C18A68"/>
+                        <circle cx="50" cy="50" r="3" fill="#000"/>
+                    </svg>
+                </div>
+                <h4>Global Scalability</h4>
+                <p>Sell internationally without physical offices: AI automation for customer service, multi-language quotes, and distribution logistics.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 8 — COMPETITIVE ANALYSIS
+     ============================================ -->
+<section class="slide" id="slide-8">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 8</div>
+        <h2 class="fade-in">Competitive <span class="gold">Analysis</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:8px;">
+            KASTON redefines the category by combining plastic's durability with assembly engineering and sustainability.
+        </p>
+
+        <div class="fade-in fade-in-delay-1" style="overflow-x:auto;">
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Criteria</th>
+                        <th class="kaston-col">KASTON</th>
+                        <th>Clay Tile</th>
+                        <th>Zinc</th>
+                        <th>Fiber Cement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lifespan</td>
+                        <td class="kaston-col">500 years</td>
+                        <td>20–40 years</td>
+                        <td>15–30 years</td>
+                        <td>20–30 years</td>
+                    </tr>
+                    <tr>
+                        <td>Weight per tile</td>
+                        <td class="kaston-col">300 g</td>
+                        <td>2–3 kg</td>
+                        <td>N/A (sheet)</td>
+                        <td>1.5–2 kg</td>
+                    </tr>
+                    <tr>
+                        <td>Hail resistance</td>
+                        <td class="kaston-col"><span class="check">&#10004; Total</span></td>
+                        <td><span class="cross">&#10008; Fragile</span></td>
+                        <td>Dents</td>
+                        <td><span class="cross">&#10008; Fragile</span></td>
+                    </tr>
+                    <tr>
+                        <td>Moisture absorption</td>
+                        <td class="kaston-col"><span class="check">&#10004; Zero</span></td>
+                        <td><span class="cross">&#10008; High</span></td>
+                        <td>Zero (rusts)</td>
+                        <td><span class="cross">&#10008; High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Transport breakage</td>
+                        <td class="kaston-col"><span class="check">&#10004; 0%</span></td>
+                        <td><span class="cross">&#10008; 5–15%</span></td>
+                        <td>0%</td>
+                        <td><span class="cross">&#10008; 5–10%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Thermal insulation</td>
+                        <td class="kaston-col"><span class="check">&#10004; High</span></td>
+                        <td>Medium</td>
+                        <td><span class="cross">&#10008; Minimal</span></td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Acoustic insulation</td>
+                        <td class="kaston-col"><span class="check">&#10004; High</span></td>
+                        <td>Medium</td>
+                        <td><span class="cross">&#10008; Noisy</span></td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Maintenance</td>
+                        <td class="kaston-col">Zero</td>
+                        <td>Partial replacement</td>
+                        <td>Paint / anti-corrosion</td>
+                        <td>Partial replacement</td>
+                    </tr>
+                    <tr>
+                        <td>Sustainability</td>
+                        <td class="kaston-col"><span class="check">&#10004; Recycled</span></td>
+                        <td>High energy use</td>
+                        <td>Mining</td>
+                        <td>Contains cement</td>
+                    </tr>
+                    <tr>
+                        <td>Assembly system</td>
+                        <td class="kaston-col"><span class="check">&#10004; K-LOCK</span></td>
+                        <td>Simple overlap</td>
+                        <td>Screws</td>
+                        <td>Screws / hooks</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 9 — REVENUE MODEL & UNIT ECONOMICS
+     ============================================ -->
+<section class="slide" id="slide-9">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 9</div>
+        <h2 class="fade-in">Revenue Model & <span class="gold">Unit Economics</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col fade-in fade-in-delay-1" style="margin-top:24px;">
+            <div>
+                <h3 style="margin-bottom:16px;">Business Model</h3>
+                <ul class="feature-list">
+                    <li>
+                        <span><strong>Direct B2C Sales</strong>
+                        Homeowners through web platform with AI-powered quotation.</span>
+                    </li>
+                    <li>
+                        <span><strong>B2B Sales</strong>
+                        Construction companies, contractors, and specialized hardware stores.</span>
+                    </li>
+                    <li>
+                        <span><strong>Installation</strong>
+                        Network of certified KASTON installers with service revenue.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:16px;">Unit Economics</h3>
+                <div class="econ-card">
+                    <h4>Cost per Tile</h4>
+                    <div class="econ-row">
+                        <span class="label">Raw material (polymer)</span>
+                        <span class="value">$533 COP</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Manufacturing</span>
+                        <span class="value">$399 COP</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Total cost per tile</span>
+                        <span class="value">$932 COP</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Selling price per tile</span>
+                        <span class="value">$2,297 COP</span>
+                    </div>
+                    <div class="econ-row" style="border-bottom:none;">
+                        <span class="label">Gross margin</span>
+                        <span class="value" style="color:var(--gold);">59.4%</span>
+                    </div>
+                </div>
+
+                <div class="econ-card" style="margin-top:16px;">
+                    <h4>Per Square Meter</h4>
+                    <div class="econ-row">
+                        <span class="label">Tiles per m²</span>
+                        <span class="value" style="color:var(--gold);">37 units</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Weight per m²</span>
+                        <span class="value">11.1 kg</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Tile dimensions</span>
+                        <span class="value">250 × 170 mm</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Cost per m²</span>
+                        <span class="value">$34,500 COP</span>
+                    </div>
+                    <div class="econ-row" style="border-bottom:none;">
+                        <span class="label">Selling price per m²</span>
+                        <span class="value" style="color:var(--gold);">$85,000 COP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 10 — GO-TO-MARKET
+     ============================================ -->
+<section class="slide" id="slide-10">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 10</div>
+        <h2 class="fade-in"><span class="gold">Go-To-Market</span> Strategy</h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:8px;">
+            Three phases to validate, grow, and scale — from the first pilot to international distribution.
+        </p>
+
+        <div class="gtm-phases fade-in fade-in-delay-1">
+            <div class="gtm-phase" data-phase="Phase 1 — Validation">
+                <h4>Local Pilot (Medellín HQ)</h4>
+                <ul>
+                    <li>Historical validation: 16 years of real installation in Medellín (proven success story)</li>
+                    <li>Document current state with photos and durability metrics after 1.5 decades</li>
+                    <li>Validate with 5–10 local architects and builders</li>
+                    <li>AI-powered web quotations</li>
+                </ul>
+            </div>
+            <div class="gtm-phase" data-phase="Phase 2 — Growth">
+                <h4>Digital Channels + Partnerships</h4>
+                <ul>
+                    <li>Digital marketing: Instagram, YouTube (video installations)</li>
+                    <li>Partnerships with specialized hardware stores</li>
+                    <li>Network of certified installers</li>
+                    <li>Expansion to Cali and Bogotá</li>
+                </ul>
+            </div>
+            <div class="gtm-phase" data-phase="Phase 3 — Scale">
+                <h4>Distribution & Internationalization</h4>
+                <ul>
+                    <li>Partnerships with large construction companies</li>
+                    <li>Catalog in big-box retailers</li>
+                    <li>National certifications (NTC)</li>
+                    <li>Pending expansion to Costa Rica</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 11 — TEAM
+     ============================================ -->
+<section class="slide" id="slide-11">
+    <div class="slide-inner" style="text-align:center;">
+        <div class="slide-label fade-in">Slide 11</div>
+        <h2 class="fade-in">The <span class="gold">Team</span></h2>
+        <div class="slide-divider fade-in" style="margin:24px auto;"></div>
+
+        <div class="team-grid fade-in fade-in-delay-1">
+            <div class="team-card">
+                <div class="team-avatar">J</div>
+                <h4>Juanita</h4>
+                <div class="team-role">Product & Validation</div>
+                <p class="muted" style="font-size:0.85rem; margin-top:8px;">Co-founder. Leads product development and market validation with architects and builders in Medellín.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">J</div>
+                <h4>Jerónimo</h4>
+                <div class="team-role">AI & Technology</div>
+                <p class="muted" style="font-size:0.85rem; margin-top:8px;">Co-founder. Builds the AI-powered quotation system and KASTON's technology infrastructure.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">J</div>
+                <h4>Julián</h4>
+                <div class="team-role">Finance</div>
+                <p class="muted" style="font-size:0.85rem; margin-top:8px;">Co-founder. Manages the business model, financial projections, and growth strategy.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 12 — ASK + TIMELINE
+     ============================================ -->
+<section class="slide" id="slide-12">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 12</div>
+        <h2 class="fade-in">The Ask & <span class="gold">Timeline</span></h2>
+        <div class="slide-divider fade-in"></div>
+
+        <div class="two-col fade-in fade-in-delay-1" style="margin-top:20px;">
+            <div>
+                <h3 style="margin-bottom:20px;">We're Raising <span class="gold">$10,000 USD</span></h3>
+                <p style="margin-bottom:28px;">Seed capital to move KASTON from prototype to first real sales.</p>
+
+                <div class="donut-container">
+                    <svg width="200" height="200" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="#1a1a1a" stroke-width="30"/>
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="#C18A68" stroke-width="30" stroke-dasharray="175.9 263.9" stroke-dashoffset="110" transform="rotate(-90 100 100)"/>
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="#8a6f4e" stroke-width="30" stroke-dasharray="131.9 307.9" stroke-dashoffset="-65.9" transform="rotate(-90 100 100)"/>
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="#a0a0a0" stroke-width="30" stroke-dasharray="131.9 307.9" stroke-dashoffset="-197.8" transform="rotate(-90 100 100)"/>
+                        <text x="100" y="95" text-anchor="middle" fill="#FFFFFF" font-family="Oswald, sans-serif" font-size="22" font-weight="700">$10K</text>
+                        <text x="100" y="115" text-anchor="middle" fill="#a0a0a0" font-family="Inter, sans-serif" font-size="11">ALLOCATION</text>
+                    </svg>
+
+                    <div class="donut-legend">
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-swatch" style="background:#C18A68;"></div>
+                            <span style="color:var(--light);">40% — Machinery</span>
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-swatch" style="background:#8a6f4e;"></div>
+                            <span style="color:var(--light);">30% — Digital Marketing</span>
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-swatch" style="background:#a0a0a0;"></div>
+                            <span style="color:var(--light);">30% — Lab Testing</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:8px;">12-Month Roadmap</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">March 2026</div>
+                        <div class="timeline-text">Company registration + legal structure</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">June 2026</div>
+                        <div class="timeline-text">First documented pilot installation</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">September 2026</div>
+                        <div class="timeline-text">Distribution partnerships signed</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">March 2027</div>
+                        <div class="timeline-text placeholder" data-placeholder="true" style="display:inline; border:none; background:none; padding:0;">
+                            <span style="font-style:italic; color:var(--muted);">[Insert 12-month revenue target]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:28px;">
+                    <h4>Key Milestones</h4>
+                    <ul class="feature-list" style="margin-top:8px;">
+                        <li><span><strong>Month 1–3:</strong> Legal setup, machinery purchase, lab testing</span></li>
+                        <li><span><strong>Month 4–6:</strong> Pilot production, first installation, case study</span></li>
+                        <li><span><strong>Month 7–9:</strong> Digital marketing, hardware store and builder partnerships</span></li>
+                        <li><span><strong>Month 10–12:</strong> Expansion to second city, revenue targets</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 13 — USER VALIDATION & TESTIMONIALS
+     ============================================ -->
+<section class="slide" id="slide-13">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 13</div>
+        <h2 class="fade-in">User <span class="gold">Validation</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            Ongoing interviews with architects, builders, and homeowners to validate the value proposition.
+        </p>
+
+        <div class="fade-in fade-in-delay-1" style="margin-bottom:32px;">
+            <h3 style="margin-bottom:20px;">Market Validation <span class="gold">(Voice of the Customer)</span></h3>
+            <div class="two-col" style="gap:24px;">
+                <div class="card" style="text-align:center; border-left:3px solid #8a4e4e;">
+                    <h4 style="color:var(--white); margin-bottom:8px;">The Pain</h4>
+                    <div style="font-family:var(--font-heading); font-size:3rem; color:#8a4e4e; font-weight:700; line-height:1; margin-bottom:8px;">8/10</div>
+                    <p style="font-size:0.9rem; color:var(--light); line-height:1.6;">8 out of 10 architects agree that <strong style="color:var(--white);">fragility and weight of clay</strong> increase structural costs by <strong style="color:#8a4e4e;">30%</strong>.</p>
+                </div>
+                <div class="card" style="text-align:center; border-left:3px solid #6b8a4e;">
+                    <h4 style="color:var(--white); margin-bottom:8px;">The Solution</h4>
+                    <div style="font-family:var(--font-heading); font-size:3rem; color:#6b8a4e; font-weight:700; line-height:1; margin-bottom:8px;">100%</div>
+                    <p style="font-size:0.9rem; color:var(--light); line-height:1.6;">100% of respondents showed <strong style="color:var(--white);">high purchase intent</strong> after learning about the K-LOCK System against strong winds.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-card fade-in fade-in-delay-2">
+            <blockquote>"KASTON's anchoring system solves my clients' biggest fear in areas with strong winds and hail."</blockquote>
+            <cite>— Architect, Medellín</cite>
+        </div>
+
+        <div class="fade-in fade-in-delay-2" style="margin-top:28px;">
+            <h3 style="margin-bottom:16px;">Technical Validation Data</h3>
+            <div class="card" style="border-left:3px solid var(--gold);">
+                <h4 style="color:var(--gold); margin-bottom:8px;">Real Structural Savings</h4>
+                <p style="font-size:0.95rem; color:var(--light); line-height:1.7;">8 out of 10 architects confirm that clay's weight (<strong style="color:var(--white);">50 kg/m²</strong>) forces spending <strong style="color:#8a4e4e;">30% more</strong> on beams and columns. KASTON weighs only <strong style="color:var(--gold);">11.1 kg/m²</strong>.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 14 — ENVIRONMENTAL IMPACT
+     ============================================ -->
+<section class="slide" id="slide-14">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 14</div>
+        <h2 class="fade-in">Environmental <span class="gold">Impact</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:32px;">
+            Every KASTON roof is a statement against waste. We transform industrial residues into infrastructure that lasts centuries.
+        </p>
+
+        <!-- Image gallery -->
+        <div class="fade-in" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:32px;">
+            <img src="img-tejas-1.png" alt="KASTON installed - aerial view" style="width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid rgba(193,138,104,0.15);">
+            <img src="img-tejas-2.png" alt="KASTON installed - forest" style="width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid rgba(193,138,104,0.15);">
+            <img src="img-tejas-3.png" alt="KASTON installed - modern" style="width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid rgba(193,138,104,0.15);">
+        </div>
+
+        <div class="two-col fade-in fade-in-delay-1">
+            <div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 15 L65 35 L55 35 L55 50 L45 50 L45 35 L35 35 Z" fill="#C18A68"/>
+                            <path d="M25 55 L25 70 L40 60 L25 55Z" fill="#C18A68" transform="rotate(120 50 50)"/>
+                            <path d="M75 55 L75 70 L60 60 L75 55Z" fill="#C18A68" transform="rotate(240 50 50)"/>
+                            <circle cx="50" cy="50" r="10" fill="#8a6f4e"/>
+                            <text x="50" y="54" text-anchor="middle" fill="#000" font-size="10" font-weight="bold">&#9851;</text>
+                        </svg>
+                    </div>
+                    <h4>Circular Economy</h4>
+                    <p>The industrial polymers we recover prevent tons of waste in landfills. Each tile is a lifecycle extended to the maximum.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Zero Process Emissions</h4>
+                    <p>Unlike clay tiles that require high-temperature kilns (900°C+), our molding process operates at significantly lower temperatures.</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:16px;">Impact Metrics</h3>
+                <div class="stat-row" style="grid-template-columns: 1fr 1fr;">
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">11.1 kg</div>
+                        <div class="stat-label">Recovered Industrial Polymer per m²</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">37 tiles × 300 g = 11.1 kg of polymer (PP + LDPE) diverted from landfills.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">0%</div>
+                        <div class="stat-label">Water Absorption = 0% Corrosion Waste</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">No rust or mold. The material is inert and doesn't gain weight with rain.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">500 years</div>
+                        <div class="stat-label">Lifespan = Zero Replacement Waste</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">Real-world validation of 16 years in Medellín. Eliminates clay's waste cycle.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color:var(--gold);">18.5 tons</div>
+                        <div class="stat-label">CO₂ Avoided per 1,000 m²</div>
+                        <p style="margin-top:6px; font-size:0.8rem; color:var(--muted);">Positive impact through recycling and eliminating fuel burning for clay manufacturing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 15 — ADDENDUM
+     ============================================ -->
+<section class="slide" id="slide-15">
+    <div class="slide-inner">
+        <div class="slide-label fade-in">Slide 15</div>
+        <h2 class="fade-in">Addendum: <span class="gold">The KASTON Collection</span></h2>
+        <div class="slide-divider fade-in"></div>
+        <p class="fade-in" style="max-width:700px; margin-bottom:8px;">
+            Our colors are not surface paint. It's the color of the molten polymer, which guarantees it won't peel over time.
+        </p>
+
+        <div class="fade-in fade-in-delay-1">
+            <h3 style="margin-bottom:12px;">Mineral Palette</h3>
+            <div class="swatch-row">
+                <div class="swatch">
+                    <div class="swatch-color star" style="background:#2a2a2a;"></div>
+                    <div class="swatch-info">
+                        <h4>Graphite Black</h4>
+                        <p>Signature color. Our hallmark.</p>
+                    </div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background:#5c3d2e;"></div>
+                    <div class="swatch-info">
+                        <h4>Wengué Brown</h4>
+                        <p>Natural warmth.</p>
+                    </div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background:#6b6b6b;"></div>
+                    <div class="swatch-info">
+                        <h4>Basalt Grey</h4>
+                        <p>Modern architecture.</p>
+                    </div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background:#4B5320;"></div>
+                    <div class="swatch-info">
+                        <h4>Military Green</h4>
+                        <p>Natural integration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col fade-in fade-in-delay-2" style="margin-top:36px;">
+            <div>
+                <h3 style="margin-bottom:16px;">Technical Specifications</h3>
+                <div class="econ-card">
+                    <h4>Per Tile</h4>
+                    <div class="econ-row">
+                        <span class="label">Weight</span>
+                        <span class="value">300 g</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Dimensions</span>
+                        <span class="value">250 × 170 mm</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Thickness</span>
+                        <span class="value">10 mm</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Tiles per m²</span>
+                        <span class="value">37 units</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Breaking load</span>
+                        <span class="value" style="color:var(--gold);">4,200–5,500 PSI</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Material</span>
+                        <span class="value">Recovered PP + LDPE</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Lifespan</span>
+                        <span class="value" style="color:var(--gold);">500+ years</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:16px;">Installation System</h3>
+                <div class="econ-card">
+                    <h4>Technical Detail</h4>
+                    <div class="econ-row">
+                        <span class="label">Assembly</span>
+                        <span class="value">K-LOCK male/female</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Anchor</span>
+                        <span class="value">Dual — high-tension mechanical tie</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Base</span>
+                        <span class="value">Welded wire mesh</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Waterproofing</span>
+                        <span class="value">Asphalt membrane</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Thermal range</span>
+                        <span class="value">-15°C to 90°C</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Shore D hardness</span>
+                        <span class="value">68–72</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Moisture absorption</span>
+                        <span class="value" style="color:var(--gold);">0%</span>
+                    </div>
+                    <div class="econ-row">
+                        <span class="label">Minimum slope</span>
+                        <span class="value">15%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="fade-in fade-in-delay-3" style="text-align:center; margin-top:40px; padding:28px; background:var(--surface); border-radius:12px; border:1px solid rgba(193,138,104,0.2);">
+            <p style="font-size:1.2rem; color:var(--white); margin-bottom:6px;">
+                Ready to armor your home?
+            </p>
+            <p style="font-family:var(--font-heading); color:var(--gold); letter-spacing:2px; font-size:0.9rem;">
+                QUOTE YOUR PROJECT TODAY AND FORGET ABOUT REPLACING YOUR ROOF FOR 500 YEARS.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     JAVASCRIPT: Navigation System
+     ============================================ -->
+<script>
+(function() {
+    'use strict';
+
+    const TOTAL_SLIDES = 15;
+    let currentSlide = 1;
+
+    const dotNav = document.getElementById('dotNav');
+    for (let i = 1; i <= TOTAL_SLIDES; i++) {
+        const dot = document.createElement('a');
+        dot.href = '#slide-' + i;
+        dot.dataset.slide = i;
+        dot.title = 'Slide ' + i;
+        if (i === 1) dot.classList.add('active');
+        dot.addEventListener('click', function(e) {
+            e.preventDefault();
+            scrollToSlide(i);
+        });
+        dotNav.appendChild(dot);
+    }
+
+    function scrollToSlide(n) {
+        const el = document.getElementById('slide-' + n);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function updateUI(n) {
+        currentSlide = n;
+        document.getElementById('slideCounter').textContent = n + ' / ' + TOTAL_SLIDES;
+        dotNav.querySelectorAll('a').forEach(function(dot) {
+            dot.classList.toggle('active', parseInt(dot.dataset.slide) === n);
+        });
+    }
+
+    const slides = document.querySelectorAll('.slide');
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                const id = entry.target.id;
+                const num = parseInt(id.replace('slide-', ''));
+                if (num) updateUI(num);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    slides.forEach(function(slide) { observer.observe(slide); });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault();
+            if (currentSlide < TOTAL_SLIDES) scrollToSlide(currentSlide + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            if (currentSlide > 1) scrollToSlide(currentSlide - 1);
+        } else if (e.key === ' ' && !e.shiftKey) {
+            e.preventDefault();
+            if (currentSlide < TOTAL_SLIDES) scrollToSlide(currentSlide + 1);
+        } else if (e.key === ' ' && e.shiftKey) {
+            e.preventDefault();
+            if (currentSlide > 1) scrollToSlide(currentSlide - 1);
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            scrollToSlide(1);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            scrollToSlide(TOTAL_SLIDES);
+        }
+    });
+
+    const fadeObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(function(el) { fadeObserver.observe(el); });
+
+    // --- Auto-scale slides to fit viewport ---
+    function fitSlides() {
+        document.querySelectorAll('.slide').forEach(function(slide) {
+            var inner = slide.querySelector('.slide-inner');
+            if (!inner) return;
+            // Reset
+            inner.style.transform = 'none';
+            inner.style.marginBottom = '0px';
+            var slideH = slide.clientHeight;
+            var pad = 72;
+            var available = slideH - pad;
+            var contentH = inner.scrollHeight;
+            if (contentH > available) {
+                var scale = Math.max(available / contentH, 0.55);
+                inner.style.transform = 'scale(' + scale + ')';
+                // Compensate layout so justify-content:center works correctly
+                inner.style.marginBottom = -(contentH * (1 - scale)) + 'px';
+            }
+        });
+    }
+    // Run after fonts load for accurate measurement
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(fitSlides);
+    } else {
+        window.addEventListener('load', fitSlides);
+    }
+    window.addEventListener('resize', fitSlides);
+
+})();
+</script>
+
+</body>
+</html>
