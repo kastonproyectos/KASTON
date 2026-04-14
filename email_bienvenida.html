@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a KASTON</title>
+    <!-- Incluimos etiquetas básicas de estilo para asegurar la compatibilidad con clientes de correo -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&display=swap');
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #0E0E0E;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .email-wrapper {
+            background-color: #0E0E0E;
+            background-image: radial-gradient(circle at 50% -20%, rgba(193, 138, 104, 0.15) 0%, rgba(14, 14, 14, 0) 50%);
+            width: 100%;
+            table-layout: fixed;
+            padding: 40px 0;
+        }
+
+        .main-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            /* Liquid Glass effect */
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-box {
+            display: inline-block;
+            background-color: #C18A68;
+            color: #0D0D0D;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            border-radius: 6px;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .content {
+            padding: 40px 30px;
+            text-align: left;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .feature-box {
+            background-color: rgba(193, 138, 104, 0.05);
+            border-left: 4px solid #C18A68;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+        }
+
+        .cta-container {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        /* Botón Liquid Glass / Bronze */
+        .btn {
+            display: inline-block;
+            background-color: #C18A68;
+            color: #0E0E0E;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 18px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(193, 138, 104, 0.2);
+        }
+
+        .footer {
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+            <td align="center">
+                <table class="main-card" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                    <!-- Cabecera -->
+                    <tr>
+                        <td class="header">
+                            <a href="https://kaston.vercel.app" class="logo">
+                                <span class="logo-box">K</span>KASTON
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Contenido principal -->
+                    <tr>
+                        <td class="content">
+                            <h1 class="title">¡Bienvenido a la ingeniería del futuro!</h1>
+
+                            <p class="text">
+                                Estamos emocionados de contar contigo. Tu registro ha sido procesado exitosamente y tu
+                                plataforma de cálculo estructural acaba de ser desbloqueada.
+                            </p>
+
+                            <div class="feature-box">
+                                <p style="margin:0; font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.5;">
+                                    <strong>¿Qué sucede ahora?</strong><br>
+                                    Ya puedes empezar a diagnosticar, escalar y proyectar la protección de tus
+                                    construcciones con tecnología de grado balístico KASTON de forma completamente
+                                    autónoma.
+                                </p>
+                            </div>
+
+                            <p class="text">
+                                Ingresa ahora a tu panel de control y genera tu primera cotización técnica en PDF. No
+                                necesitas volver a registrarte.
+                            </p>
+
+                            <div class="cta-container">
+                                <a href="https://kaston.vercel.app/cotizador.html" class="btn">
+                                    IR AL COTIZADOR
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Pie de página -->
+                    <tr>
+                        <td class="footer">
+                            <p style="margin-bottom: 10px;">Ingeniería de Protección y Blindaje de Cubiertas.</p>
+                            <p style="margin: 0;">© 2026 KASTON. Todos los derechos reservados.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
