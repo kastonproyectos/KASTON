@@ -1543,30 +1543,24 @@
             return (
                 <div className="min-h-screen bg-graphite font-sans flex flex-col items-center pb-24">
                     <header className="w-full border-b border-white/10 sticky top-0 z-50" style={{ backgroundColor: '#0E0E0E' }}>
-                        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
+                        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between w-full gap-3">
+                            <div className="flex items-center gap-3 flex-shrink-0">
                                 {typeof KASTON_LOGO !== 'undefined' ? (
-                                    <img src={KASTON_LOGO} alt="KASTON" width="231" height="130" style={{ height: '130px', width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))' }} />
+                                    <img src={KASTON_LOGO} alt="KASTON" width="231" height="130" style={{ height: 'clamp(55px, 10vw, 130px)', width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))', flexShrink: 0 }} />
                                 ) : (
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold shadow-[0_0_15px_rgba(193,138,104,0.5)]">
-                                            K
-                                        </div>
+                                        <div className="w-8 h-8 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold shadow-[0_0_15px_rgba(193,138,104,0.5)]">K</div>
                                         <h1 className="text-xl font-bold tracking-wider">KASTON</h1>
                                     </div>
                                 )}
                             </div>
-                            <div className="flex items-center gap-4">
-                                <div className="text-sm font-medium text-white/50 tracking-widest flex items-center gap-2 relative z-50">
-                                    <div className="flex bg-transparent border border-white/20 rounded-full overflow-hidden">
-                                        <button onClick={() => handleLanguageChange('es')} className={`px-3 py-1 transition-colors cursor-pointer ${language === 'es' ? 'bg-bronze text-graphite font-bold' : 'text-white/50 hover:text-white'}`}>ES</button>
-                                        <button onClick={() => handleLanguageChange('en')} className={`px-3 py-1 transition-colors cursor-pointer ${language === 'en' ? 'bg-bronze text-graphite font-bold' : 'text-white/50 hover:text-white'}`}>EN</button>
-                                    </div>
+                            <div className="flex items-center gap-3 ml-auto flex-shrink-0">
+                                <div className="flex bg-transparent border border-white/20 rounded-full overflow-hidden">
+                                    <button onClick={() => handleLanguageChange('es')} className={`px-3 py-1 text-xs transition-colors cursor-pointer ${language === 'es' ? 'bg-bronze text-graphite font-bold' : 'text-white/50 hover:text-white'}`}>ES</button>
+                                    <button onClick={() => handleLanguageChange('en')} className={`px-3 py-1 text-xs transition-colors cursor-pointer ${language === 'en' ? 'bg-bronze text-graphite font-bold' : 'text-white/50 hover:text-white'}`}>EN</button>
                                 </div>
                                 {session && (
-                                    <button onClick={() => { onLogout(); setCurrentTab('profile'); }} className="text-xs text-white/30 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer border border-white/10 hover:border-bronze px-3 py-1 rounded">
-                                        {t.logout}
-                                    </button>
+                                    <button onClick={() => { onLogout(); setCurrentTab('profile'); }} className="text-xs text-white/30 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer border border-white/10 hover:border-bronze px-3 py-1 rounded">{t.logout}</button>
                                 )}
                             </div>
                         </div>
@@ -2306,9 +2300,9 @@
         function TriageScreen({ language, onSelectFlow }) {
             const t = T[language] || T['es'];
             return (
-                <div className="w-full flex-grow flex flex-col justify-start relative overflow-x-hidden pb-12">
-                    <div className="absolute top-[-100px] right-[-100px] w-96 h-96 bg-bronze rounded-full opacity-10 blur-[150px] pointer-events-none"></div>
-                    <div className="absolute bottom-[-100px] left-[-100px] w-96 h-96 bg-slateBlue rounded-full opacity-10 blur-[150px] pointer-events-none"></div>
+                <div className="w-full flex-grow flex flex-col justify-start relative pb-12">
+                    <div className="fixed top-0 right-0 w-full h-full bg-bronze rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(30%, -30%)' }}></div>
+                    <div className="fixed bottom-0 left-0 w-full h-full bg-slateBlue rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(-30%, 30%)' }}></div>
 
                     <div className="max-w-4xl w-full z-10 animate-fade-in flex flex-col items-center pt-8 mb-auto mx-auto pb-8">
                         <div className="mb-10 text-center">
