@@ -1572,7 +1572,7 @@
                         </div>
                     </header>
 
-                    <main className="w-full main-container flex-grow flex flex-col items-center py-10 px-4 md:px-6">
+                    <main className="w-full flex-grow flex flex-col items-center py-10 px-4 md:px-6" style={{ overflowY: 'visible' }}>
                         {currentTab === 'triage' && <TriageScreen language={language} onSelectFlow={(flow) => {
                             setTriageFlow(flow);
                             setCurrentTab('dashboard');
@@ -2306,7 +2306,7 @@
         function TriageScreen({ language, onSelectFlow }) {
             const t = T[language] || T['es'];
             return (
-                <div className="w-full flex-grow flex flex-col justify-start md:justify-center relative overflow-x-hidden overflow-y-auto pb-12">
+                <div className="w-full flex-grow flex flex-col justify-start relative overflow-x-hidden pb-12">
                     <div className="absolute top-[-100px] right-[-100px] w-96 h-96 bg-bronze rounded-full opacity-10 blur-[150px] pointer-events-none"></div>
                     <div className="absolute bottom-[-100px] left-[-100px] w-96 h-96 bg-slateBlue rounded-full opacity-10 blur-[150px] pointer-events-none"></div>
 
@@ -2322,19 +2322,19 @@
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                            <button onClick={() => onSelectFlow('A')} className="glass-panel p-8 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer h-full">
+                            <button onClick={() => onSelectFlow('A')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
                                 <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">{t.routeA}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeASub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeADesc}"</p>
                             </button>
 
-                            <button onClick={() => onSelectFlow('B')} className="glass-panel p-8 text-left rounded-2xl flex flex-col group hover:border-slateBlue/50 transition-all duration-300 relative overflow-hidden cursor-pointer h-full">
+                            <button onClick={() => onSelectFlow('B')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-slateBlue/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
                                 <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">{t.routeB}</h3>
                                 <div className="text-slateBlue font-bold text-xs uppercase tracking-widest mb-4">{t.routeBSub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeBDesc}"</p>
                             </button>
 
-                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${encodeURIComponent(language === 'en' ? 'DO YOU NEED TO CHANGE AND INSTALL A STRUCTURE?' : '¿NECESITA CAMBIAR E INSTALAR ESTRUCTURA?')}&body=${encodeURIComponent(language === 'en' ? 'PLEASE SPECIFY YOUR PROJECT SO WE CAN ADVISE YOU, TELL US ABOUT YOUR CASE AND PROVIDE MEASUREMENTS' : 'ESPECIFIQUENOS SU PROYECTO PARA NOSOTROS ASESORARLOS, CUENTENOS DEL CASO DENOS MEDIDAS')}`} className="glass-panel p-8 text-left rounded-2xl flex flex-col group hover:border-greenNeon/50 transition-all duration-300 relative overflow-hidden cursor-pointer h-full no-underline">
+                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${encodeURIComponent(language === 'en' ? 'DO YOU NEED TO CHANGE AND INSTALL A STRUCTURE?' : '¿NECESITA CAMBIAR E INSTALAR ESTRUCTURA?')}&body=${encodeURIComponent(language === 'en' ? 'PLEASE SPECIFY YOUR PROJECT SO WE CAN ADVISE YOU, TELL US ABOUT YOUR CASE AND PROVIDE MEASUREMENTS' : 'ESPECIFIQUENOS SU PROYECTO PARA NOSOTROS ASESORARLOS, CUENTENOS DEL CASO DENOS MEDIDAS')}`} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-greenNeon/50 transition-all duration-300 relative overflow-hidden cursor-pointer no-underline">
                                 <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">{t.routeC}</h3>
                                 <div className="text-greenNeon font-bold text-xs uppercase tracking-widest mb-4">{t.routeCSub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeCDesc}"</p>
