@@ -7,6 +7,15 @@
     <title>KASTON — Cubiertas de Polímero Recuperado | 500 Años de Durabilidad</title>
     <meta name="description"
         content="KASTON: la primera cubierta de polímero recuperado diseñada para durar 500 años. Indestructible, liviana, sostenible.">
+    <link rel="icon" type="image/svg+xml" href="isotipo.svg">
+    <meta property="og:title" content="KASTON — Cubiertas de Polímero Recuperado">
+    <meta property="og:description" content="La primera cubierta de polímero recuperado diseñada para durar 500 años. Indestructible, liviana y sostenible.">
+    <meta property="og:image" content="img-tejas-1.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="KASTON — Cubiertas de Polímero Recuperado">
+    <meta name="twitter:description" content="La primera cubierta de polímero recuperado diseñada para durar 500 años.">
+    <meta name="twitter:image" content="img-tejas-1.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -367,9 +376,17 @@
         .hero-bg {
             position: absolute;
             inset: 0;
-            background: url('img-tejas-3.png') center/cover no-repeat;
-            opacity: 0.15;
+            overflow: hidden;
             z-index: 0;
+        }
+
+        .hero-bg video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.35;
         }
 
         .hero .container {
@@ -1001,7 +1018,11 @@
      HERO
      ================================================ -->
     <section class="hero" id="hero">
-        <div class="hero-bg"></div>
+        <div class="hero-bg">
+            <video autoplay loop muted playsinline>
+                <source src="assets/background.mp4" type="video/mp4">
+            </video>
+        </div>
         <div class="container">
             <div class="fade-in" style="margin-bottom:28px;">
                 <img src="isotipo.svg" alt="KASTON" style="height:160px; width:auto;">
@@ -1495,7 +1516,6 @@
         </div>
     </section>
 
-    </section>
 
     <!-- ================================================
      MODELO COMERCIAL
