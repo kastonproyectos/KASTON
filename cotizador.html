@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>KASTON</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASTON — Cotizador Técnico</title>
+    <link rel="icon" type="image/svg+xml" href="isotipo.svg">
 
     <!-- Dependencias Externas CND para ejecutar React localmente sin servidor -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -418,7 +419,7 @@
                     const unit = proj.unidad || 'm2';
                     const inputValue = proj.area || 0;
                     const areaM2 = unit === 'ft2' ? inputValue / 10.7639 : inputValue;
-                    const material = proj.tipoConstruccion || 'clay';
+                    const material = proj.material || proj.tipoConstruccion || 'clay';
                     const currency = proj.divisa || 'COP';
 
                     const metrics = calculateMetrics(areaM2, material, currency, rates);
@@ -675,20 +676,41 @@
 
             const t = T[language] || T['es'];
 
-            const validateCurrentPassword = () => {
-                // Secuencia simulada o validación real: al no poder validar fácilmente la password actual sin un nuevo signIn
-                // asumimos validación exitosa para efectos de la interfaz solicitada si no está vacío
-                if (currentPassword.trim().length > 0) {
-                    setIsPasswordValidated(true);
-                } else {
+            const validateCurrentPassword = async () => {
+                if (!currentPassword.trim()) {
                     alert(t.reqCurrPass);
+                    return;
+                }
+                if (!supabase || !session?.user?.email) {
+                    setIsPasswordValidated(true);
+                    return;
+                }
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: session.user.email,
+                    password: currentPassword
+                });
+                if (error) {
+                    alert('Contraseña actual incorrecta.');
+                } else {
+                    setIsPasswordValidated(true);
                 }
             };
 
-            const handleSaveSettings = () => {
+            const handleSaveSettings = async () => {
                 if (isPasswordValidated && newPassword && newPassword !== confirmPassword) {
                     alert(t.passMismatch);
                     return;
+                }
+                if (supabase && session) {
+                    const userUpdate = { data: { phone } };
+                    if (isPasswordValidated && newPassword) {
+                        userUpdate.password = newPassword;
+                    }
+                    const { error } = await supabase.auth.updateUser(userUpdate);
+                    if (error) {
+                        alert('Error al actualizar: ' + error.message);
+                        return;
+                    }
                 }
                 alert(t.chgSaved);
                 setIsSettingsMode(false);
@@ -697,7 +719,7 @@
             const userName = getPersistedData('full_name', settings.name);
             const userRole = getPersistedData('role', settings.role);
             const idType = getPersistedData('id_type', 'Documento no registrado');
-            const idNumber = getPersistedData('id_number', 'No registrado');
+            const [idNumber, setIdNumber] = useState(getPersistedData('id_number', ''));
 
             const fallbackInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
 
@@ -851,7 +873,7 @@
             )
         }
 
-        function CalculatorTab({ defaults, onSaveProject, editingProject, defaultFlow, session, setCurrentTab, rates, language }) {
+        function CalculatorTab({ defaults, onSaveProject, editingProject, defaultFlow, session, setCurrentTab, setTriageFlow, rates, language }) {
             const t = T[language] || T['es'];
             const [flowActive, setFlowActive] = useState(editingProject ? editingProject.flow : (defaultFlow || 'A'));
             const [constructionType, setConstructionType] = useState(editingProject ? (editingProject.tipoConstruccion || 'Residencial') : 'Residencial');
@@ -1021,6 +1043,7 @@
                     nombre: nombre.trim(),
                     flow: flowActive,
                     tipoConstruccion: constructionType,
+                    material: material,
                     area: inputValue,
                     unidad: unit,
                     inversion_tejas: modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost,
@@ -1122,7 +1145,7 @@
                                     onChange={(e) => {
                                         const raw = e.target.value;
                                         setInputText(raw);
-                                        const parsed = parseInt(raw, 10);
+                                        const parsed = parseFloat(raw);
                                         if (!isNaN(parsed) && parsed > 0) {
                                             if (parsed > (unit === 'ft2' ? 16145 : 1500)) {
                                                 alert(T[language]?.redirectRouteC || "Área límite superada. Bloqueo de seguridad activado, será redireccionado al Plan de Ingeniería Integral.");
@@ -1137,7 +1160,7 @@
                                     }}
                                     onBlur={() => {
                                         const maxVal = unit === 'ft2' ? 16145 : 1500;
-                                        const clamped = Math.max(sliderMin, Math.min(parseInt(inputText, 10) || sliderMin, maxVal));
+                                        const clamped = Math.max(sliderMin, Math.min(parseFloat(inputText) || sliderMin, maxVal));
                                         setInputValue(clamped);
                                         setInputText(String(clamped));
                                     }}
@@ -1202,6 +1225,7 @@
                                 {t.netSupplyObj}
                                 <InfoTooltip title={t.calcPrec} technicalValue={t.netSupplyNoWaste} description={t.calcPrecDesc} />
                             </div>
+                            <div className="mt-2 text-[10px] text-yellow-400/60 text-center uppercase tracking-wider">{t.wasteNote}</div>
                         </div>
 
                         {flowActive === 'A' ? (
@@ -1388,7 +1412,7 @@
                         try {
                             await supabase.from('projects').update({
                                 project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: settings.currency,
+                                selected_color: proj.divisa,
                                 total_weight_saved: proj.plastico_kg / 1000,
                                 plastic_upcycled_kg: proj.plastico_kg,
                                 estimated_savings_usd: proj.inversion_tejas,
@@ -1399,7 +1423,7 @@
                             // Fallback: update without project_data if column doesn't exist
                             await supabase.from('projects').update({
                                 project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: settings.currency,
+                                selected_color: proj.divisa,
                                 total_weight_saved: proj.plastico_kg / 1000,
                                 plastic_upcycled_kg: proj.plastico_kg,
                                 estimated_savings_usd: proj.inversion_tejas,
@@ -1416,7 +1440,7 @@
                                 id: proj.id,
                                 user_id: session?.user?.id,
                                 project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: settings.currency,
+                                selected_color: proj.divisa,
                                 total_weight_saved: proj.plastico_kg / 1000,
                                 plastic_upcycled_kg: proj.plastico_kg,
                                 estimated_savings_usd: proj.inversion_tejas,
@@ -1430,7 +1454,7 @@
                                 id: proj.id,
                                 user_id: session?.user?.id,
                                 project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: settings.currency,
+                                selected_color: proj.divisa,
                                 total_weight_saved: proj.plastico_kg / 1000,
                                 plastic_upcycled_kg: proj.plastico_kg,
                                 estimated_savings_usd: proj.inversion_tejas,
@@ -1463,7 +1487,7 @@
             };
 
             const getMailtoLink = (proj) => {
-                const targetProj = proj || showSuccess;
+                const targetProj = proj;
                 if (!targetProj) return '#';
                 const subject = encodeURIComponent(`Cotización - ${targetProj?.tipoConstruccion || 'Proyecto'}`);
                 const body = encodeURIComponent(`Nombre de la persona: ${userName}\nCorreo de la persona: ${userEmail}\n\nAdjunto la cotización generada automáticamente por la plataforma KASTON.\n\nPOR FAVOR, ADJUNTE EN ESTE CORREO EL PDF GENERADO DESCARGADO Y LAS IMÁGENES DE REFERENCIA DE LA CONSTRUCCIÓN A COTIZAR.\n\nDetalles del proyecto:\n- Nombre: ${targetProj?.nombre}\n- Tipo de construcción: ${targetProj?.tipoConstruccion}\n- Área: ${targetProj?.area} ${targetProj?.unidad}\n- Inversión estimada: $${targetProj?.inversion_tejas?.toLocaleString()} ${targetProj?.divisa}`);
@@ -1501,6 +1525,8 @@
                                         try { return JSON.parse(p.project_data); } catch (e) { }
                                     }
                                     // Fallback: reconstruct from individual columns
+                                    const storedVal = p.selected_color || '';
+                                    const isCurrency = ['COP', 'USD', 'EUR'].includes(storedVal);
                                     return {
                                         id: p.id,
                                         nombre: p.client_name || 'Sin nombre',
@@ -1508,9 +1534,9 @@
                                         unidad: 'm2',
                                         inversion_tejas: p.estimated_savings_usd || 0,
                                         plastico_kg: p.plastic_upcycled_kg || 0,
-                                        divisa: p.selected_color || 'COP',
-                                        material: 'Lámina de Zinc',
-                                        tipoConstruccion: 'zinc',
+                                        divisa: isCurrency ? storedVal : 'COP',
+                                        material: 'clay',
+                                        tipoConstruccion: 'clay',
                                         inclinacion: 15,
                                         flow: 'A',
                                         tasas: null
@@ -1571,7 +1597,7 @@
                             setTriageFlow(flow);
                             setCurrentTab('dashboard');
                         }} />}
-                        {currentTab === 'dashboard' && <CalculatorTab language={language} defaults={settings} onSaveProject={handleSaveProject} editingProject={editingProject} defaultFlow={triageFlow || 'A'} session={session} setCurrentTab={setCurrentTab} rates={rates} />}
+                        {currentTab === 'dashboard' && <CalculatorTab language={language} defaults={settings} onSaveProject={handleSaveProject} editingProject={editingProject} defaultFlow={triageFlow || 'A'} session={session} setCurrentTab={setCurrentTab} setTriageFlow={setTriageFlow} rates={rates} />}
                         {currentTab === 'projects' && (
                             session ? <ProjectsTab language={language} session={session} projects={projects} onEditProject={handleEditProject} onDeleteProject={handleDeleteProject} onQuoteProject={handleQuoteProject} rates={rates} /> :
                                 <div className="w-full flex-grow flex flex-col items-center justify-center p-8 mt-20 text-center animate-fade-in"><p className="text-white/50 tracking-widest uppercase mb-6 text-sm">{t.authReq}</p><h2 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">{t.loginToView}</h2><button onClick={() => setCurrentTab('profile')} className="bg-bronze hover:bg-white text-graphite px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-colors cursor-pointer shadow-[0_0_20px_rgba(193,138,104,0.3)]">{t.goToProfile}</button></div>
@@ -1619,6 +1645,7 @@
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
             const [confirmMsg, setConfirmMsg] = useState(null);
+            const [confirmPassword, setConfirmPassword] = useState('');
 
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
@@ -1638,6 +1665,7 @@
                 if (!isLogin && !fullName.trim()) { setError(t.errNameReq); return; }
                 if (!isLogin && !phone.trim()) { setError(t.errPhoneReq); return; }
                 if (!isLogin && !idNumber.trim()) { setError(t.errIdReq); return; }
+                if (!isLogin && password !== confirmPassword) { setError(t.passMismatch); return; }
 
                 // Identity String Validation Enforcement
                 if (!isLogin) {
@@ -1784,6 +1812,15 @@
                                 <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.passLabel}</label>
                                 <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner" placeholder={t.passPlace} />
                             </div>
+                            {!isLogin && (
+                                <div>
+                                    <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.confPass}</label>
+                                    <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className={`w-full bg-black/50 border rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner ${password && confirmPassword && password !== confirmPassword ? 'border-red-500/50' : 'border-white/10'}`} placeholder={t.passPlace} />
+                                    {password && confirmPassword && password !== confirmPassword && (
+                                        <p className="text-red-400 text-[10px] mt-1 uppercase tracking-widest">{t.passMismatch}</p>
+                                    )}
+                                </div>
+                            )}
 
                             <button type="submit" disabled={loading} className="w-full mt-4 bg-white/5 border border-white/20 hover:border-bronze hover:bg-bronze hover:text-graphite text-white font-bold py-4 rounded-xl uppercase tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] cursor-pointer">
                                 {loading ? '...' : (isLogin ? t.enterDash : t.createAcc)}
@@ -1891,6 +1928,7 @@
                 calcPrec: "Cálculo de Precisión",
                 netSupplyNoWaste: "Suministro Neto — Sin Factor de Merma",
                 calcPrecDesc: "Ingeniería exacta para blindar su hogar contra eventos climáticos extremos de hasta 225 km/h. La cantidad mostrada es calculada por metro cuadrado neto. El desperdicio constructivo debe ser ajustado manualmente por el constructor.",
+                wasteNote: "+ 5–10% de merma constructiva recomendada",
                 structRelief: "Alivio Estructural",
                 stabLoad: "Carga de Estabilidad",
                 earthqResp: "MEJORA DE RESPUESTA SÍSMICA",
@@ -2036,7 +2074,7 @@
                 routeBDesc: "I want to quote the KASTON exterior shield for my project in the design or from-scratch construction phase.",
                 routeC: "Comprehensive Engineering Plan",
                 routeCSub: "Expert structural advice",
-                routeCDesc: "Requires technical support to validate the viability and engineering of the assembly. Our team will connect with yours.",
+                routeCDesc: "I need a calculation of the supporting structure and a complete system from scratch.",
                 noSavedProj: "No saved projects",
                 noSavedD: "Calculations saved in the dashboard will appear here.",
                 myProjects: "My Projects",
@@ -2048,7 +2086,7 @@
                 downPdf: "DOWNLOAD PDF",
                 needStruct: "DO YOU NEED TO INSTALL A STRUCTURE?",
                 contactUs: "Contact us for personalized attention.",
-                contactK: "Contactar KASTON",
+                contactK: "Contact KASTON",
                 zincMsg: "TECHNICAL REQUIREMENT: Due to the stability weight of the KASTON system (12.6 kg/m2), a reinforced supporting structure is required. Do you want to include the quote and structure accompaniment by KASTON in your project?",
                 settingsTab: "Settings",
                 back: "Back",
@@ -2109,6 +2147,7 @@
                 calcPrec: "Precision Calculation",
                 netSupplyNoWaste: "Net Supply — Without Waste Factor",
                 calcPrecDesc: "Exact engineering to shield your home against extreme weather events up to 225 km/h. The quantity shown is calculated per net square meter. Construction waste must be manually adjusted by the builder.",
+                wasteNote: "+ 5–10% construction waste recommended",
                 structRelief: "Structural Relief",
                 stabLoad: "Stability Load",
                 earthqResp: "SEISMIC RESPONSE IMPROVEMENT",
