@@ -187,6 +187,67 @@
             zinc: { label: 'Lámina de Zinc', weight: 4.0, color: '#90a4ae' }
         };
 
+        const PHONE_PREFIXES = [
+            { code: '+57', name: 'Colombia' }, { code: '+1', name: 'EE.UU. / CAN' },
+            { code: '+52', name: 'México' }, { code: '+54', name: 'Argentina' },
+            { code: '+55', name: 'Brasil' }, { code: '+56', name: 'Chile' },
+            { code: '+51', name: 'Perú' }, { code: '+58', name: 'Venezuela' },
+            { code: '+593', name: 'Ecuador' }, { code: '+591', name: 'Bolivia' },
+            { code: '+595', name: 'Paraguay' }, { code: '+598', name: 'Uruguay' },
+            { code: '+507', name: 'Panamá' }, { code: '+503', name: 'El Salvador' },
+            { code: '+502', name: 'Guatemala' }, { code: '+506', name: 'Costa Rica' },
+            { code: '+1809', name: 'R. Dominicana' }, { code: '+34', name: 'España' },
+            { code: '+44', name: 'Reino Unido' }, { code: '+49', name: 'Alemania' },
+            { code: '+33', name: 'Francia' }, { code: '+39', name: 'Italia' },
+            { code: '+971', name: 'Emiratos Árabes' }, { code: '+61', name: 'Australia' },
+        ];
+
+        const KASTON_COLORS = [
+            { id: 'grafito', hex: '#2a2a2a', nameEs: 'Negro Grafito', nameEn: 'Graphite Black', descEs: 'Color estrella. Nuestra firma.', star: true },
+            { id: 'wengue',  hex: '#5c3d2e', nameEs: 'Café Wengué',   nameEn: 'Wengué Brown',   descEs: 'Calidez natural.',            star: false },
+            { id: 'basalto', hex: '#6b6b6b', nameEs: 'Gris Basalto',  nameEn: 'Basalt Gray',    descEs: 'Arquitectura moderna.',        star: false },
+            { id: 'militar', hex: '#4B5320', nameEs: 'Verde Militar',  nameEn: 'Military Green', descEs: 'Integración natural.',         star: false },
+        ];
+
+        const ROOF_TYPES = [
+            { id:'gable2',   nameEs:'2 Aguas',              nameEn:'2-Water Gable',     descEs:'Tejado triangular estándar con cumbrera central',
+              svg:`<polygon points="5,44 40,8 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="40" y1="8" x2="40" y2="44" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="3,3"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'dormer',   nameEs:'Con Buhardilla',        nameEn:'With Dormer',       descEs:'Dos aguas con ventana emergente o lucernario',
+              svg:`<polygon points="5,44 40,8 75,44" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><rect x="29" y="22" width="14" height="11" fill="rgba(193,138,104,.95)" stroke="#C18A68" stroke-width="1"/><polygon points="27,22 40,13 53,22" fill="rgba(193,138,104,.9)" stroke="#C18A68" stroke-width="1"/><rect x="33" y="25" width="5" height="5" fill="rgba(0,0,0,.5)"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'m_shape',  nameEs:'M',                    nameEn:'M-Roof',            descEs:'Doble tejado a dos aguas paralelo',
+              svg:`<polygon points="5,44 22,14 40,33 58,14 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'hip4',     nameEs:'Cuatro Aguas',          nameEn:'Hip Roof',          descEs:'Techo piramidal truncado — faldones en los cuatro lados',
+              svg:`<polygon points="5,44 18,16 62,16 75,44" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><line x1="18" y1="16" x2="62" y2="16" stroke="#C18A68" stroke-width="2"/><polygon points="5,44 18,16 10,44" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="75,44 62,16 72,44" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'dutch',    nameEs:'Dos Aguas Holandés',    nameEn:'Dutch Gable',       descEs:'Dos aguas con pequeños faldones en los extremos',
+              svg:`<polygon points="15,44 20,22 60,22 65,44" fill="rgba(193,138,104,.55)" stroke="#C18A68" stroke-width="1"/><polygon points="5,44 15,44 20,22" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="65,44 75,44 60,22" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="20,22 40,8 60,22" fill="rgba(193,138,104,.85)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'combined', nameEs:'Combinado',             nameEn:'Combined',          descEs:'Techo compuesto a diferentes alturas',
+              svg:`<polygon points="5,44 5,28 30,10 55,28 55,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><polygon points="55,28 55,44 75,44 75,22 65,22" fill="rgba(193,138,104,.5)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'cross4',   nameEs:'Cruzado 4 Aguas',       nameEn:'Cross Hip',         descEs:'Unión en L o T con faldones inclinados',
+              svg:`<polygon points="5,44 5,28 20,14 48,14 48,28 65,44" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><polygon points="48,14 48,44 65,44 65,28 58,14" fill="rgba(193,138,104,.45)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'stack4',   nameEs:'Superpuesto 4 Aguas',   nameEn:'Stacked Hip',       descEs:'Estructura escalonada de cuatro faldones',
+              svg:`<polygon points="22,44 10,32 50,32 38,44" fill="rgba(193,138,104,.4)" stroke="#C18A68" stroke-width="1"/><polygon points="38,44 50,32 62,44" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="14,32 5,18 55,18 46,32" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><polygon points="46,32 55,18 66,32" fill="rgba(193,138,104,.45)" stroke="#C18A68" stroke-width="1"/><line x1="5" y1="18" x2="55" y2="18" stroke="#C18A68" stroke-width="2"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'valley4',  nameEs:'4 Aguas y Valle',        nameEn:'Hip with Valley',   descEs:'Configuración compleja con intersecciones y canales',
+              svg:`<polygon points="5,44 20,18 40,30 40,44" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><polygon points="40,30 20,18 55,18 75,44 40,44" fill="rgba(193,138,104,.5)" stroke="#C18A68" stroke-width="1"/><polygon points="20,18 35,8 55,18" fill="rgba(193,138,104,.8)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'hex',      nameEs:'Hexagonal',              nameEn:'Hexagonal',         descEs:'Techo poligonal de seis caras',
+              svg:`<polygon points="40,8 62,20 62,42 40,48 18,42 18,20" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><circle cx="40" cy="28" r="3" fill="#C18A68"/><line x1="40" y1="28" x2="40" y2="8" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="62" y2="20" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="62" y2="42" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="18" y2="42" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="18" y2="20" stroke="rgba(255,255,255,.3)" stroke-width="1"/>` },
+            { id:'gambrel',  nameEs:'Gambrel',                nameEn:'Gambrel (Barn)',    descEs:'Estilo granero con dos pendientes distintas por lado',
+              svg:`<polygon points="5,44 20,28 30,14 50,14 60,28 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="20" y1="28" x2="60" y2="28" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="4,3"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'mansard',  nameEs:'Mansard',                nameEn:'Mansard',           descEs:'Estilo francés con cuatro lados y doble pendiente',
+              svg:`<polygon points="5,44 18,22 62,22 75,44" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><rect x="18" y="13" width="44" height="9" fill="rgba(193,138,104,.85)" stroke="#C18A68" stroke-width="1.5"/><line x1="18" y1="22" x2="62" y2="22" stroke="#C18A68" stroke-width="2"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'saltbox',  nameEs:'Saltbox',                nameEn:'Saltbox',           descEs:'Techo asimétrico con un lado considerablemente más largo',
+              svg:`<polygon points="5,8 5,44 75,44 75,26" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="8" x2="75" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'pyramid',  nameEs:'Pirámide',               nameEn:'Pyramid',           descEs:'Cuatro faldones triangulares que convergen en un único punto',
+              svg:`<polygon points="5,44 40,8 75,44" fill="rgba(193,138,104,.65)" stroke="#C18A68" stroke-width="1.5"/><polygon points="40,8 75,44 55,44" fill="rgba(193,138,104,.4)" stroke="#C18A68" stroke-width="1"/><circle cx="40" cy="8" r="3" fill="#C18A68"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'skillion', nameEs:'Skillion e Inclinado',   nameEn:'Skillion',          descEs:'Múltiples niveles de techos monopendiente desalineados',
+              svg:`<polygon points="5,44 5,18 38,18 38,30" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><polygon points="38,30 38,44 5,44" fill="rgba(193,138,104,.2)" stroke="#C18A68" stroke-width="0.5" stroke-dasharray="3,2"/><polygon points="38,44 38,22 75,22 75,40" fill="rgba(193,138,104,.55)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'flat',     nameEs:'Plano',                  nameEn:'Flat Roof',         descEs:'Cubierta horizontal con inclinación mínima técnica',
+              svg:`<rect x="5" y="22" width="70" height="20" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="22" x2="75" y2="19" stroke="rgba(255,255,255,.4)" stroke-width="2"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'shed',     nameEs:'Cobertizo',              nameEn:'Shed / Mono-pitch', descEs:'Monopendiente simple — un solo faldón inclinado',
+              svg:`<polygon points="5,44 5,16 75,28 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="16" x2="75" y2="28" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+            { id:'butterfly',nameEs:'Mariposa',               nameEn:'Butterfly',         descEs:'Techo invertido en V — recoge el agua hacia el centro',
+              svg:`<polygon points="5,44 5,12 40,38 75,12 75,44" fill="rgba(193,138,104,.45)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="12" x2="40" y2="38" stroke="#C18A68" stroke-width="2"/><line x1="75" y1="12" x2="40" y2="38" stroke="#C18A68" stroke-width="2"/><circle cx="40" cy="38" r="3.5" fill="#0066FF" opacity=".8"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
+        ];
+
         const formatCurrency = (value, currency = 'COP') => {
             let num = Number(value);
             if (isNaN(num)) return value;
@@ -350,6 +411,141 @@
                     )}
                 </div>
             )
+        }
+
+        /* =============================================
+           PHONE INPUT — Prefijo internacional + número
+           ============================================= */
+        function PhoneInput({ value, onChange, language, required }) {
+            const detect = (v) => {
+                if (!v) return { prefix: '+57', number: '' };
+                const match = PHONE_PREFIXES.slice().sort((a,b) => b.code.length - a.code.length)
+                    .find(p => v.startsWith(p.code));
+                if (match) return { prefix: match.code, number: v.slice(match.code.length).trim() };
+                return { prefix: '+57', number: v };
+            };
+            const init = detect(value);
+            const [prefix, setPrefix] = useState(init.prefix);
+            const [number, setNumber] = useState(init.number);
+
+            const emit = (p, n) => onChange(`${p} ${n}`);
+            const onPfx = (e) => { setPrefix(e.target.value); emit(e.target.value, number); };
+            const onNum = (e) => { const n = e.target.value.replace(/\D/g,''); setNumber(n); emit(prefix, n); };
+
+            return (
+                <div className="flex gap-2">
+                    <select value={prefix} onChange={onPfx}
+                        className="bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze transition-all shadow-inner cursor-pointer appearance-none text-sm"
+                        style={{ minWidth:'130px' }}>
+                        {PHONE_PREFIXES.map(p => (
+                            <option key={p.code} value={p.code} className="bg-graphite">{p.code} {p.name}</option>
+                        ))}
+                    </select>
+                    <input type="tel" required={required} value={number} onChange={onNum}
+                        className="flex-1 bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner"
+                        placeholder="300 000 0000" />
+                </div>
+            );
+        }
+
+        /* =============================================
+           COLOR PICKER — Paleta mineral KASTON
+           ============================================= */
+        function ColorPicker({ selectedColor, onSelectColor, language }) {
+            const t = T[language] || T['es'];
+            return (
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                        <label className="text-xs text-white/50 uppercase tracking-widest font-semibold">{t.colorLabel}</label>
+                        <InfoTooltip title={t.colorTooltipTitle} description={t.colorTooltipDesc} />
+                    </div>
+                    <div className="grid grid-cols-4 gap-3">
+                        {KASTON_COLORS.map(c => (
+                            <button key={c.id} onClick={() => onSelectColor(c.id)}
+                                className={`rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${selectedColor === c.id ? 'border-white scale-105 shadow-[0_0_12px_rgba(255,255,255,.25)]' : 'border-transparent hover:border-white/40'}`}>
+                                <div style={{ backgroundColor: c.hex, height:'44px', position:'relative' }}>
+                                    {c.star && <span style={{ position:'absolute', top:'4px', right:'6px', color:'#C18A68', fontSize:'11px' }}>★</span>}
+                                </div>
+                                <div className="bg-black/50 px-1 py-1.5 text-center">
+                                    <p className={`text-[8.5px] uppercase tracking-wide leading-tight font-bold ${selectedColor === c.id ? 'text-white' : 'text-white/50'}`}>
+                                        {language === 'en' ? c.nameEn : c.nameEs}
+                                    </p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        /* =============================================
+           ROOF CONFIGURATOR — Aguas + Pendiente
+           ============================================= */
+        function RoofConfigurator({ selectedType, onSelectType, pendiente, onPendienteChange, language }) {
+            const t = T[language] || T['es'];
+            const [noSabe, setNoSabe] = useState(pendiente === null);
+            const activeRoof = ROOF_TYPES.find(r => r.id === selectedType);
+
+            return (
+                <div className="glass-panel rounded-2xl p-6 flex flex-col gap-6 animate-fade-in">
+                    {/* Aguas — obligatorio */}
+                    <div>
+                        <div className="flex items-center gap-3 mb-4">
+                            <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofTypeTitle}</h3>
+                            <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
+                        </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                            {ROOF_TYPES.map(rt => (
+                                <button key={rt.id} onClick={() => onSelectType(rt.id)}
+                                    className={`flex flex-col items-center p-2 rounded-xl border transition-all duration-200 cursor-pointer gap-1.5
+                                        ${selectedType === rt.id
+                                            ? 'border-bronze bg-bronze/15 shadow-[0_0_14px_rgba(193,138,104,.25)]'
+                                            : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'}`}>
+                                    <svg viewBox="0 0 80 50" width="58" height="36" xmlns="http://www.w3.org/2000/svg"
+                                        dangerouslySetInnerHTML={{ __html: rt.svg }} />
+                                    <span className={`text-[8px] uppercase font-bold tracking-wide text-center leading-tight ${selectedType === rt.id ? 'text-bronze' : 'text-white/50'}`}>
+                                        {language === 'en' ? (rt.nameEn || rt.nameEs) : rt.nameEs}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="mt-3 min-h-[18px]">
+                            {!selectedType
+                                ? <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.roofTypeReq}</p>
+                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">
+                                    {activeRoof ? `${activeRoof.nameEs} — ${activeRoof.descEs}` : ''}
+                                  </p>
+                            }
+                        </div>
+                    </div>
+
+                    {/* Pendiente — opcional */}
+                    <div className="border-t border-white/10 pt-5">
+                        <div className="flex items-center gap-3 mb-4">
+                            <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofPitchTitle}</h3>
+                            <span className="text-[9px] bg-white/5 text-white/40 border border-white/10 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.optional}</span>
+                        </div>
+                        <label className="flex items-center gap-3 cursor-pointer mb-4">
+                            <input type="checkbox" checked={noSabe}
+                                onChange={(e) => { setNoSabe(e.target.checked); onPendienteChange(e.target.checked ? null : 15); }}
+                                className="w-4 h-4 cursor-pointer accent-bronze" />
+                            <span className="text-sm text-white/70">{t.pitchUnknown}</span>
+                        </label>
+                        {!noSabe && (
+                            <div className="flex items-center gap-4 animate-fade-in">
+                                <input type="number" min="2" max="75"
+                                    value={pendiente || 15}
+                                    onChange={(e) => onPendienteChange(Number(e.target.value))}
+                                    className="w-24 bg-black/50 border border-white/10 rounded-xl p-3 text-white text-center text-2xl font-black focus:outline-none focus:border-bronze transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                                <div className="flex flex-col">
+                                    <span className="text-white/50 text-sm uppercase tracking-widest">{t.pitchDegrees}</span>
+                                    <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">{t.pitchRange}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         }
 
         // TODO: PEGA TUS CREDENCIALES DE SUPABASE AQUÍ
@@ -887,6 +1083,9 @@
             const [isSaving, setIsSaving] = useState(false);
             const [isPdfDownloaded, setIsPdfDownloaded] = useState(false);
             const [showZincModal, setShowZincModal] = useState(false);
+            const [roofType, setRoofType] = useState(editingProject ? (editingProject.roofType || null) : null);
+            const [pendiente, setPendiente] = useState(editingProject ? (editingProject.pendiente !== undefined ? editingProject.pendiente : null) : null);
+            const [selectedColor, setSelectedColor] = useState(editingProject ? (editingProject.selectedColor || null) : null);
 
             useEffect(() => {
                 setUnit(defaults.unit);
@@ -1045,6 +1244,9 @@
                     flow: flowActive,
                     tipoConstruccion: constructionType,
                     material: material,
+                    roofType: roofType,
+                    pendiente: pendiente,
+                    selectedColor: selectedColor,
                     area: inputValue,
                     unidad: unit,
                     inversion_tejas: modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost,
@@ -1089,6 +1291,11 @@
                 if (!session) {
                     alert(t.loginToSave);
                     setCurrentTab('profile');
+                    return;
+                }
+
+                if (!roofType) {
+                    alert(t.roofTypeRequired);
                     return;
                 }
 
@@ -1217,6 +1424,20 @@
                                 {t.routeBActive}
                             </div>
                         )}
+                    </div>
+
+                    {/* ── Configurador de Techo ─────────────────────── */}
+                    <RoofConfigurator
+                        selectedType={roofType}
+                        onSelectType={setRoofType}
+                        pendiente={pendiente}
+                        onPendienteChange={setPendiente}
+                        language={language}
+                    />
+
+                    {/* ── Color Picker ──────────────────────────────── */}
+                    <div className="glass-panel rounded-2xl p-6">
+                        <ColorPicker selectedColor={selectedColor} onSelectColor={setSelectedColor} language={language} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1759,7 +1980,7 @@
                                     </div>
                                     <div>
                                         <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.phoneNum} *</label>
-                                        <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner" placeholder={t.telPlace} />
+                                        <PhoneInput value={phone} onChange={setPhone} language={language} required />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -1786,7 +2007,23 @@
                                     </div>
                                     <div>
                                         <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.idNum} *</label>
-                                        <input type="text" required value={idNumber} onChange={e => setIdNumber(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner" placeholder={t.idPlace} />
+                                        <input type="text" required value={idNumber}
+                                            onChange={e => {
+                                                const raw = e.target.value;
+                                                if (idType === 'Pasaporte') {
+                                                    const letters = raw.slice(0,2).replace(/[^a-zA-Z]/g,'');
+                                                    const digits  = raw.slice(2).replace(/\D/g,'');
+                                                    setIdNumber((letters + digits).toUpperCase());
+                                                } else {
+                                                    setIdNumber(raw.replace(/\D/g,''));
+                                                }
+                                            }}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner"
+                                            placeholder={idType === 'Pasaporte' ? 'AB1234567' : t.idPlace}
+                                            inputMode={idType === 'Pasaporte' ? 'text' : 'numeric'} />
+                                        <p className="text-[9px] text-white/35 mt-1.5 uppercase tracking-widest">
+                                            {idType === 'Pasaporte' ? t.passportFmtHint : t.numericOnlyHint}
+                                        </p>
                                     </div>
                                     <div>
                                         <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.profPhoto} *</label>
@@ -2034,10 +2271,24 @@
                 errNameReq: "El nombre completo es obligatorio.",
                 errPhoneReq: "El teléfono celular es obligatorio.",
                 errIdReq: "El número de identificación es obligatorio.",
-                errPassportFmt: "El Pasaporte debe comenzar con 2 letras seguidas de números.",
+                errPassportFmt: "El Pasaporte debe comenzar con 2 letras seguidas de números (ej: AB1234567).",
                 errDocPre: "El documento tipo",
                 errDocSuf: "solo debe contener números.",
                 errBadCreds: "Credenciales incorrectas. Verifica tu correo y contraseña.",
+                passportFmtHint: "Formato: 2 letras + números (ej: AB1234567)",
+                numericOnlyHint: "Solo caracteres numéricos",
+                roofTypeTitle: "Tipo de Techo (Aguas)",
+                roofPitchTitle: "Pendiente del Techo",
+                mandatory: "Obligatorio",
+                optional: "Opcional",
+                pitchUnknown: "No lo sé, me gustaría asesorarme y conocerla",
+                pitchDegrees: "Grados de inclinación",
+                pitchRange: "Rango típico: 2° – 75°",
+                roofTypeReq: "Selecciona el tipo de techo para continuar",
+                roofTypeRequired: "Debes seleccionar el tipo de techo (aguas) antes de guardar el proyecto.",
+                colorLabel: "Color de Teja Deseado",
+                colorTooltipTitle: "Variación de Color por Polímero",
+                colorTooltipDesc: "Al fabricar con polímero recuperado (plásticos reciclados de alta resistencia), el tono final real será lo más cercano posible al render mostrado, pero puede presentar variaciones naturales según la mezcla de materiales en cada lote de producción. Esto no afecta las propiedades técnicas del producto.",
                 awaitConfirm: "Registro exitoso! Por favor revisa tu bandeja de entrada para confirmar tu cuenta antes de iniciar sesión.",
                 selectImg: "Seleccionar imagen",
                 svcBannerTitle: "¡Advertencia Estructural!",
@@ -2253,10 +2504,24 @@
                 errNameReq: "Full name is required.",
                 errPhoneReq: "Phone number is required.",
                 errIdReq: "Identification number is required.",
-                errPassportFmt: "Passport must start with 2 letters followed by numbers.",
+                errPassportFmt: "Passport must start with 2 letters followed by numbers (e.g. AB1234567).",
                 errDocPre: "Document type",
                 errDocSuf: "must contain numbers only.",
                 errBadCreds: "Invalid credentials. Please check your email and password.",
+                passportFmtHint: "Format: 2 letters + numbers (e.g. AB1234567)",
+                numericOnlyHint: "Numeric characters only",
+                roofTypeTitle: "Roof Type (Waters)",
+                roofPitchTitle: "Roof Pitch",
+                mandatory: "Required",
+                optional: "Optional",
+                pitchUnknown: "I don't know — I'd like advice on this",
+                pitchDegrees: "Degrees of inclination",
+                pitchRange: "Typical range: 2° – 75°",
+                roofTypeReq: "Select a roof type to continue",
+                roofTypeRequired: "You must select a roof type before saving the project.",
+                colorLabel: "Desired Tile Color",
+                colorTooltipTitle: "Color Variation — Recovered Polymer",
+                colorTooltipDesc: "When manufacturing with recovered polymer (high-strength recycled plastics), the final real tone will be as close as possible to the render shown, but may present natural variations based on the material mix in each production batch. This does not affect the product's technical properties.",
                 awaitConfirm: "Registration successful! Please check your inbox to confirm your account before logging in.",
                 selectImg: "Select image",
                 svcBannerTitle: "Structural Warning!",
