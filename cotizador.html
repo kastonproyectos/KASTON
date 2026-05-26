@@ -27,6 +27,7 @@
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        heading: ['Oswald', 'sans-serif'],
                     }
                 }
             }
@@ -154,7 +155,7 @@
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Oswald:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 </head>
 
@@ -279,7 +280,7 @@
                             <span className="text-xs text-white/50">{sublabel}</span>
                         </div>
                     </div>
-                    <div className="text-sm font-medium tracking-widest text-white/70 uppercase">
+                    <div className="text-sm font-heading font-medium tracking-widest text-white/70 uppercase">
                         {label}
                     </div>
                 </div>
@@ -524,11 +525,11 @@
                             <p className="text-white uppercase tracking-widest font-semibold">{t.noSavedProj}</p>
                             <p className="text-xs text-white/50 mt-2">{t.noSavedD}</p>
                         </div>
-                        <div className="w-full glass-panel border-l-4 border-l-greenNeon p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-r from-greenNeon/5 to-transparent pointer-events-none"></div>
+                        <div className="w-full glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
                             <div className="relative z-10 flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-greenNeon text-lg font-black">[PLAN C]</span>
+                                    <span className="text-bronze text-lg font-heading font-black">[PLAN C]</span>
                                     <h4 className="text-lg font-bold text-white uppercase tracking-wider">{t.needStruct}</h4>
                                 </div>
                                 <p className="text-white/60 text-sm tracking-wide mb-3">{t.contactUs}</p>
@@ -538,9 +539,9 @@
                                     <span>▸ Obra nueva o refuerzo</span>
                                     <span>▸ Material (Acero / Madera / Mixto)</span>
                                 </div>
-                                <p className="text-[10px] text-greenNeon/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
+                                <p className="text-[10px] text-bronze/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
                             </div>
-                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="flex-shrink-0 bg-greenNeon/20 hover:bg-greenNeon text-greenNeon hover:text-graphite font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 border border-greenNeon/50 relative z-10 text-sm text-center shadow-[0_0_20px_rgba(0,255,136,0.2)] hover:shadow-[0_0_30px_rgba(0,255,136,0.5)]">
+                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="flex-shrink-0 bg-bronze/20 hover:bg-bronze text-bronze hover:text-graphite font-heading font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 border border-bronze/50 relative z-10 text-sm text-center shadow-[0_0_20px_rgba(193,138,104,0.2)] hover:shadow-[0_0_30px_rgba(193,138,104,0.4)]">
                                 {t.contactK}
                             </a>
                         </div>
@@ -550,7 +551,7 @@
 
             return (
                 <div className="w-full max-w-5xl flex flex-col gap-6 animate-fade-in">
-                    <h2 className="text-2xl font-bold tracking-tight text-white uppercase border-b border-white/10 pb-4">{t.myProjects}</h2>
+                    <h2 className="text-2xl font-heading font-bold tracking-tight text-white uppercase border-b border-white/10 pb-4">{t.myProjects}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {projects.map(proj => (
                             <div key={proj.id} className="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-bronze/50 transition-colors">
@@ -621,11 +622,11 @@
                         ))}
                     </div>
                     {/* Advisory Banner - Plan C Structural Engineering */}
-                    <div className="w-full glass-panel border-l-4 border-l-greenNeon p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden mt-2">
-                        <div className="absolute inset-0 bg-gradient-to-r from-greenNeon/5 to-transparent pointer-events-none"></div>
+                    <div className="w-full glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden mt-2">
+                        <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
                         <div className="relative z-10 flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                                <span className="text-greenNeon text-lg font-black">[PLAN C]</span>
+                                <span className="text-bronze text-lg font-heading font-black">[PLAN C]</span>
                                 <h4 className="text-lg font-bold text-white uppercase tracking-wider">{t.needStruct}</h4>
                             </div>
                             <p className="text-white/60 text-sm tracking-wide mb-3">{t.contactUs}</p>
@@ -635,9 +636,9 @@
                                 <span>▸ Obra nueva o refuerzo</span>
                                 <span>▸ Material (Acero / Madera / Mixto)</span>
                             </div>
-                            <p className="text-[10px] text-greenNeon/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
+                            <p className="text-[10px] text-bronze/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
                         </div>
-                        <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="flex-shrink-0 bg-greenNeon/20 hover:bg-greenNeon text-greenNeon hover:text-graphite font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 border border-greenNeon/50 relative z-10 text-sm text-center shadow-[0_0_20px_rgba(0,255,136,0.2)] hover:shadow-[0_0_30px_rgba(0,255,136,0.5)]">
+                        <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="flex-shrink-0 bg-bronze/20 hover:bg-bronze text-bronze hover:text-graphite font-heading font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 border border-bronze/50 relative z-10 text-sm text-center shadow-[0_0_20px_rgba(193,138,104,0.2)] hover:shadow-[0_0_30px_rgba(193,138,104,0.4)]">
                             {t.contactK}
                         </a>
                     </div>
@@ -727,7 +728,7 @@
                 return (
                     <div className="w-full max-w-2xl mx-auto flex flex-col gap-6 animate-fade-in relative z-10">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-white uppercase tracking-widest">{t.settingsTab}</h2>
+                            <h2 className="text-2xl font-heading font-bold text-white uppercase tracking-widest">{t.settingsTab}</h2>
                             <button onClick={() => setIsSettingsMode(false)} className="text-white/40 hover:text-white transition-colors uppercase tracking-widest text-xs border border-white/10 px-3 py-1 rounded cursor-pointer">{t.back}</button>
                         </div>
 
@@ -819,7 +820,7 @@
                             </div>
                         )}
                         <div className="flex-1 space-y-2 text-center md:text-left">
-                            <h2 className="text-3xl font-bold tracking-tight text-white uppercase">{userName}</h2>
+                            <h2 className="text-3xl font-heading font-bold tracking-tight text-white uppercase">{userName}</h2>
                             <p className="text-bronze font-bold text-sm tracking-widest uppercase">{userRole}</p>
                             <p className="text-white/50 text-xs tracking-widest">{session?.user?.email}</p>
                             <div className="mt-2 text-white/40 text-xs uppercase tracking-widest flex items-center gap-2 justify-center md:justify-start">
@@ -1123,9 +1124,9 @@
                     )}
                     <div className="glass-panel rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
                         <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-bronze rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
-                        <div className="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-slateBlue rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
+                        <div className="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-bronze rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
                         <div className="flex-1 space-y-4 relative z-10 w-full md:w-auto">
-                            <h2 className="text-2xl font-semibold tracking-tight text-white mb-2 uppercase text-white/70">
+                            <h2 className="text-2xl font-heading font-semibold tracking-tight text-white mb-2 uppercase text-white/70">
                                 {t.typeAreaProj}
                             </h2>
                             <div className="mb-4">
@@ -1618,7 +1619,7 @@
                             <button onClick={() => setCurrentTab('projects')} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto rounded-lg transition-colors duration-300 relative min-h-[56px] ${currentTab === 'projects' ? 'text-bronze' : 'text-white/40 hover:text-white/70'}`}>
                                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                                 <span className="text-[10px] uppercase font-bold tracking-widest">{t.bottomProj}</span>
-                                {projects.length > 0 && <span className="absolute top-2 right-4 bg-greenNeon border border-graphite w-2 h-2 rounded-full"></span>}
+                                {projects.length > 0 && <span className="absolute top-2 right-4 bg-bronze border border-graphite w-2 h-2 rounded-full"></span>}
                             </button>
                             <button onClick={() => setCurrentTab('profile')} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto rounded-lg transition-colors duration-300 min-h-[56px] ${currentTab === 'profile' ? 'text-bronze' : 'text-white/40 hover:text-white/70'}`}>
                                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -1738,7 +1739,7 @@
                             )}
                         </div>
 
-                        <h2 className="text-2xl font-semibold tracking-tight text-white mb-6 text-center relative z-10 uppercase">
+                        <h2 className="text-2xl font-heading font-semibold tracking-tight text-white mb-6 text-center relative z-10 uppercase">
                             {isLogin ? t.corpAcc : t.techReg}
                         </h2>
 
@@ -2341,7 +2342,7 @@
             return (
                 <div className="w-full flex-grow flex flex-col justify-start relative pb-12">
                     <div className="fixed top-0 right-0 w-full h-full bg-bronze rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(30%, -30%)' }}></div>
-                    <div className="fixed bottom-0 left-0 w-full h-full bg-slateBlue rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(-30%, 30%)' }}></div>
+                    <div className="fixed bottom-0 left-0 w-full h-full bg-bronze rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(-30%, 30%)' }}></div>
 
                     <div className="max-w-4xl w-full z-10 animate-fade-in flex flex-col items-center pt-8 mb-auto mx-auto pb-8">
                         <div className="mb-10 text-center">
@@ -2350,28 +2351,28 @@
                             ) : (
                                 <div className="w-16 h-16 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold text-4xl mx-auto mb-4 shadow-[0_0_20px_rgba(193,138,104,0.5)]">K</div>
                             )}
-                            <h1 className="text-3xl font-bold tracking-tight text-white uppercase mt-4 mb-2">{t.trTitle}</h1>
+                            <h1 className="text-3xl font-heading font-bold tracking-tight text-white uppercase mt-4 mb-2">{t.trTitle}</h1>
                             <p className="text-white/50 tracking-widest text-sm uppercase">{t.trSub}</p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                             <button onClick={() => onSelectFlow('A')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
-                                <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">{t.routeA}</h3>
+                                <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeA}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeASub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeADesc}"</p>
                             </button>
 
-                            <button onClick={() => onSelectFlow('B')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-slateBlue/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
-                                <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">{t.routeB}</h3>
-                                <div className="text-slateBlue font-bold text-xs uppercase tracking-widest mb-4">{t.routeBSub}</div>
+                            <button onClick={() => onSelectFlow('B')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-white/30 transition-all duration-300 relative overflow-hidden cursor-pointer">
+                                <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeB}</h3>
+                                <div className="text-white/50 font-bold text-xs uppercase tracking-widest mb-4">{t.routeBSub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeBDesc}"</p>
                             </button>
 
-                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${encodeURIComponent(language === 'en' ? 'DO YOU NEED TO CHANGE AND INSTALL A STRUCTURE?' : '¿NECESITA CAMBIAR E INSTALAR ESTRUCTURA?')}&body=${encodeURIComponent(language === 'en' ? 'PLEASE SPECIFY YOUR PROJECT SO WE CAN ADVISE YOU, TELL US ABOUT YOUR CASE AND PROVIDE MEASUREMENTS' : 'ESPECIFIQUENOS SU PROYECTO PARA NOSOTROS ASESORARLOS, CUENTENOS DEL CASO DENOS MEDIDAS')}`} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-greenNeon/50 transition-all duration-300 relative overflow-hidden cursor-pointer no-underline">
-                                <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">{t.routeC}</h3>
-                                <div className="text-greenNeon font-bold text-xs uppercase tracking-widest mb-4">{t.routeCSub}</div>
+                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${encodeURIComponent(language === 'en' ? 'DO YOU NEED TO CHANGE AND INSTALL A STRUCTURE?' : '¿NECESITA CAMBIAR E INSTALAR ESTRUCTURA?')}&body=${encodeURIComponent(language === 'en' ? 'PLEASE SPECIFY YOUR PROJECT SO WE CAN ADVISE YOU, TELL US ABOUT YOUR CASE AND PROVIDE MEASUREMENTS' : 'ESPECIFIQUENOS SU PROYECTO PARA NOSOTROS ASESORARLOS, CUENTENOS DEL CASO DENOS MEDIDAS')}`} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/30 transition-all duration-300 relative overflow-hidden cursor-pointer no-underline">
+                                <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeC}</h3>
+                                <div className="text-bronze/70 font-bold text-xs uppercase tracking-widest mb-4">{t.routeCSub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeCDesc}"</p>
-                                <div className="mt-4 text-[10px] text-greenNeon/60 uppercase tracking-widest font-bold border-t border-greenNeon/20 pt-3">→ KASTON.PROYECTOS@GMAIL.COM</div>
+                                <div className="mt-4 text-[10px] text-bronze/60 uppercase tracking-widest font-bold border-t border-bronze/20 pt-3">→ KASTON.PROYECTOS@GMAIL.COM</div>
                             </a>
                         </div>
                     </div>
