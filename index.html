@@ -99,6 +99,7 @@
         p {
             font-size: clamp(0.95rem, 1.2vw, 1.1rem);
             color: var(--light);
+            font-weight: 300;
         }
 
         .gold {
@@ -448,11 +449,18 @@
         .spec-item {
             background: var(--surface);
             border: 1px solid rgba(193, 138, 104, 0.12);
+            border-left: 3px solid var(--gold);
             border-radius: 10px;
             padding: 20px 16px;
             text-align: center;
             word-break: break-word;
             overflow-wrap: break-word;
+            transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+        }
+
+        .spec-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(193, 138, 104, 0.12);
         }
 
         .spec-item .spec-val {
@@ -462,13 +470,15 @@
             font-weight: 700;
             line-height: 1;
             margin-bottom: 6px;
+            letter-spacing: -0.5px;
         }
 
         .spec-item .spec-lbl {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: var(--muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            font-weight: 300;
         }
 
         .hero-subtitle {
@@ -512,18 +522,20 @@
 
         .hero-stat .number {
             font-family: var(--font-heading);
-            font-size: 2.4rem;
+            font-size: 2.8rem;
             font-weight: 700;
             color: var(--gold);
             line-height: 1;
+            letter-spacing: -0.5px;
         }
 
         .hero-stat .label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--muted);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 6px;
+            letter-spacing: 2px;
+            margin-top: 8px;
+            font-weight: 300;
         }
 
         /* =============================================
@@ -538,16 +550,19 @@
         .card {
             background: var(--surface);
             border: 1px solid rgba(193, 138, 104, 0.15);
+            border-left: 3px solid rgba(193, 138, 104, 0.4);
             border-radius: 12px;
             padding: 36px 28px;
-            transition: border-color 0.35s var(--ease), transform 0.35s var(--ease);
+            transition: border-color 0.35s var(--ease), transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
             word-break: break-word;
             overflow-wrap: break-word;
         }
 
         .card:hover {
             border-color: var(--gold);
+            border-left-color: var(--gold);
             transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(193, 138, 104, 0.14);
         }
 
         .card-icon {
@@ -677,6 +692,7 @@
 
         .swatch:hover {
             transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
         }
 
         .swatch-color {
@@ -788,11 +804,14 @@
             padding: 24px 20px;
             position: relative;
             border: 1px solid rgba(193, 138, 104, 0.1);
-            transition: border-color 0.3s;
+            border-left: 3px solid var(--gold);
+            transition: border-color 0.3s, transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
         }
 
         .install-step:hover {
             border-color: rgba(193, 138, 104, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(193, 138, 104, 0.1);
         }
 
         .install-step .step-num {
@@ -1206,19 +1225,19 @@
                     </div>
                     <div style="display:flex; gap:20px;">
                         <div
-                            style="flex:1; background:var(--surface); border-radius:10px; padding:20px; text-align:center; border:1px solid rgba(193,138,104,0.12);">
+                            style="flex:1; background:var(--surface); border-radius:10px; padding:20px; text-align:center; border:1px solid rgba(193,138,104,0.12); border-left:3px solid var(--gold); transition:transform 0.35s ease,box-shadow 0.35s ease;" onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px rgba(193,138,104,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
                             <div
                                 style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">
                                 500</div>
-                            <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px;"
+                            <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:300;"
                                 data-i18n="sol.stat1">Años de vida</div>
                         </div>
                         <div
-                            style="flex:1; background:var(--surface); border-radius:10px; padding:20px; text-align:center; border:1px solid rgba(193,138,104,0.12);">
+                            style="flex:1; background:var(--surface); border-radius:10px; padding:20px; text-align:center; border:1px solid rgba(193,138,104,0.12); border-left:3px solid var(--gold); transition:transform 0.35s ease,box-shadow 0.35s ease;" onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px rgba(193,138,104,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
                             <div
                                 style="font-family:var(--font-heading); font-size:1.8rem; color:var(--gold); font-weight:700;">
                                 0%</div>
-                            <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px;"
+                            <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:300;"
                                 data-i18n="sol.stat2">Oxidación</div>
                         </div>
                     </div>
