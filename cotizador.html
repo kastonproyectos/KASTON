@@ -210,43 +210,251 @@
         ];
 
         const ROOF_TYPES = [
-            { id:'gable2',   nameEs:'2 Aguas',              nameEn:'2-Water Gable',     descEs:'Tejado triangular estándar con cumbrera central',
+            { id:'gable2',   nameEs:'2 Aguas',              nameEn:'2-Water Gable',     descEs:'Tejado triangular estándar con cumbrera central. Dos faldones inclinados que se unen en una cumbrera superior.',
               svg:`<polygon points="5,44 40,8 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="40" y1="8" x2="40" y2="44" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="3,3"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'dormer',   nameEs:'Con Buhardilla',        nameEn:'With Dormer',       descEs:'Dos aguas con ventana emergente o lucernario',
+            { id:'dormer',   nameEs:'Con Buhardilla',        nameEn:'With Dormer',       descEs:'Techo a dos aguas con ventana emergente (buhardilla) o lucernario integrado en la cubierta.',
               svg:`<polygon points="5,44 40,8 75,44" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><rect x="29" y="22" width="14" height="11" fill="rgba(193,138,104,.95)" stroke="#C18A68" stroke-width="1"/><polygon points="27,22 40,13 53,22" fill="rgba(193,138,104,.9)" stroke="#C18A68" stroke-width="1"/><rect x="33" y="25" width="5" height="5" fill="rgba(0,0,0,.5)"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'m_shape',  nameEs:'M',                    nameEn:'M-Roof',            descEs:'Doble tejado a dos aguas paralelo',
+            { id:'m_shape',  nameEs:'M',                    nameEn:'M-Roof',            descEs:'Doble tejado a dos aguas paralelo. Dos cumbres y un valle central que forma una "M" vista de frente.',
               svg:`<polygon points="5,44 22,14 40,33 58,14 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'hip4',     nameEs:'Cuatro Aguas',          nameEn:'Hip Roof',          descEs:'Techo piramidal truncado — faldones en los cuatro lados',
+            { id:'hip4',     nameEs:'Cuatro Aguas',          nameEn:'Hip Roof',          descEs:'Techo piramidal truncado con faldones inclinados en los cuatro lados. Sin triángulos verticales en los extremos.',
               svg:`<polygon points="5,44 18,16 62,16 75,44" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><line x1="18" y1="16" x2="62" y2="16" stroke="#C18A68" stroke-width="2"/><polygon points="5,44 18,16 10,44" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="75,44 62,16 72,44" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'dutch',    nameEs:'Dos Aguas Holandés',    nameEn:'Dutch Gable',       descEs:'Dos aguas con pequeños faldones en los extremos',
+            { id:'dutch',    nameEs:'Dos Aguas Holandés',    nameEn:'Dutch Gable',       descEs:'Combinación de techo a dos aguas con pequeños faldones triangulares en los extremos (Dutch Gable).',
               svg:`<polygon points="15,44 20,22 60,22 65,44" fill="rgba(193,138,104,.55)" stroke="#C18A68" stroke-width="1"/><polygon points="5,44 15,44 20,22" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="65,44 75,44 60,22" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="20,22 40,8 60,22" fill="rgba(193,138,104,.85)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'combined', nameEs:'Combinado',             nameEn:'Combined',          descEs:'Techo compuesto a diferentes alturas',
+            { id:'combined', nameEs:'Combinado',             nameEn:'Combined',          descEs:'Techo compuesto por secciones a diferentes alturas y pendientes. Común en ampliaciones o diseños arquitectónicos complejos.',
               svg:`<polygon points="5,44 5,28 30,10 55,28 55,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><polygon points="55,28 55,44 75,44 75,22 65,22" fill="rgba(193,138,104,.5)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'cross4',   nameEs:'Cruzado 4 Aguas',       nameEn:'Cross Hip',         descEs:'Unión en L o T con faldones inclinados',
+            { id:'cross4',   nameEs:'Cruzado 4 Aguas',       nameEn:'Cross Hip',         descEs:'Unión en forma de L o T de dos cuerpos con cuatro aguas cada uno. Frecuente en casas con planta irregular.',
               svg:`<polygon points="5,44 5,28 20,14 48,14 48,28 65,44" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><polygon points="48,14 48,44 65,44 65,28 58,14" fill="rgba(193,138,104,.45)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'stack4',   nameEs:'Superpuesto 4 Aguas',   nameEn:'Stacked Hip',       descEs:'Estructura escalonada de cuatro faldones',
+            { id:'stack4',   nameEs:'Superpuesto 4 Aguas',   nameEn:'Stacked Hip',       descEs:'Estructura escalonada de dos niveles de cuatro faldones. El nivel superior es más pequeño y se centra sobre el inferior.',
               svg:`<polygon points="22,44 10,32 50,32 38,44" fill="rgba(193,138,104,.4)" stroke="#C18A68" stroke-width="1"/><polygon points="38,44 50,32 62,44" fill="rgba(193,138,104,.35)" stroke="#C18A68" stroke-width="1"/><polygon points="14,32 5,18 55,18 46,32" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><polygon points="46,32 55,18 66,32" fill="rgba(193,138,104,.45)" stroke="#C18A68" stroke-width="1"/><line x1="5" y1="18" x2="55" y2="18" stroke="#C18A68" stroke-width="2"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'valley4',  nameEs:'4 Aguas y Valle',        nameEn:'Hip with Valley',   descEs:'Configuración compleja con intersecciones y canales',
+            { id:'valley4',  nameEs:'4 Aguas y Valle',        nameEn:'Hip with Valley',   descEs:'Configuración compleja con intersecciones entre cuerpos de cuatro aguas, generando valles (canales de desagüe internos).',
               svg:`<polygon points="5,44 20,18 40,30 40,44" fill="rgba(193,138,104,.7)" stroke="#C18A68" stroke-width="1.5"/><polygon points="40,30 20,18 55,18 75,44 40,44" fill="rgba(193,138,104,.5)" stroke="#C18A68" stroke-width="1"/><polygon points="20,18 35,8 55,18" fill="rgba(193,138,104,.8)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'hex',      nameEs:'Hexagonal',              nameEn:'Hexagonal',         descEs:'Techo poligonal de seis caras',
+            { id:'hex',      nameEs:'Hexagonal',              nameEn:'Hexagonal',         descEs:'Techo poligonal de seis caras que convergen en un punto central. Común en torreones, quioscos y estructuras circulares.',
               svg:`<polygon points="40,8 62,20 62,42 40,48 18,42 18,20" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><circle cx="40" cy="28" r="3" fill="#C18A68"/><line x1="40" y1="28" x2="40" y2="8" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="62" y2="20" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="62" y2="42" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="18" y2="42" stroke="rgba(255,255,255,.3)" stroke-width="1"/><line x1="40" y1="28" x2="18" y2="20" stroke="rgba(255,255,255,.3)" stroke-width="1"/>` },
-            { id:'gambrel',  nameEs:'Gambrel',                nameEn:'Gambrel (Barn)',    descEs:'Estilo granero con dos pendientes distintas por lado',
+            { id:'gambrel',  nameEs:'Gambrel',                nameEn:'Gambrel (Barn)',    descEs:'Estilo granero con dos pendientes distintas por lado: la inferior muy inclinada y la superior más suave. Maximiza espacio habitable.',
               svg:`<polygon points="5,44 20,28 30,14 50,14 60,28 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="20" y1="28" x2="60" y2="28" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="4,3"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'mansard',  nameEs:'Mansard',                nameEn:'Mansard',           descEs:'Estilo francés con cuatro lados y doble pendiente',
+            { id:'mansard',  nameEs:'Mansard',                nameEn:'Mansard',           descEs:'Estilo francés: cuatro lados con doble pendiente pronunciada en la parte inferior y plana en la superior. Haussmann, París.',
               svg:`<polygon points="5,44 18,22 62,22 75,44" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><rect x="18" y="13" width="44" height="9" fill="rgba(193,138,104,.85)" stroke="#C18A68" stroke-width="1.5"/><line x1="18" y1="22" x2="62" y2="22" stroke="#C18A68" stroke-width="2"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'saltbox',  nameEs:'Saltbox',                nameEn:'Saltbox',           descEs:'Techo asimétrico con un lado considerablemente más largo',
+            { id:'saltbox',  nameEs:'Saltbox',                nameEn:'Saltbox',           descEs:'Techo asimétrico: un lado corto y otro considerablemente más largo que cubre una adición trasera. Origen colonial norteamericano.',
               svg:`<polygon points="5,8 5,44 75,44 75,26" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="8" x2="75" y2="26" stroke="rgba(255,255,255,.3)" stroke-width="1"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'pyramid',  nameEs:'Pirámide',               nameEn:'Pyramid',           descEs:'Cuatro faldones triangulares que convergen en un único punto',
+            { id:'pyramid',  nameEs:'Pirámide',               nameEn:'Pyramid',           descEs:'Cuatro faldones triangulares que convergen en un único punto central. Simétrico en los cuatro lados, sin cumbrera horizontal.',
               svg:`<polygon points="5,44 40,8 75,44" fill="rgba(193,138,104,.65)" stroke="#C18A68" stroke-width="1.5"/><polygon points="40,8 75,44 55,44" fill="rgba(193,138,104,.4)" stroke="#C18A68" stroke-width="1"/><circle cx="40" cy="8" r="3" fill="#C18A68"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'skillion', nameEs:'Skillion e Inclinado',   nameEn:'Skillion',          descEs:'Múltiples niveles de techos monopendiente desalineados',
+            { id:'skillion', nameEs:'Skillion e Inclinado',   nameEn:'Skillion',          descEs:'Múltiples niveles de techos monopendiente desalineados y a distintas alturas. Arquitectura moderna y minimalista.',
               svg:`<polygon points="5,44 5,18 38,18 38,30" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><polygon points="38,30 38,44 5,44" fill="rgba(193,138,104,.2)" stroke="#C18A68" stroke-width="0.5" stroke-dasharray="3,2"/><polygon points="38,44 38,22 75,22 75,40" fill="rgba(193,138,104,.55)" stroke="#C18A68" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'flat',     nameEs:'Plano',                  nameEn:'Flat Roof',         descEs:'Cubierta horizontal con inclinación mínima técnica',
-              svg:`<rect x="5" y="22" width="70" height="20" fill="rgba(193,138,104,.6)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="22" x2="75" y2="19" stroke="rgba(255,255,255,.4)" stroke-width="2"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'shed',     nameEs:'Cobertizo',              nameEn:'Shed / Mono-pitch', descEs:'Monopendiente simple — un solo faldón inclinado',
+            { id:'shed',     nameEs:'Cobertizo',              nameEn:'Shed / Mono-pitch', descEs:'Monopendiente simple — un solo faldón inclinado en una dirección. Requiere mínimo 15% de pendiente para adecuada escorrentía.',
+              requiresMinPitch: true,
               svg:`<polygon points="5,44 5,16 75,28 75,44" fill="rgba(193,138,104,.75)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="16" x2="75" y2="28" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
-            { id:'butterfly',nameEs:'Mariposa',               nameEn:'Butterfly',         descEs:'Techo invertido en V — recoge el agua hacia el centro',
+            { id:'butterfly',nameEs:'Mariposa',               nameEn:'Butterfly',         descEs:'Techo invertido en V que recoge el agua hacia el centro. Diseño moderno que permite captación de agua lluvia.',
               svg:`<polygon points="5,44 5,12 40,38 75,12 75,44" fill="rgba(193,138,104,.45)" stroke="#C18A68" stroke-width="1.5"/><line x1="5" y1="12" x2="40" y2="38" stroke="#C18A68" stroke-width="2"/><line x1="75" y1="12" x2="40" y2="38" stroke="#C18A68" stroke-width="2"/><circle cx="40" cy="38" r="3.5" fill="#0066FF" opacity=".8"/><rect x="5" y="44" width="70" height="3" fill="rgba(193,138,104,.35)"/>` },
         ];
+
+        /* ── Carga el logo KASTON como PNG para incrustar en el PDF ── */
+        const loadLogoForPDF = () => new Promise((resolve) => {
+            try {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 360; canvas.height = 100;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, 360, 100);
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch(e) { resolve(null); }
+                };
+                img.onerror = () => resolve(null);
+                img.src = new URL('logo-kaston.svg', window.location.href).href;
+            } catch(e) { resolve(null); }
+        });
+
+        /* ── Constructor de PDF premium KASTON ── */
+        const buildPremiumPDF = (doc, data, logoDataUrl) => {
+            const {
+                flow, area, unit, areaM2, material, currency, metrics, modality,
+                roofType, pendiente, selectedColor, constructionType,
+                clientName, clientPhone, clientDoc, clientRole,
+                withObservation, includeZincWaiver, t
+            } = data;
+
+            const C = {
+                dark:   [13,  13,  13 ],
+                bronze: [193, 138, 104],
+                white:  [255, 255, 255],
+                offWhite:[248,247,245 ],
+                mid:    [160, 160, 160],
+                dim:    [110, 110, 110],
+                ink:    [30,  30,  30 ],
+                stripe: [245, 244, 242],
+                red:    [180, 60,  60 ],
+            };
+            const pageW = 210;
+            const col1 = 18, col2 = 110;
+
+            /* ── HEADER ── */
+            doc.setFillColor(...C.dark);
+            doc.rect(0, 0, pageW, 44, 'F');
+            doc.setFillColor(...C.bronze);
+            doc.rect(0, 44, pageW, 1.5, 'F');
+
+            if (logoDataUrl) {
+                doc.addImage(logoDataUrl, 'PNG', col1, 6, 55, 15);
+            } else {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(20);
+                doc.setTextColor(...C.white);
+                doc.text('KASTON', col1, 22);
+            }
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(...C.bronze);
+            doc.text(t.pdfReportTitle, col1, logoDataUrl ? 27 : 30);
+
+            const dateStr = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+            doc.setFontSize(7.5);
+            doc.setTextColor(...C.mid);
+            doc.text(dateStr, pageW - col1, 38, { align: 'right' });
+
+            /* ── BANDA CLIENTE ── */
+            doc.setFillColor(...C.stripe);
+            doc.rect(0, 45.5, pageW, 14, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(6.5);
+            doc.setTextColor(...C.dim);
+            doc.text(t.pdfClientData, col1, 51);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(...C.ink);
+            const clientLine = `${t.pdfClientName} ${clientName}  ·  ${t.pdfClientPhone} ${clientPhone}  ·  ${t.pdfClientDoc} ${clientDoc}  ·  ${clientRole}`;
+            doc.text(clientLine, col1, 56.5);
+
+            /* ── helper: cabecera de sección ── */
+            let y = 65;
+            const sectionHeader = (label) => {
+                doc.setFillColor(...C.bronze);
+                doc.rect(col1, y, 3, 5, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(...C.ink);
+                doc.text(label, col1 + 5, y + 4);
+                y += 10;
+            };
+            const row = (label, value, bold = false) => {
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setFontSize(8.5);
+                doc.setTextColor(...C.dim);
+                doc.text(label, col1 + 4, y);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(...C.ink);
+                doc.text(String(value), col2, y);
+                y += 6;
+            };
+            const divider = () => {
+                doc.setDrawColor(...C.bronze);
+                doc.setLineWidth(0.3);
+                doc.line(col1, y, pageW - col1, y);
+                y += 5;
+            };
+
+            const activeRoof = ROOF_TYPES.find(r => r.id === roofType);
+            const pendienteLabel = pendiente === null || pendiente === undefined
+                ? t.pitchUnknown
+                : `${pendiente}%`;
+            const colorLabel = KASTON_COLORS.find(c => c.id === selectedColor)?.nameEs || '—';
+            const matLabel = MATERIAL_CONSTANTS[material]?.label || material;
+
+            /* ── SECCIÓN 1: CONFIGURACIÓN ── */
+            sectionHeader(t.pdfP1);
+            row(t.pdfRoofArea, `${area} ${unit}  (≈ ${areaM2.toFixed(1)} m²)`);
+            row(t.pdfConstrType, constructionType);
+            if (flow === 'A') row(t.pdfP1TradMat, matLabel);
+            row(t.pdfRoofTypeLabel, activeRoof ? (activeRoof.nameEs) : '—');
+            row(t.pdfPendienteLabel, pendienteLabel);
+            row(t.pdfColorLabel, colorLabel);
+            divider();
+
+            /* ── SECCIÓN 2: INVENTARIO ── */
+            if (flow === 'A') {
+                sectionHeader(t.pdfP2);
+                row(t.pdfReqUnits, `${metrics.units} uds`, true);
+                divider();
+                sectionHeader(t.pdfP3);
+                row(t.pdfDeadLoadRelief, `${metrics.weightSavedTons} ${t.pdfTonsEl}`, true);
+                divider();
+            } else {
+                sectionHeader(t.pdfSpecTitle);
+                row(t.pdfRollThick, '8 mm espesor, estabilizado UV');
+                divider();
+                sectionHeader(t.pdfP2Req);
+                row(t.pdfNetVol, `${metrics.units} uds`, true);
+                divider();
+                sectionHeader(t.pdfCapExtStab);
+                row(t.pdfIzodConf, '29.4 J/m');
+                divider();
+            }
+
+            /* ── SECCIÓN 3: FINANCIERO & ESG ── */
+            sectionHeader(t.pdfESGTitle);
+            const sym = currency === 'EUR' ? '€' : '$';
+            const invAmount = modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost;
+            const invLabel  = modality === 'full' ? t.pdfInvAllInc : t.pdfInvTileOnly;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(...C.bronze);
+            doc.text(`${sym} ${formatCurrency(invAmount, currency)} ${currency}`, col1 + 4, y);
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(...C.dim);
+            doc.text(invLabel, col1 + 4, y);
+            y += 7;
+            row(t.pdfUpcycledTitle, `${metrics.plasticUpcycled.toFixed(1)} kg`);
+            row(t.pdfCO2RedTitle,   `${metrics.co2Reduced.toFixed(1)} kg`);
+            divider();
+
+            /* ── SECCIÓN 4: PROTECCIÓN EJECUTIVA ── */
+            sectionHeader(t.pdfExecProt);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(...C.ink);
+            doc.text(`· ${t.pdfKastonOp}`, col1 + 4, y);  y += 5.5;
+            doc.text(`· ${t.pdfMampos}`,   col1 + 4, y);  y += 5.5;
+            doc.text(`· ${t.pdfStructPort}`,col1 + 4, y); y += 5.5;
+            doc.setFontSize(7.5);
+            doc.setTextColor(...C.dim);
+            doc.text(t.pdfClientAuton, col1 + 4, y); y += 5;
+            doc.text(t.pdfKastonTeam,  col1 + 4, y); y += 8;
+
+            /* ── CLÁUSULA ZINC ── */
+            if (includeZincWaiver) {
+                doc.setFillColor(254, 242, 242);
+                doc.rect(col1, y, pageW - col1*2, 38, 'F');
+                doc.setFontSize(7);
+                doc.setTextColor(...C.red);
+                const zinc = [t.pdfZincObs1,t.pdfZincObs2,t.pdfZincObs3,t.pdfZincObs4,t.pdfZincObs5,t.pdfZincObs6];
+                zinc.forEach(line => { doc.text(line, col1 + 3, y + 5); y += 5; });
+                y += 8;
+            }
+
+            /* ── OBSERVACIÓN ESTRUCTURAL ── */
+            if (withObservation) {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(...C.ink);
+                doc.text(t.pdfObs, col1, y); y += 6;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.text(t.pdfObsText, col1, y); y += 8;
+            }
+
+            /* ── FOOTER ── */
+            doc.setFillColor(...C.dark);
+            doc.rect(0, 282, pageW, 15, 'F');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            doc.setTextColor(...C.mid);
+            doc.text('KASTON® · kaston.proyectos@gmail.com · kastonproyectos.com', col1, 291);
+            doc.text(t.pdfReportTitle, pageW - col1, 291, { align: 'right' });
+        };
 
         const formatCurrency = (value, currency = 'COP') => {
             let num = Number(value);
@@ -483,65 +691,117 @@
            ============================================= */
         function RoofConfigurator({ selectedType, onSelectType, pendiente, onPendienteChange, language }) {
             const t = T[language] || T['es'];
-            const [noSabe, setNoSabe] = useState(pendiente === null);
             const activeRoof = ROOF_TYPES.find(r => r.id === selectedType);
+            const requiresMinPitch = activeRoof?.requiresMinPitch || false;
+
+            // pendiente === undefined → no elegida aún | null → "no sé" | number → valor conocido
+            const pitchMode = pendiente === undefined ? null : (pendiente === null ? 'unknown' : 'known');
+            const pitchValue = typeof pendiente === 'number' ? pendiente : 15;
+            const pitchBelowMin = pitchMode === 'known' && pitchValue < 15;
+
+            const [tooltip, setTooltip] = useState(null);
 
             return (
                 <div className="glass-panel rounded-2xl p-6 flex flex-col gap-6 animate-fade-in">
-                    {/* Aguas — obligatorio */}
+                    {/* ── Tipo de techo ─────────────────────────────── */}
                     <div>
                         <div className="flex items-center gap-3 mb-4">
                             <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofTypeTitle}</h3>
                             <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
                         </div>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 relative">
                             {ROOF_TYPES.map(rt => (
-                                <button key={rt.id} onClick={() => onSelectType(rt.id)}
-                                    className={`flex flex-col items-center p-2 rounded-xl border transition-all duration-200 cursor-pointer gap-1.5
+                                <button key={rt.id}
+                                    onClick={() => onSelectType(rt.id)}
+                                    onMouseEnter={() => setTooltip(rt.id)}
+                                    onMouseLeave={() => setTooltip(null)}
+                                    className={`relative flex flex-col items-center p-2.5 rounded-xl border transition-all duration-200 cursor-pointer gap-2
                                         ${selectedType === rt.id
-                                            ? 'border-bronze bg-bronze/15 shadow-[0_0_14px_rgba(193,138,104,.25)]'
+                                            ? 'border-bronze bg-bronze/15 shadow-[0_0_14px_rgba(193,138,104,.3)]'
                                             : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'}`}>
-                                    <svg viewBox="0 0 80 50" width="58" height="36" xmlns="http://www.w3.org/2000/svg"
+                                    <svg viewBox="0 0 80 50" width="62" height="38" xmlns="http://www.w3.org/2000/svg"
                                         dangerouslySetInnerHTML={{ __html: rt.svg }} />
-                                    <span className={`text-[8px] uppercase font-bold tracking-wide text-center leading-tight ${selectedType === rt.id ? 'text-bronze' : 'text-white/50'}`}>
+                                    <span className={`text-[8.5px] font-bold tracking-wide text-center leading-tight w-full ${selectedType === rt.id ? 'text-bronze' : 'text-white/60'}`}>
                                         {language === 'en' ? (rt.nameEn || rt.nameEs) : rt.nameEs}
                                     </span>
+                                    {tooltip === rt.id && (
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-52 bg-[#1a1a1a] border border-white/15 rounded-xl p-3 text-left pointer-events-none shadow-xl animate-fade-in">
+                                            <p className="text-[10px] text-bronze font-bold uppercase tracking-wide mb-1">{language === 'en' ? rt.nameEn : rt.nameEs}</p>
+                                            <p className="text-[10px] text-white/70 leading-relaxed">{rt.descEs}</p>
+                                        </div>
+                                    )}
                                 </button>
                             ))}
                         </div>
-                        <div className="mt-3 min-h-[18px]">
+                        <div className="mt-3 min-h-[16px]">
                             {!selectedType
                                 ? <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.roofTypeReq}</p>
-                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">
-                                    {activeRoof ? `${activeRoof.nameEs} — ${activeRoof.descEs}` : ''}
-                                  </p>
+                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">{activeRoof?.nameEs}</p>
                             }
                         </div>
                     </div>
 
-                    {/* Pendiente — opcional */}
+                    {/* ── Pendiente — OBLIGATORIO ────────────────────── */}
                     <div className="border-t border-white/10 pt-5">
                         <div className="flex items-center gap-3 mb-4">
                             <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofPitchTitle}</h3>
-                            <span className="text-[9px] bg-white/5 text-white/40 border border-white/10 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.optional}</span>
+                            <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
+                            <InfoTooltip title={t.pitchMinTitle} description={t.pitchMinDesc} />
                         </div>
-                        <label className="flex items-center gap-3 cursor-pointer mb-4">
-                            <input type="checkbox" checked={noSabe}
-                                onChange={(e) => { setNoSabe(e.target.checked); onPendienteChange(e.target.checked ? null : 15); }}
-                                className="w-4 h-4 cursor-pointer accent-bronze" />
-                            <span className="text-sm text-white/70">{t.pitchUnknown}</span>
-                        </label>
-                        {!noSabe && (
-                            <div className="flex items-center gap-4 animate-fade-in">
-                                <input type="number" min="2" max="75"
-                                    value={pendiente || 15}
-                                    onChange={(e) => onPendienteChange(Number(e.target.value))}
-                                    className="w-24 bg-black/50 border border-white/10 rounded-xl p-3 text-white text-center text-2xl font-black focus:outline-none focus:border-bronze transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                                <div className="flex flex-col">
-                                    <span className="text-white/50 text-sm uppercase tracking-widest">{t.pitchDegrees}</span>
-                                    <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">{t.pitchRange}</span>
+
+                        {/* Dos opciones explícitas */}
+                        <div className="flex flex-col gap-2 mb-4">
+                            <button
+                                onClick={() => onPendienteChange(pitchMode === 'known' ? pitchValue : 15)}
+                                className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 cursor-pointer text-left
+                                    ${pitchMode === 'known'
+                                        ? 'border-bronze bg-bronze/15'
+                                        : 'border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/8'}`}>
+                                <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center
+                                    ${pitchMode === 'known' ? 'border-bronze' : 'border-white/30'}`}>
+                                    {pitchMode === 'known' && <span className="w-2 h-2 rounded-full bg-bronze block" />}
+                                </span>
+                                <span className={`text-sm font-medium ${pitchMode === 'known' ? 'text-white' : 'text-white/60'}`}>{t.pitchKnown}</span>
+                            </button>
+                            <button
+                                onClick={() => onPendienteChange(null)}
+                                className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 cursor-pointer text-left
+                                    ${pitchMode === 'unknown'
+                                        ? 'border-bronze bg-bronze/15'
+                                        : 'border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/8'}`}>
+                                <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center
+                                    ${pitchMode === 'unknown' ? 'border-bronze' : 'border-white/30'}`}>
+                                    {pitchMode === 'unknown' && <span className="w-2 h-2 rounded-full bg-bronze block" />}
+                                </span>
+                                <span className={`text-sm font-medium ${pitchMode === 'unknown' ? 'text-white' : 'text-white/60'}`}>{t.pitchUnknown}</span>
+                            </button>
+                        </div>
+
+                        {pitchMode === null && (
+                            <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.pitchSelectReq}</p>
+                        )}
+
+                        {pitchMode === 'known' && (
+                            <div className="flex items-center gap-4 animate-fade-in mt-2">
+                                <input type="number" min="15" max="100"
+                                    value={pitchValue}
+                                    onChange={(e) => {
+                                        const v = Number(e.target.value);
+                                        onPendienteChange(v < 1 ? 15 : v);
+                                    }}
+                                    className={`w-24 bg-black/50 border rounded-xl p-3 text-white text-center text-2xl font-black focus:outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                                        ${pitchBelowMin ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-bronze'}`} />
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-white/50 text-sm uppercase tracking-widest">{t.pitchUnit}</span>
+                                    <span className="text-[10px] text-white/30 uppercase tracking-widest">{t.pitchRange}</span>
                                 </div>
                             </div>
+                        )}
+                        {pitchBelowMin && (
+                            <p className="text-[10px] text-red-400 mt-2 font-semibold">{t.pitchMinError}</p>
+                        )}
+                        {(requiresMinPitch && pitchMode === 'unknown') && (
+                            <p className="text-[10px] text-yellow-400/80 mt-2 font-semibold">{t.pitchShedWarn}</p>
                         )}
                     </div>
                 </div>
@@ -586,131 +846,38 @@
                 '⚠ ADJUNTE EL PDF generado por la plataforma.\n\n' +
                 'Iniciaremos el análisis bajo el estándar de Ingeniería de Protección para resistir vientos de hasta 225 km/h.'
             );
-            const handleDownloadPDF = (proj, includeZincWaiver = false) => {
+            const handleDownloadPDF = async (proj, includeZincWaiver = false) => {
                 try {
                     const doc = new window.jsPDF();
-                    // Header
-                    doc.setFillColor(13, 13, 13);
-                    doc.rect(0, 0, 210, 40, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(24);
-                    doc.text("KASTON", 20, 25);
-                    doc.setFontSize(10);
-                    doc.setTextColor(193, 138, 104);
-                    doc.text(t.pdfReportTitle, 20, 32);
-
-                    // Client data block
+                    const logoDataUrl = await loadLogoForPDF();
                     const meta = session?.user?.user_metadata || {};
-                    const clientName = meta.full_name || t.pdfClientUnreg;
-                    const clientPhone = meta.phone || t.pdfClientUnreg;
-                    const clientDoc = meta.id_number ? `${meta.id_type || ''} ${meta.id_number}`.trim() : t.pdfClientUnreg;
-                    const clientRole = meta.role || t.pdfClientUnreg;
-                    doc.setTextColor(30, 30, 30);
-                    doc.setFontSize(8);
-                    doc.text(`${t.pdfClientData}  |  ${t.pdfClientName} ${clientName}  |  Rol / Role: ${clientRole}  |  ${t.pdfClientPhone} ${clientPhone}  |  ${t.pdfClientDoc} ${clientDoc}`, 20, 47);
-
-                    doc.setTextColor(30, 30, 30);
-                    doc.setFontSize(14);
-
-                    const flowActive = proj.flow || 'A';
                     const unit = proj.unidad || 'm2';
                     const inputValue = proj.area || 0;
                     const areaM2 = unit === 'ft2' ? inputValue / 10.7639 : inputValue;
                     const material = proj.material || proj.tipoConstruccion || 'clay';
                     const currency = proj.divisa || 'COP';
-
                     const metrics = calculateMetrics(areaM2, material, currency, rates);
 
-                    if (flowActive === 'A') {
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP1, 20, 58);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfRoofArea} ${inputValue} ${unit} (~${areaM2.toFixed(1)} m2)`, 25, 68);
-                        doc.text(`${t.pdfP1TradMat} ${MATERIAL_CONSTANTS[material] ? MATERIAL_CONSTANTS[material].label : material}`, 25, 75);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP2, 20, 93);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfReqUnits} ${metrics.units} uds`, 25, 103);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP3, 20, 118);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfDeadLoadRelief} ${metrics.weightSavedTons} ${t.pdfTonsEl}`, 25, 128);
-                    } else {
-                        doc.setFontSize(14);
-                        doc.text(t.pdfSpecTitle, 20, 58);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfEstArea} ${inputValue} ${unit} (~${areaM2.toFixed(1)} m2)`, 25, 68);
-                        doc.text(t.pdfRollThick, 25, 75);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP2Req, 20, 93);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfNetVol} ${metrics.units} ${t.pdfReqUdsC}`, 25, 103);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfCapExtStab, 20, 118);
-                        doc.setFontSize(11);
-                        doc.text(t.pdfIzodConf, 25, 128);
-                    }
-
-                    doc.setFontSize(14);
-                    doc.text(t.pdfESGTitle, 20, 148);
-                    doc.setFontSize(10);
-                    const currSymbol = currency === 'EUR' ? '€' : '$';
-                    const projModality = proj.modality || 'supply';
-                    if (projModality === 'supply') {
-                        doc.text(`${t.pdfInvTileOnly} ${currSymbol}${formatCurrency(metrics.finalCost, currency)} ${currency}`, 25, 156);
-                        doc.setTextColor(150, 150, 150);
-                        doc.setFontSize(8);
-                        doc.text(t.pdfNodeOnlyTile1, 25, 161);
-                        doc.text(t.pdfNodeOnlyTile2, 25, 165);
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(10);
-                        doc.text(`${t.pdfUpcycledTitle} ${metrics.plasticUpcycled.toFixed(1)} kg`, 25, 173);
-                        doc.text(`${t.pdfCO2RedTitle} ${metrics.co2Reduced.toFixed(1)} kg`, 25, 180);
-                    } else {
-                        doc.text(`${t.pdfInvAllInc} ${currSymbol}${formatCurrency(metrics.finalCostTodoCosto, currency)} ${currency}`, 25, 156);
-                        doc.setTextColor(150, 150, 150);
-                        doc.setFontSize(8);
-                        doc.text(t.pdfNodeAllInc1, 25, 161);
-                        doc.text(t.pdfNodeAllInc2, 25, 165);
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(10);
-                        doc.text(`${t.pdfUpcycledTitle} ${metrics.plasticUpcycled.toFixed(1)} kg`, 25, 173);
-                        doc.text(`${t.pdfCO2RedTitle} ${metrics.co2Reduced.toFixed(1)} kg`, 25, 180);
-                    }
-
-                    doc.setTextColor(30, 30, 30);
-                    doc.setFontSize(14);
-                    doc.text(t.pdfExecProt, 20, 193);
-                    doc.setFontSize(10);
-                    doc.text(t.pdfKastonOp, 25, 203);
-                    doc.text(t.pdfMampos, 25, 210);
-                    doc.text(t.pdfStructPort, 25, 217);
-                    doc.setFontSize(9);
-                    doc.setTextColor(100, 100, 100);
-                    doc.text(t.pdfClientAuton, 25, 227);
-                    doc.text(t.pdfKastonTeam, 25, 232);
-
-                    if (includeZincWaiver) {
-                        doc.setFontSize(8);
-                        doc.setTextColor(180, 50, 50);
-                        doc.text(t.pdfZincObs1, 20, 248);
-                        doc.text(t.pdfZincObs2, 20, 253);
-                        doc.text(t.pdfZincObs3, 20, 258);
-                        doc.text(t.pdfZincObs4, 20, 263);
-                        doc.text(t.pdfZincObs5, 20, 268);
-                        doc.text(t.pdfZincObs6, 20, 273);
-                    }
-
-                    doc.save(`Kaston-Proyecto-${proj.nombre ? proj.nombre.replace(/\s+/g, '-') : 'Resumen'}.pdf`);
+                    buildPremiumPDF(doc, {
+                        t, flow: proj.flow || 'A',
+                        area: inputValue, unit, areaM2,
+                        material, currency, metrics,
+                        modality: proj.modality || 'supply',
+                        roofType: proj.roofType || null,
+                        pendiente: proj.pendiente !== undefined ? proj.pendiente : null,
+                        selectedColor: proj.selectedColor || null,
+                        constructionType: proj.tipoConstruccion || 'Residencial',
+                        clientName:  meta.full_name  || t.pdfClientUnreg,
+                        clientPhone: meta.phone       || t.pdfClientUnreg,
+                        clientDoc:   meta.id_number ? `${meta.id_type||''} ${meta.id_number}`.trim() : t.pdfClientUnreg,
+                        clientRole:  meta.role        || t.pdfClientUnreg,
+                        withObservation: false, includeZincWaiver,
+                    }, logoDataUrl);
+                    doc.save(`Kaston-Proyecto-${proj.nombre ? proj.nombre.replace(/\s+/g,'-') : 'Resumen'}.pdf`);
                 } catch (err) {
                     console.error("Error regenerando PDF: ", err);
                     alert(t.pdfGenError);
                 }
-
             };
 
             if (projects.length === 0) {
@@ -1084,7 +1251,7 @@
             const [isPdfDownloaded, setIsPdfDownloaded] = useState(false);
             const [showZincModal, setShowZincModal] = useState(false);
             const [roofType, setRoofType] = useState(editingProject ? (editingProject.roofType || null) : null);
-            const [pendiente, setPendiente] = useState(editingProject ? (editingProject.pendiente !== undefined ? editingProject.pendiente : null) : null);
+            const [pendiente, setPendiente] = useState(editingProject ? (editingProject.pendiente !== undefined ? editingProject.pendiente : null) : undefined);
             const [selectedColor, setSelectedColor] = useState(editingProject ? (editingProject.selectedColor || null) : null);
 
             useEffect(() => {
@@ -1120,108 +1287,20 @@
                 setIsSaving(true);
                 try {
                     const doc = new jsPDF();
-                    doc.setFillColor(13, 13, 13);
-                    doc.rect(0, 0, 210, 40, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(24);
-                    doc.text("KASTON", 20, 25);
-                    doc.setFontSize(10);
-                    doc.setTextColor(193, 138, 104);
-                    doc.text(t.pdfReportTitle, 20, 32);
-
-                    // Client data block
+                    const logoDataUrl = await loadLogoForPDF();
                     const meta = session?.user?.user_metadata || {};
-                    const clientName = meta.full_name || t.pdfClientUnreg;
-                    const clientPhone = meta.phone || t.pdfClientUnreg;
-                    const clientDoc = meta.id_number ? `${meta.id_type || ''} ${meta.id_number}`.trim() : t.pdfClientUnreg;
-                    const clientRole = meta.role || t.pdfClientUnreg;
-                    doc.setTextColor(30, 30, 30);
-                    doc.setFontSize(8);
-                    doc.text(`${t.pdfClientData}  |  ${t.pdfClientName} ${clientName}  |  Rol / Role: ${clientRole}  |  ${t.pdfClientPhone} ${clientPhone}  |  ${t.pdfClientDoc} ${clientDoc}`, 20, 47);
-
-                    doc.setTextColor(30, 30, 30);
-                    doc.setFontSize(14);
-                    if (flowActive === 'A') {
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP1, 20, 58);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfRoofArea} ${inputValue} ${unit} (~${areaM2.toFixed(1)} m2)`, 25, 68);
-                        doc.text(`${t.pdfP1TradMat} ${MATERIAL_CONSTANTS[material].label}`, 25, 75);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP2, 20, 90);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfReqUnits} ${metrics.units} uds`, 25, 100);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP3, 20, 115);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfDeadLoadRelief} ${metrics.weightSavedTons} ${t.pdfTonsEl}`, 25, 125);
-                    } else {
-                        doc.setFontSize(14);
-                        doc.text(t.pdfSpecTitle, 20, 58);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfEstArea} ${inputValue} ${unit} (~${areaM2.toFixed(1)} m2)`, 25, 68);
-                        doc.text(t.pdfRollThick, 25, 75);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfP2Req, 20, 93);
-                        doc.setFontSize(11);
-                        doc.text(`${t.pdfNetVol} ${metrics.units} ${t.pdfReqUdsC}`, 25, 103);
-
-                        doc.setFontSize(14);
-                        doc.text(t.pdfCapExtStab, 20, 118);
-                        doc.setFontSize(11);
-                        doc.text(t.pdfIzodConf, 25, 128);
-                    }
-
-                    doc.setFontSize(14);
-                    doc.text(t.pdfESGTitle, 20, 145);
-                    doc.setFontSize(10);
-                    const currSymbol = currency === 'EUR' ? '€' : '$';
-                    if (modality === 'supply') {
-                        doc.text(`${t.pdfInvTileOnly} ${currSymbol}${formatCurrency(metrics.finalCost, currency)} ${currency}`, 25, 153);
-                        doc.setTextColor(150, 150, 150);
-                        doc.setFontSize(8);
-                        doc.text(t.pdfNodeOnlyTile1, 25, 158);
-                        doc.text(t.pdfNodeOnlyTile2, 25, 162);
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(10);
-                        doc.text(`${t.pdfUpcycledTitle} ${metrics.plasticUpcycled.toFixed(1)} kg`, 25, 170);
-                        doc.text(`${t.pdfCO2RedTitle} ${metrics.co2Reduced.toFixed(1)} kg`, 25, 177);
-                    } else if (modality === 'full') {
-                        doc.text(`${t.pdfInvAllInc} ${currSymbol}${formatCurrency(metrics.finalCostTodoCosto, currency)} ${currency}`, 25, 153);
-                        doc.setTextColor(150, 150, 150);
-                        doc.setFontSize(8);
-                        doc.text(t.pdfNodeAllInc1, 25, 158);
-                        doc.text(t.pdfNodeAllInc2, 25, 162);
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(10);
-                        doc.text(`${t.pdfUpcycledTitle} ${metrics.plasticUpcycled.toFixed(1)} kg`, 25, 170);
-                        doc.text(`${t.pdfCO2RedTitle} ${metrics.co2Reduced.toFixed(1)} kg`, 25, 177);
-                    }
-
-                    doc.setTextColor(30, 30, 30);
-                    doc.setFontSize(14);
-                    doc.text(t.pdfExecProt, 20, 190);
-                    doc.setFontSize(10);
-                    doc.text(t.pdfKastonOp, 25, 200);
-                    doc.text(t.pdfMampos, 25, 207);
-                    doc.text(t.pdfStructPort, 25, 214);
-                    doc.setFontSize(9);
-                    doc.setTextColor(100, 100, 100);
-                    doc.text(t.pdfClientAuton, 25, 224);
-                    doc.text(t.pdfKastonTeam, 25, 229);
-
-                    if (withObservation) {
-                        doc.setTextColor(30, 30, 30);
-                        doc.setFontSize(14);
-                        doc.text(t.pdfObs, 20, 245);
-                        doc.setFontSize(10);
-                        doc.text(t.pdfObsText, 25, 255);
-                    }
-
-                    doc.save(`Kaston-Ingenieria-${inputValue}${unit}.pdf`);
+                    buildPremiumPDF(doc, {
+                        t, flow: flowActive, area: inputValue, unit, areaM2,
+                        material, currency, metrics, modality,
+                        roofType, pendiente, selectedColor,
+                        constructionType,
+                        clientName:  meta.full_name  || t.pdfClientUnreg,
+                        clientPhone: meta.phone       || t.pdfClientUnreg,
+                        clientDoc:   meta.id_number ? `${meta.id_type||''} ${meta.id_number}`.trim() : t.pdfClientUnreg,
+                        clientRole:  meta.role        || t.pdfClientUnreg,
+                        withObservation, includeZincWaiver: false,
+                    }, logoDataUrl);
+                    doc.save(`Kaston-Cotizacion-${inputValue}${unit}.pdf`);
                     setIsPdfDownloaded(true);
                 } catch (err) {
                     console.error("Error durante el proceso:", err);
@@ -1296,6 +1375,16 @@
 
                 if (!roofType) {
                     alert(t.roofTypeRequired);
+                    return;
+                }
+
+                if (pendiente === undefined) {
+                    alert(t.pitchSelectReqAlert);
+                    return;
+                }
+
+                if (typeof pendiente === 'number' && pendiente < 15) {
+                    alert(t.pitchMinErrorAlert);
                     return;
                 }
 
@@ -2281,12 +2370,24 @@
                 roofPitchTitle: "Pendiente del Techo",
                 mandatory: "Obligatorio",
                 optional: "Opcional",
+                pitchKnown: "Conozco la pendiente",
                 pitchUnknown: "No lo sé, me gustaría asesorarme y conocerla",
-                pitchDegrees: "Grados de inclinación",
-                pitchRange: "Rango típico: 2° – 75°",
+                pitchUnit: "% Pendiente",
+                pitchRange: "Mínimo 15% — Máximo 100%",
+                pitchMinTitle: "Pendiente Mínima",
+                pitchMinDesc: "El mínimo es de 15% para la fluidez del agua",
+                pitchMinError: "La pendiente mínima es 15% para garantizar la escorrentía del agua.",
+                pitchMinErrorAlert: "La pendiente debe ser mínimo 15% para garantizar la fluidez del agua.",
+                pitchSelectReq: "Selecciona una opción de pendiente para continuar",
+                pitchSelectReqAlert: "Debes indicar la pendiente del techo antes de guardar el proyecto.",
+                pitchShedWarn: "El cobertizo requiere mínimo 15% de pendiente. Se coordinará en la asesoría.",
                 roofTypeReq: "Selecciona el tipo de techo para continuar",
                 roofTypeRequired: "Debes seleccionar el tipo de techo (aguas) antes de guardar el proyecto.",
                 colorLabel: "Color de Teja Deseado",
+                pdfRoofTypeLabel: "Tipo de Techo:",
+                pdfPendienteLabel: "Pendiente:",
+                pdfColorLabel: "Color Seleccionado:",
+                pdfConstrType: "Tipo de Construcción:",
                 colorTooltipTitle: "Variación de Color por Polímero",
                 colorTooltipDesc: "Al fabricar con polímero recuperado (plásticos reciclados de alta resistencia), el tono final real será lo más cercano posible al render mostrado, pero puede presentar variaciones naturales según la mezcla de materiales en cada lote de producción. Esto no afecta las propiedades técnicas del producto.",
                 awaitConfirm: "Registro exitoso! Por favor revisa tu bandeja de entrada para confirmar tu cuenta antes de iniciar sesión.",
@@ -2510,16 +2611,28 @@
                 errBadCreds: "Invalid credentials. Please check your email and password.",
                 passportFmtHint: "Format: 2 letters + numbers (e.g. AB1234567)",
                 numericOnlyHint: "Numeric characters only",
-                roofTypeTitle: "Roof Type (Waters)",
+                roofTypeTitle: "Roof Type",
                 roofPitchTitle: "Roof Pitch",
                 mandatory: "Required",
                 optional: "Optional",
+                pitchKnown: "I know the pitch",
                 pitchUnknown: "I don't know — I'd like advice on this",
-                pitchDegrees: "Degrees of inclination",
-                pitchRange: "Typical range: 2° – 75°",
+                pitchUnit: "% Pitch",
+                pitchRange: "Min 15% — Max 100%",
+                pitchMinTitle: "Minimum Pitch",
+                pitchMinDesc: "Minimum 15% pitch is required for proper water runoff",
+                pitchMinError: "Minimum pitch is 15% to ensure water drainage.",
+                pitchMinErrorAlert: "Pitch must be at least 15% to ensure proper water runoff.",
+                pitchSelectReq: "Select a pitch option to continue",
+                pitchSelectReqAlert: "You must indicate the roof pitch before saving the project.",
+                pitchShedWarn: "Shed roof requires at least 15% pitch. Will be discussed during consultation.",
                 roofTypeReq: "Select a roof type to continue",
                 roofTypeRequired: "You must select a roof type before saving the project.",
                 colorLabel: "Desired Tile Color",
+                pdfRoofTypeLabel: "Roof Type:",
+                pdfPendienteLabel: "Pitch:",
+                pdfColorLabel: "Selected Color:",
+                pdfConstrType: "Construction Type:",
                 colorTooltipTitle: "Color Variation — Recovered Polymer",
                 colorTooltipDesc: "When manufacturing with recovered polymer (high-strength recycled plastics), the final real tone will be as close as possible to the render shown, but may present natural variations based on the material mix in each production batch. This does not affect the product's technical properties.",
                 awaitConfirm: "Registration successful! Please check your inbox to confirm your account before logging in.",
