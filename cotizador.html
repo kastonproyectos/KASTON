@@ -411,17 +411,18 @@
             row(t.pdfCO2RedTitle,   `${metrics.co2Reduced.toFixed(1)} kg`);
             divider();
 
-            /* ── SECCIÓN 4: PROTECCIÓN EJECUTIVA ── */
+            /* ── SECCIÓN 4: ALCANCE Y VISITA TÉCNICA ── */
             sectionHeader(t.pdfExecProt);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8.5);
             doc.setTextColor(...C.ink);
-            doc.text(`· ${t.pdfKastonOp}`, col1 + 4, y);  y += 5.5;
-            doc.text(`· ${t.pdfMampos}`,   col1 + 4, y);  y += 5.5;
-            doc.text(`· ${t.pdfStructPort}`,col1 + 4, y); y += 5.5;
+            doc.text(`· ${t.pdfKastonOp}`,   col1 + 4, y); y += 5.5;
+            doc.text(`· ${t.pdfMampos}`,      col1 + 4, y); y += 5.5;
+            doc.text(`· ${t.pdfStructPort}`,  col1 + 4, y); y += 5.5;
             doc.setFontSize(7.5);
             doc.setTextColor(...C.dim);
-            doc.text(t.pdfClientAuton, col1 + 4, y); y += 5;
+            doc.text(t.pdfVisitNote,   col1 + 4, y); y += 4.5;
+            doc.text(t.pdfClientAuton, col1 + 4, y); y += 4.5;
             doc.text(t.pdfKastonTeam,  col1 + 4, y); y += 8;
 
             /* ── CLÁUSULA ZINC ── */
@@ -858,6 +859,7 @@
                     const currency = proj.divisa || 'COP';
                     const metrics = calculateMetrics(areaM2, material, currency, rates);
 
+                    const clientName = meta.full_name || session?.user?.email?.split('@')[0] || t.pdfClientUnreg;
                     buildPremiumPDF(doc, {
                         t, flow: proj.flow || 'A',
                         area: inputValue, unit, areaM2,
@@ -867,13 +869,13 @@
                         pendiente: proj.pendiente !== undefined ? proj.pendiente : null,
                         selectedColor: proj.selectedColor || null,
                         constructionType: proj.tipoConstruccion || 'Residencial',
-                        clientName:  meta.full_name  || t.pdfClientUnreg,
+                        clientName,
                         clientPhone: meta.phone       || t.pdfClientUnreg,
                         clientDoc:   meta.id_number ? `${meta.id_type||''} ${meta.id_number}`.trim() : t.pdfClientUnreg,
                         clientRole:  meta.role        || t.pdfClientUnreg,
                         withObservation: false, includeZincWaiver,
                     }, logoDataUrl);
-                    doc.save(`Kaston-Proyecto-${proj.nombre ? proj.nombre.replace(/\s+/g,'-') : 'Resumen'}.pdf`);
+                    doc.save(`Cotización Kaston — ${clientName}.pdf`);
                 } catch (err) {
                     console.error("Error regenerando PDF: ", err);
                     alert(t.pdfGenError);
@@ -1281,6 +1283,14 @@
             const sliderMax = unit === 'ft2' ? 16145.85 : 1500;
             const sliderStep = unit === 'ft2' ? 0.01 : 1;
 
+            const isFormComplete = Boolean(
+                modality &&
+                roofType &&
+                pendiente !== undefined &&
+                (pendiente === null || (typeof pendiente === 'number' && pendiente >= 15)) &&
+                selectedColor
+            );
+
             const handlePDF = async (options = {}) => {
                 if (!modality) return;
                 const withObservation = options && options.withObservation === true;
@@ -1289,18 +1299,19 @@
                     const doc = new jsPDF();
                     const logoDataUrl = await loadLogoForPDF();
                     const meta = session?.user?.user_metadata || {};
+                    const clientName = meta.full_name || session?.user?.email?.split('@')[0] || t.pdfClientUnreg;
                     buildPremiumPDF(doc, {
                         t, flow: flowActive, area: inputValue, unit, areaM2,
                         material, currency, metrics, modality,
                         roofType, pendiente, selectedColor,
                         constructionType,
-                        clientName:  meta.full_name  || t.pdfClientUnreg,
+                        clientName,
                         clientPhone: meta.phone       || t.pdfClientUnreg,
                         clientDoc:   meta.id_number ? `${meta.id_type||''} ${meta.id_number}`.trim() : t.pdfClientUnreg,
                         clientRole:  meta.role        || t.pdfClientUnreg,
                         withObservation, includeZincWaiver: false,
                     }, logoDataUrl);
-                    doc.save(`Kaston-Cotizacion-${inputValue}${unit}.pdf`);
+                    doc.save(`Cotización Kaston — ${clientName}.pdf`);
                     setIsPdfDownloaded(true);
                 } catch (err) {
                     console.error("Error durante el proceso:", err);
@@ -1640,16 +1651,13 @@
                         </div>
                     </div>
 
-                    {!modality && (
-                        <div className="w-full mt-4 p-4 rounded-xl border-2 border-red-500/50 bg-red-500/10 flex items-start gap-3 animate-pulse">
-                            <svg className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                            <div>
-                                <p className="text-red-500 font-black uppercase tracking-widest text-xs mb-1">{t.reqModal}</p>
-                                <p className="text-red-500/80 text-xs uppercase tracking-wide">{t.reqModalDesc}</p>
-                            </div>
+                    {!isFormComplete && !isPdfDownloaded && (
+                        <div className="w-full mt-4 p-4 rounded-xl border border-white/10 bg-white/5 flex items-start gap-3">
+                            <svg className="w-5 h-5 text-white/30 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <p className="text-white/40 text-xs uppercase tracking-wide leading-relaxed">{t.formIncompleteHint}</p>
                         </div>
                     )}
-                    {!isPdfDownloaded && modality && (
+                    {isFormComplete && !isPdfDownloaded && (
                         <div className="w-full mt-4 p-4 rounded-xl border-2 border-bronze bg-bronze/10 flex items-start gap-3 animate-pulse">
                             <svg className="w-6 h-6 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                             <div>
@@ -1659,7 +1667,7 @@
                         </div>
                     )}
                     <div className="flex flex-col md:flex-row justify-end gap-3 mt-4 relative z-10">
-                        <button onClick={handlePDF} disabled={!modality} className={`flex-1 md:flex-none justify-center transition-all duration-300 border px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-sm flex items-center gap-3 relative overflow-hidden group shadow-[0_0_15px_rgba(0,0,0,0.5)] ${!modality ? 'opacity-50 cursor-not-allowed bg-black text-white/50 border-white/20' : (!isPdfDownloaded ? 'bg-bronze border-bronze text-graphite hover:bg-white cursor-pointer' : 'bg-white/5 border-white/20 hover:bg-bronze hover:border-bronze hover:text-graphite text-white cursor-pointer')}`}>
+                        <button onClick={handlePDF} disabled={!isFormComplete} className={`flex-1 md:flex-none justify-center transition-all duration-300 border px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-sm flex items-center gap-3 relative overflow-hidden group shadow-[0_0_15px_rgba(0,0,0,0.5)] ${!isFormComplete ? 'opacity-40 cursor-not-allowed bg-black text-white/30 border-white/10' : (!isPdfDownloaded ? 'bg-bronze border-bronze text-graphite hover:bg-white cursor-pointer' : 'bg-white/5 border-white/20 hover:bg-bronze hover:border-bronze hover:text-graphite text-white cursor-pointer')}`}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             <span className="relative z-10">{isPdfDownloaded ? t.pdfDownloaded : t.downPdfQuote}</span>
                         </button>
@@ -1678,7 +1686,39 @@
             );
         }
 
+        function WelcomeModal({ language, onAccept }) {
+            const t = T[language] || T['es'];
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)' }}>
+                    <div className="relative w-full max-w-lg bg-[#0f0f0f] border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.8)] animate-fade-in">
+                        {/* Franja bronce top */}
+                        <div style={{ height:'3px', background:'linear-gradient(90deg,#C18A68,#a8754f)' }} />
+                        <div className="p-8 flex flex-col gap-6">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] text-bronze uppercase tracking-[0.2em] font-bold">{t.welcomeTag}</span>
+                                <h2 className="text-xl font-heading font-bold text-white leading-snug">{t.welcomeTitle}</h2>
+                            </div>
+                            <p className="text-sm text-white/65 leading-relaxed">{t.welcomeBody}</p>
+                            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                                <button
+                                    onClick={onAccept}
+                                    className="flex-1 bg-bronze hover:bg-white text-[#0d0d0d] font-bold uppercase tracking-widest text-sm py-3.5 rounded-xl transition-all duration-200 cursor-pointer">
+                                    {t.welcomeAccept}
+                                </button>
+                                <button
+                                    onClick={() => { window.location.href = 'https://kastonproyectos.com'; }}
+                                    className="flex-1 border border-white/15 hover:border-white/30 text-white/50 hover:text-white/80 font-semibold uppercase tracking-widest text-sm py-3.5 rounded-xl transition-all duration-200 cursor-pointer">
+                                    {t.welcomeDecline}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         function MainDashboard({ onLogout, session, extraData, onAuth }) {
+            const [showWelcomeModal, setShowWelcomeModal] = useState(() => !sessionStorage.getItem('kaston_welcomed'));
             const [currentTab, setCurrentTab] = useState(() => sessionStorage.getItem('kaston_currentTab') || 'triage');
             const [projects, setProjects] = useState([]);
             const [language, setLanguage] = useState('es');
@@ -1879,6 +1919,12 @@
 
             return (
                 <div className="min-h-screen bg-graphite font-sans flex flex-col items-center pb-24">
+                    {showWelcomeModal && (
+                        <WelcomeModal language={language} onAccept={() => {
+                            sessionStorage.setItem('kaston_welcomed', '1');
+                            setShowWelcomeModal(false);
+                        }} />
+                    )}
                     <header className="w-full border-b border-white/10 sticky top-0 z-50" style={{ backgroundColor: '#0E0E0E' }}>
                         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between w-full gap-3">
                             <div className="flex items-center gap-3 flex-shrink-0">
@@ -2174,15 +2220,21 @@
                 bottomProf: "Perfil",
                 trTitle: "Triage de Proyecto",
                 trSub: "Seleccione el perfil técnico de su requerimiento",
+                welcomeTag: "Cotizador Técnico KASTON",
+                welcomeTitle: "¡Hola! Te damos la bienvenida al Cotizador Técnico de KASTON.",
+                welcomeBody: "Queremos que el proceso de cotizar tu proyecto sea lo más sencillo, transparente y rápido posible. Diseñamos esta herramienta para que funcione como nuestro primer filtro de ahorro de tiempo: tú nos compartes lo que ya conoces de tu espacio y nosotros avanzamos de inmediato. Así, cuando programemos tu visita técnica presencial, iremos directo al grano para concluir los detalles finales de tu instalación sin hacerte perder tiempo en papeleos previos.",
+                welcomeAccept: "Entendido, ¡empecemos!",
+                welcomeDecline: "No acepto, volver al sitio",
+                formIncompleteHint: "Completa todas las secciones del formulario (modalidad, tipo de techo, pendiente y color) para habilitar la descarga del PDF.",
                 routeA: "Plan de Reemplazo",
                 routeASub: "Sustitución de techo existente",
-                routeADesc: "Deseo sustituir un techo existente (Barro, Zinc, Fibrocemento) por la ingeniería y blindaje KASTON.",
+                routeADesc: "Deseo sustituir un techo existente (Barro, Zinc, Fibrocemento) por el Sistema KASTON. KASTON instala exclusivamente el Sistema KASTON; no realizamos mampostería ni construcción desde cero.",
                 routeB: "Plan de Especificación",
                 routeBSub: "Proyecto en planos",
-                routeBDesc: "Deseo cotizar el escudo exterior KASTON para mi proyecto en fase de diseño o construcción desde cero.",
-                routeC: "RUTA C",
-                routeCSub: "Ingeniería Integral",
-                routeCDesc: "Necesito cálculo de estructura portante y sistema completo desde cero.",
+                routeBDesc: "Deseo cotizar el Sistema KASTON para mi proyecto en fase de diseño o construcción desde cero. KASTON se encarga de la instalación del sistema sobre la estructura indicada en planos.",
+                routeC: "Ruta C — Ingeniería Integral",
+                routeCSub: "Estructura + Sistema KASTON",
+                routeCDesc: "Requiero diseño y montaje de la estructura portante antes de instalar el Sistema KASTON. Esta ruta incluye asesoría estructural completa desde cero.",
                 noSavedProj: "No hay proyectos guardados",
                 noSavedD: "Los cálculos que guardes en el dashboard aparecerán aquí.",
                 myProjects: "Mis Proyectos",
@@ -2338,12 +2390,13 @@
                 pdfInvAllInc: "Inversión (Todo Costo / Instalado):",
                 pdfNodeAllInc1: "NOTA: Solución integral cubierta bajo el estándar de Ingeniería de Protección.",
                 pdfNodeAllInc2: "Incluye malla, alambre y ejecución por cuadrilla especializada.",
-                pdfExecProt: "5. PROTOCOLO DE EJECUCION Y MANO DE OBRA",
-                pdfKastonOp: "KASTON opera bajo un modelo de ingenieria consultiva. Acompanamiento en:",
-                pdfMampos: " - Mamposteria: Ajuste y nivelacion de culatas y muros de soporte.",
-                pdfStructPort: " - Estructura Portante: Diseno y montaje en acero o madera inmunizada.",
-                pdfClientAuton: "Nota: El cliente conserva la autonomia total para decidir si ejecuta la obra con el",
-                pdfKastonTeam: "equipo recomendado por KASTON o con contratistas externos de su eleccion.",
+                pdfExecProt: "5. ALCANCE DE LA INSTALACIÓN KASTON",
+                pdfKastonOp: "KASTON instala exclusivamente el Sistema KASTON sobre la estructura existente.",
+                pdfMampos: "No realizamos mampostería ni construcción de techo desde cero.",
+                pdfStructPort: "Ruta C: Si requiere diseño/montaje de estructura portante, escríbanos para asesoría integral.",
+                pdfVisitNote: "Esta cotización sirve para programar una visita técnica presencial de diagnóstico final.",
+                pdfClientAuton: "En la visita se revisarán detalles como nivelación de culatas y se concluirá",
+                pdfKastonTeam: "el plan definitivo de instalación sin hacerle perder tiempo en papeleos previos.",
                 pdfObs: "6. OBSERVACIONES",
                 pdfObsText: "El cliente manifiesta que cuenta con una empresa para la ejecucion de la estructura portante.",
                 pdfCancelName: "Se canceló el guardado. El proyecto debe tener un nombre.",
@@ -2419,15 +2472,21 @@
                 bottomProf: "Profile",
                 trTitle: "Project Triage",
                 trSub: "Select the technical profile for your requirement",
+                welcomeTag: "KASTON Technical Quoter",
+                welcomeTitle: "Hello! Welcome to KASTON's Technical Quoter.",
+                welcomeBody: "We want the process of quoting your project to be as simple, transparent, and fast as possible. We designed this tool as our first time-saving filter: you share what you already know about your space and we move forward immediately. When we schedule your in-person technical visit, we'll go straight to the point to finalize installation details without wasting your time on paperwork.",
+                welcomeAccept: "Got it, let's start!",
+                welcomeDecline: "I don't accept, go back",
+                formIncompleteHint: "Complete all sections (modality, roof type, pitch, and color) to enable the PDF download.",
                 routeA: "Replacement Plan",
                 routeASub: "Existing roof substitution",
-                routeADesc: "I want to replace an existing roof (Clay, Zinc, Fiber Cement) with KASTON engineering and armor.",
+                routeADesc: "I want to replace an existing roof (Clay, Zinc, Fiber Cement) with the KASTON System. KASTON installs exclusively the KASTON System; we do not perform masonry or build from scratch.",
                 routeB: "Specification Plan",
                 routeBSub: "Project in design",
-                routeBDesc: "I want to quote the KASTON exterior shield for my project in the design or from-scratch construction phase.",
-                routeC: "Comprehensive Engineering Plan",
-                routeCSub: "Expert structural advice",
-                routeCDesc: "I need a calculation of the supporting structure and a complete system from scratch.",
+                routeBDesc: "I want to quote the KASTON System for my project in the design or new-build phase. KASTON handles installation of the system over the structure indicated in the plans.",
+                routeC: "Route C — Comprehensive Engineering",
+                routeCSub: "Structure + KASTON System",
+                routeCDesc: "I need design and installation of the supporting structure before installing the KASTON System. This route includes full structural consulting from scratch.",
                 noSavedProj: "No saved projects",
                 noSavedD: "Calculations saved in the dashboard will appear here.",
                 myProjects: "My Projects",
@@ -2583,10 +2642,11 @@
                 pdfInvAllInc: "Investment (All-Inclusive / Installed):",
                 pdfNodeAllInc1: "NOTE: Integral solution covered by the Protection Engineering standard.",
                 pdfNodeAllInc2: "Includes mesh, wire, and execution by a specialized crew.",
-                pdfExecProt: "5. EXECUTION PROTOCOL AND LABOR",
-                pdfKastonOp: "KASTON operates under a consultative engineering model. Accompaniment in:",
-                pdfMampos: " - Masonry: Adjustment and leveling of gables and support walls.",
-                pdfStructPort: " - Supporting Structure: Design and assembly in steel or immunized wood.",
+                pdfExecProt: "5. KASTON INSTALLATION SCOPE",
+                pdfKastonOp: "KASTON installs exclusively the KASTON System over the existing structure.",
+                pdfMampos: "We do not perform masonry or build roofs from scratch.",
+                pdfStructPort: "Route C: If you need structure design/installation, contact us for full engineering support.",
+                pdfVisitNote: "This quote serves to schedule an in-person technical diagnostic visit.",
                 pdfClientAuton: "Note: The client retains full autonomy to decide whether to execute the work with the",
                 pdfKastonTeam: "team recommended by KASTON or with external contractors of their choice.",
                 pdfObs: "6. OBSERVATIONS",
