@@ -215,14 +215,14 @@
                 nameEs: 'A Dos Aguas',
                 nameEn: 'Gable',
                 descEs: 'Estructura clásica compuesta por dos vertientes inclinadas que se intersectan en una cumbrera central superior, formando una silueta triangular en su fachada principal.',
-                imagePath: "/assets/techos/dos-aguas.jpg"
+                imagePath: "/assets/techos/dos-aguas.png"
             },
             {
                 id: 'hip',
                 nameEs: 'A Cuatro Aguas',
                 nameEn: 'Hip',
                 descEs: 'Diseño donde todas las caras de la cubierta son planos inclinados que convergen hacia las esquinas superiores, eliminando las paredes verticales altas en los laterales.',
-                imagePath: "/assets/techos/cuatro-aguas.jpg"
+                imagePath: "/assets/techos/cuatro-aguas.png"
             },
             {
                 id: 'shed',
@@ -257,14 +257,14 @@
                 nameEs: 'Saltbox',
                 nameEn: 'Saltbox',
                 descEs: 'Diseño a dos aguas asimétrico donde una de las vertientes de la cubierta es significativamente más larga y se extiende hacia los niveles inferiores de la edificación.',
-                imagePath: "/assets/techos/saltbox.jpg"
+                imagePath: "/assets/techos/saltbox.png"
             },
             {
                 id: 'jerkinhead',
                 nameEs: 'Jerkinhead',
                 nameEn: 'Jerkinhead',
                 descEs: 'Variación del techo a dos aguas tradicional donde los extremos o picos superiores de la cumbrera principal están recortados por una pequeña sección inclinada.',
-                imagePath: "/assets/techos/jerkinhead.jpg"
+                imagePath: "/assets/techos/jerkinhead.png"
             },
             {
                 id: 'bonnet',
@@ -278,14 +278,14 @@
                 nameEs: 'Combinado',
                 nameEn: 'Combination',
                 descEs: 'Diseño híbrido de alta complejidad que integra de manera articulada dos o más tipologías distintas de techos inclinados o intersecciones en L dentro de la misma edificación.',
-                imagePath: "/assets/techos/combinado.jpg"
+                imagePath: "/assets/techos/combinado.png"
             },
             {
                 id: 'pyramidal',
                 nameEs: 'Techo Piramidal',
                 nameEn: 'Pyramidal',
                 descEs: 'Variación del estilo a cuatro aguas donde todas las vertientes triangulares convergen simétricamente en un único punto central superior, eliminando la línea de cumbrera horizontal.',
-                imagePath: "/assets/techos/piramidal.jpg"
+                imagePath: "/assets/techos/piramidal.png"
             },
             {
                 id: 'dutch_gable',
@@ -306,7 +306,7 @@
                 nameEs: 'Techo con Buhardilla',
                 nameEn: 'Dormer',
                 descEs: 'Cubierta inclinada tradicional que incorpora una pequeña estructura vertical saliente con su propio tejado para albergar una ventana superior.',
-                imagePath: "/assets/techos/buhardilla.jpg"
+                imagePath: "/assets/techos/buhardilla.png"
             },
             {
                 id: 'monitor',
@@ -854,9 +854,9 @@
                                         <InfoTooltip title={language === 'en' ? rt.nameEn : rt.nameEs} description={rt.descEs} />
                                     </div>
                                     {rt.imagePath ? (
-                                        <img src={rt.imagePath} alt={rt.nameEs} className="mt-1 h-24 w-full object-contain" />
+                                        <img src={rt.imagePath} alt={rt.nameEs} className="w-full h-24 object-contain mx-auto p-1" />
                                     ) : (
-                                        <div className="mt-1 h-24 w-full flex items-center justify-center">
+                                        <div className="w-full h-24 flex items-center justify-center mx-auto p-1">
                                             <span className="text-5xl font-black text-[#6F767D]">?</span>
                                         </div>
                                     )}
