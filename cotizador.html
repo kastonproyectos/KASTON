@@ -771,18 +771,6 @@
                         </div>
                     </div>
 
-                    {/* ── Tipo especial: aviso de asesoría ──────────── */}
-                    {activeRoof?.id === 'otro' && (
-                        <div className="border-t border-white/10 pt-5 animate-fade-in">
-                            <div className="flex items-start gap-3 p-4 rounded-xl border border-bronze/40 bg-bronze/8" style={{ background:'rgba(193,138,104,.05)' }}>
-                                <div className="w-7 h-7 rounded-full bg-bronze/20 text-bronze flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">★</div>
-                                <div>
-                                    <p className="text-xs text-bronze font-black uppercase tracking-wider mb-2">{t.specialRoofTitle}</p>
-                                    <p className="text-[11px] text-white/70 leading-relaxed">{t.specialRoofAdvisory}</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* ── Pendiente — OBLIGATORIO ────────────────────── */}
                     {activeRoof?.id !== 'otro' && <div className="border-t border-white/10 pt-5">
