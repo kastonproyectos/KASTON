@@ -743,22 +743,24 @@
                             {ROOF_TYPES.map(rt => (
                                 <button key={rt.id}
                                     onClick={() => onSelectType(rt.id)}
-                                    className={`relative flex flex-col items-center p-3 rounded-xl border transition-all duration-300 cursor-pointer gap-2
+                                    className={`relative flex flex-col justify-between h-full text-center items-center p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer gap-2
                                         ${selectedType === rt.id
                                             ? 'border-[#4E5154] bg-[#4E5154]/20 shadow-md shadow-black/40'
                                             : 'border-white/10 bg-white/5 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20'}`}>
                                     <div className="absolute top-1 right-1 z-10" onClick={(e) => e.stopPropagation()}>
                                         <InfoTooltip title={rt.name} description={rt.description} />
                                     </div>
-                                    {rt.imagePath ? (
-                                        <img src={rt.imagePath} alt={rt.name} className="w-full h-24 object-contain mx-auto p-1" />
-                                    ) : (
-                                        <div className="mt-1 h-24 w-full flex items-center justify-center">
-                                            <span className="text-5xl font-black text-[#6F767D]">?</span>
-                                        </div>
-                                    )}
-                                    <span className={`text-[9px] font-bold tracking-wide text-center leading-tight w-full ${selectedType === rt.id ? 'text-white' : 'text-white/60'}`}>
-                                        {language === 'en' ? (rt.nameEn || rt.nameEs) : rt.nameEs}
+                                    <div className="flex-1 flex items-center justify-center w-full">
+                                        {rt.imagePath ? (
+                                            <img src={rt.imagePath} alt={rt.name} className="w-full h-24 object-contain mx-auto p-1" />
+                                        ) : (
+                                            <div className="mt-1 h-24 w-full flex items-center justify-center">
+                                                <span className="text-5xl font-black text-[#6F767D]">?</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span className={`text-[10px] mt-auto font-bold tracking-wide text-center leading-tight w-full ${selectedType === rt.id ? 'text-white' : 'text-white/60'}`}>
+                                        {rt.name}
                                     </span>
                                 </button>
                             ))}
