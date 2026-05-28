@@ -369,7 +369,7 @@
             row(t.pdfRoofArea, `${area} ${unit}  (≈ ${areaM2.toFixed(1)} m²)`);
             row(t.pdfConstrType, constructionType);
             if (flow === 'A') row(t.pdfP1TradMat, matLabel);
-            row(t.pdfRoofTypeLabel, activeRoof ? (activeRoof.nameEs) : '—');
+            row(t.pdfRoofTypeLabel, activeRoof ? (activeRoof.name) : '—');
             row(t.pdfPendienteLabel, pendienteLabel);
             
             // Render color with a hex block if available
@@ -766,7 +766,7 @@
                         <div className="mt-3 min-h-[16px]">
                             {!selectedType
                                 ? <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.roofTypeReq}</p>
-                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">{activeRoof?.nameEs}</p>
+                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">{activeRoof?.name}</p>
                             }
                         </div>
                     </div>
