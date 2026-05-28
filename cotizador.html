@@ -210,22 +210,22 @@
         ];
 
                 const ROOF_TYPES = [
-  { id: "dos-aguas", name: "A Dos Aguas", imagePath: './Tipos de techos/dos-aguas.png', description: "Estructura de dos caras inclinadas que suben y se unen en el centro, formando un triángulo en el frente." },
-  { id: "cuatro-aguas", name: "A Cuatro Aguas", imagePath: './Tipos de techos/cuatro-aguas.png', description: "Estructura de cuatro caras inclinadas que bajan hacia cada esquina de la propiedad, sin dejar paredes altas." },
-  { id: "cobertizo", name: "Cobertizo / Una Sola Vertiente", imagePath: './Tipos de techos/cobertizo-v2.png', description: "Estructura compuesta por una sola rampa recta e inclinada que va de un extremo al otro." },
-  { id: "mansarda", name: "Mansarda", imagePath: './Tipos de techos/hastial-holandes.png', description: "Techo de cuatro lados con un quiebre de doble pendiente: muy empinado en la base y casi plano en la parte superior." },
-  { id: "gambrel", name: "Gambrel / Tipo Granero", imagePath: './Tipos de techos/gambrel.png', description: "Techo que presenta dos pendientes laterales a cada lado, quebrándose hacia afuera en los costados." },
-  { id: "mariposa", name: "Mariposa", imagePath: './Tipos de techos/mariposa.png', description: "Diseño invertido en forma de 'V', donde los extremos exteriores son elevados y el centro es hondo." },
-  { id: "saltbox", name: "Saltbox", imagePath: './Tipos de techos/saltbox.png', description: "Diseño asimétrico donde una caída del techo es corta y la otra es un plano largo que baja casi hasta el suelo." },
-  { id: "jerkinhead", name: "Jerkinhead", imagePath: './Tipos de techos/jerkinhead.png', description: "Base a dos aguas tradicional, pero con las puntas superiores de los extremos recortadas por una pequeña caída diagonal." },
-  { id: "bonete", name: "Techo con Bonete", imagePath: './Tipos de techos/bonete.png', description: "Techo a cuatro aguas que en la parte inferior cambia de inclinación, extendiéndose hacia afuera con una pendiente más plana." },
-  { id: "combinado", name: "Combinado", imagePath: './Tipos de techos/dos-aguas-alt.png', description: "Unión de varias formas y caídas de techo distintas sobre una estructura que se cruza en forma de L." },
-  { id: "piramidal", name: "Techo Piramidal", imagePath: './Tipos de techos/cobertizo-alt.png', description: "Diseño de cuatro caras triangulares idénticas que suben de forma simétrica hasta unirse en una sola punta central." },
-  { id: "hastial-holandes", name: "Hastial Holandés", imagePath: './Tipos de techos/mansarda.png', description: "Base inclinada a cuatro aguas que lleva un pequeño triángulo clásico montado en la parte más alta de la cumbrera." },
-  { id: "hexagonal", name: "Hexagonal", imagePath: './Tipos de techos/buhardilla.png', description: "Estructura geométrica de seis caras triangulares iguales que suben y cierran en punta sobre una planta hexagonal." },
-  { id: "buhardilla", name: "Techo con Buhardilla", imagePath: './Tipos de techos/piramidal.png', description: "Techo inclinado del cual sobresale una pequeña estructura vertical independiente con su propia ventana y tejado." },
-  { id: "monitor", name: "Monitor", imagePath: './Tipos de techos/monitor.png', description: "Techo interrumpido por un volumen central que se eleva hacia arriba y lleva ventanas rectangulares en los laterales." },
-  { id: "dientes-sierra", name: "Dientes de Sierra", imagePath: './Tipos de techos/dientes-sierra.png', description: "Secuencia repetitiva de techos asimétricos en cadena, combinando rampas inclinadas con paredes verticales." },
+  { id: "dos-aguas", name: "A Dos Aguas", imagePath: "./Tipos de techos/dos-aguas.png", description: "Estructura de dos caras inclinadas que suben y se unen en el centro, formando un triángulo en el frente." },
+  { id: "cuatro-aguas", name: "A Cuatro Aguas", imagePath: "./Tipos de techos/cuatro-aguas.png", description: "Estructura de cuatro caras inclinadas que bajan hacia cada esquina de la propiedad, sin dejar paredes altas." },
+  { id: "techo-l", name: "Techo en L / Intersección", imagePath: "./Tipos de techos/combinado.png", description: "Estructura en forma de L donde dos techos inclinados se cruzan, creando una línea de unión en la esquina donde se juntan." },
+  { id: "mansarda", name: "Mansarda", imagePath: "./Tipos de techos/hastial-holandes.png", description: "Techo de cuatro lados con un quiebre de doble pendiente: muy empinado en la base y casi plano en la parte superior." },
+  { id: "gambrel", name: "Gambrel / Tipo Granero", imagePath: "./Tipos de techos/gambrel.png", description: "Techo que presenta dos pendientes laterales a cada lado, quebrándose hacia afuera en los costados." },
+  { id: "mariposa", name: "Mariposa", imagePath: "./Tipos de techos/mariposa.png", description: "Diseño invertido en forma de 'V', donde los extremos exteriores son elevados y el centro es hondo." },
+  { id: "saltbox", name: "Saltbox", imagePath: "./Tipos de techos/saltbox.png", description: "Diseño asimétrico donde una caída del techo es corta y la otra es un plano largo que baja casi hasta el suelo." },
+  { id: "jerkinhead", name: "Jerkinhead", imagePath: "./Tipos de techos/jerkinhead.png", description: "Base a dos aguas tradicional, pero con las puntas superiores de los extremos recortadas por una pequeña caída diagonal." },
+  { id: "bonete", name: "Techo con Bonete", imagePath: "./Tipos de techos/bonete.png", description: "Techo a cuatro aguas que en la parte inferior cambia de inclinación, extendiéndose hacia afuera con una pendiente más plana." },
+  { id: "cobertizo", name: "Cobertizo / Una Sola Vertiente", imagePath: "./Tipos de techos/cobertizo.png", description: "Estructura compuesta por una sola rampa recta e inclinada que va de un extremo al otro de la construcción." },
+  { id: "piramidal", name: "Techo Piramidal", imagePath: "./Tipos de techos/dos-aguas-alt.png", description: "Diseño de cuatro caras triangulares idénticas que suben de forma simétrica hasta unirse en una sola punta central." },
+  { id: "hastial-holandes", name: "Hastial Holandés", imagePath: "./Tipos de techos/mansarda.png", description: "Base inclinada a cuatro aguas que lleva un pequeño triángulo clásico montado en la parte más alta de la cumbrera." },
+  { id: "hexagonal", name: "Hexagonal", imagePath: "./Tipos de techos/buhardilla.png", description: "Estructura geométrica de seis caras triangulares iguales que suben y cierran en punta sobre una planta hexagonal." },
+  { id: "buhardilla", name: "Techo con Buhardilla", imagePath: "./Tipos de techos/piramidal.png", description: "Techo inclinado del cual sobresale una pequeña estructura vertical independiente con su propia ventana y tejado." },
+  { id: "monitor", name: "Monitor", imagePath: "./Tipos de techos/monitor.png", description: "Techo interrumpido por un volumen central que se eleva hacia arriba y lleva ventanas rectangulares en los laterales." },
+  { id: "dientes-sierra", name: "Dientes de Sierra", imagePath: "./Tipos de techos/dientes-sierra.png", description: "Secuencia repetitiva de techos asimétricos en cadena, combinando rampas inclinadas con paredes verticales." },
   { id: "otro", name: "Otro / Diseño Especial", imagePath: null, description: "Estructuras personalizadas, techos curvos o configuraciones arquitectónicas complejas que no entran en los modelos estándar." }
 ];
 
