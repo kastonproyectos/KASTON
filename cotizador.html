@@ -210,24 +210,127 @@
         ];
 
                 const ROOF_TYPES = [
-  { id: "dos-aguas", name: "A Dos Aguas", imagePath: "/assets/techos/dos-aguas.png" },
-  { id: "cuatro-aguas", name: "A Cuatro Aguas", imagePath: "/assets/techos/cuatro-aguas.png" },
-  { id: "cobertizo", name: "Cobertizo / Una Sola Vertiente", imagePath: "/assets/techos/cobertizo.png" },
-  { id: "mansarda", name: "Mansarda", imagePath: "/assets/techos/mansarda.png" },
-  { id: "gambrel", name: "Gambrel / Tipo Granero", imagePath: "/assets/techos/gambrel.png" },
-  { id: "mariposa", name: "Mariposa", imagePath: "/assets/techos/mariposa.png" },
-  { id: "saltbox", name: "Saltbox", imagePath: "/assets/techos/saltbox.png" },
-  { id: "jerkinhead", name: "Jerkinhead", imagePath: "/assets/techos/jerkinhead.png" },
-  { id: "bonete", name: "Techo con Bonete", imagePath: "/assets/techos/bonete.png" },
-  { id: "combinado", name: "Combinado", imagePath: "/assets/techos/combinado.png" },
-  { id: "piramidal", name: "Techo Piramidal", imagePath: "/assets/techos/piramidal.png" },
-  { id: "hastial-holandes", name: "Hastial Holandés", imagePath: "/assets/techos/hastial-holandes.png" },
-  { id: "hexagonal", name: "Hexagonal", imagePath: "/assets/techos/hexagonal.png" },
-  { id: "buhardilla", name: "Techo con Buhardilla", imagePath: "/assets/techos/buhardilla.png" },
-  { id: "monitor", name: "Monitor", imagePath: "/assets/techos/monitor.png" },
-  { id: "dientes-sierra", name: "Dientes de Sierra", imagePath: "/assets/techos/dientes-sierra.png" },
-  { id: "otro", name: "Otro / Diseño Especial", imagePath: null }
-];
+            {
+                id: 'gable',
+                nameEs: 'A Dos Aguas',
+                nameEn: 'Gable',
+                descEs: 'Estructura clásica compuesta por dos vertientes inclinadas que se intersectan en una cumbrera central superior, formando una silueta triangular en su fachada principal.',
+                imagePath: "/assets/techos/dos-aguas.jpg"
+            },
+            {
+                id: 'hip',
+                nameEs: 'A Cuatro Aguas',
+                nameEn: 'Hip',
+                descEs: 'Diseño donde todas las caras de la cubierta son planos inclinados que convergen hacia las esquinas superiores, eliminando las paredes verticales altas en los laterales.',
+                imagePath: "/assets/techos/cuatro-aguas.jpg"
+            },
+            {
+                id: 'shed',
+                nameEs: 'Cobertizo / Una Sola Vertiente',
+                nameEn: 'Shed',
+                descEs: 'Cubierta de una sola vertiente plana y continua que se extiende de forma inclinada desde un muro de mayor altura hacia uno más bajo.',
+                imagePath: "/assets/techos/cobertizo.png"
+            },
+            {
+                id: 'mansard',
+                nameEs: 'Mansarda',
+                nameEn: 'Mansard',
+                descEs: 'Techo de cuatro lados donde cada vertiente presenta un quiebre de doble inclinación: una sección inferior muy empinada y una sección superior casi plana.',
+                imagePath: "/assets/techos/mansarda.png"
+            },
+            {
+                id: 'gambrel',
+                nameEs: 'Gambrel / Tipo Granero',
+                nameEn: 'Gambrel',
+                descEs: 'Variación del estilo a dos aguas que posee dos pendientes distintas a cada lado, acentuando notablemente la inclinación en la sección inferior de la estructura.',
+                imagePath: "/assets/techos/gambrel.png"
+            },
+            {
+                id: 'butterfly',
+                nameEs: 'Mariposa',
+                nameEn: 'Butterfly',
+                descEs: 'Estructura moderna invertida formada por dos secciones inclinadas que convergen hacia el eje central de la casa, simulando la forma de dos alas abiertas.',
+                imagePath: "/assets/techos/mariposa.png"
+            },
+            {
+                id: 'saltbox',
+                nameEs: 'Saltbox',
+                nameEn: 'Saltbox',
+                descEs: 'Diseño a dos aguas asimétrico donde una de las vertientes de la cubierta es significativamente más larga y se extiende hacia los niveles inferiores de la edificación.',
+                imagePath: "/assets/techos/saltbox.jpg"
+            },
+            {
+                id: 'jerkinhead',
+                nameEs: 'Jerkinhead',
+                nameEn: 'Jerkinhead',
+                descEs: 'Variación del techo a dos aguas tradicional donde los extremos o picos superiores de la cumbrera principal están recortados por una pequeña sección inclinada.',
+                imagePath: "/assets/techos/jerkinhead.jpg"
+            },
+            {
+                id: 'bonnet',
+                nameEs: 'Techo con Bonete',
+                nameEn: 'Bonnet',
+                descEs: 'Cubierta a cuatro aguas que presenta un cambio de inclinación en los bordes inferiores, extendiéndose hacia afuera con una pendiente mucho más suave.',
+                imagePath: "/assets/techos/bonete.png"
+            },
+            {
+                id: 'combined',
+                nameEs: 'Combinado',
+                nameEn: 'Combination',
+                descEs: 'Diseño híbrido de alta complejidad que integra de manera articulada dos o más tipologías distintas de techos inclinados o intersecciones en L dentro de la misma edificación.',
+                imagePath: "/assets/techos/combinado.jpg"
+            },
+            {
+                id: 'pyramidal',
+                nameEs: 'Techo Piramidal',
+                nameEn: 'Pyramidal',
+                descEs: 'Variación del estilo a cuatro aguas donde todas las vertientes triangulares convergen simétricamente en un único punto central superior, eliminando la línea de cumbrera horizontal.',
+                imagePath: "/assets/techos/piramidal.jpg"
+            },
+            {
+                id: 'dutch_gable',
+                nameEs: 'Hastial Holandés',
+                nameEn: 'Dutch Gable',
+                descEs: 'Diseño híbrido que combina una base a cuatro aguas con una pequeña estructura a dos aguas en la parte superior, creando un remate triangular elevado en la cumbrera.',
+                imagePath: "/assets/techos/hastial-holandes.png"
+            },
+            {
+                id: 'hexagonal',
+                nameEs: 'Hexagonal',
+                nameEn: 'Hexagonal',
+                descEs: 'Estructura poliédrica compuesta por seis vertientes triangulares idénticas que convergen simétricamente en un punto central superior sobre una base de planta hexagonal.',
+                imagePath: "/assets/techos/hexagonal.png"
+            },
+            {
+                id: 'dormer',
+                nameEs: 'Techo con Buhardilla',
+                nameEn: 'Dormer',
+                descEs: 'Cubierta inclinada tradicional que incorpora una pequeña estructura vertical saliente con su propio tejado para albergar una ventana superior.',
+                imagePath: "/assets/techos/buhardilla.jpg"
+            },
+            {
+                id: 'monitor',
+                nameEs: 'Monitor',
+                nameEn: 'Monitor',
+                descEs: 'Estructura compuesta por una sección de cubierta principal interrumpida en su cumbrera por un volumen elevado central, el cual cuenta con muros verticales cortos diseñados para la entrada de luz.',
+                imagePath: "/assets/techos/monitor.png"
+            },
+            {
+                id: 'sawtooth',
+                nameEs: 'Dientes de Sierra',
+                nameEn: 'Sawtooth',
+                descEs: 'Diseño industrial conformado por una sucesión en serie de techos asimétricos, donde cada módulo combina una vertiente inclinada opaca con un plano vertical acristalado.',
+                imagePath: "/assets/techos/dientes-sierra.png"
+            },
+            {
+                id: 'custom',
+                nameEs: 'Otro / Diseño Especial',
+                nameEn: 'Custom Design',
+                descEs: 'Configuraciones arquitectónicas singulares, techos con múltiples intersecciones complejas o geometrías personalizadas que no se ajustan a los modelos estándar.',
+                isSpecial: true,
+                imagePath: null
+            },
+        ];
 
         /* ── Carga una imagen local para el PDF ── */
         const loadImageAsBase64 = (imageUrl) => new Promise((resolve) => {
@@ -748,12 +851,12 @@
                                             ? 'border-[#4E5154] bg-[#4E5154]/20 shadow-md shadow-black/40'
                                             : 'border-white/10 bg-white/5 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20'}`}>
                                     <div className="absolute top-1 right-1 z-10" onClick={(e) => e.stopPropagation()}>
-                                        <InfoTooltip title={rt.name} description={""} />
+                                        <InfoTooltip title={language === 'en' ? rt.nameEn : rt.nameEs} description={rt.descEs} />
                                     </div>
                                     {rt.imagePath ? (
-                                        <img src={rt.imagePath} alt={rt.name} className="w-full h-24 object-contain mx-auto p-1" />
+                                        <img src={rt.imagePath} alt={rt.nameEs} className="mt-1 h-24 w-full object-contain" />
                                     ) : (
-                                        <div className="w-full h-24 flex items-center justify-center mx-auto p-1">
+                                        <div className="mt-1 h-24 w-full flex items-center justify-center">
                                             <span className="text-5xl font-black text-[#6F767D]">?</span>
                                         </div>
                                     )}
@@ -772,7 +875,7 @@
                     </div>
 
                     {/* ── Tipo especial: aviso de asesoría ──────────── */}
-                    {activeRoof?.id === 'otro' && (
+                    {activeRoof?.isSpecial && (
                         <div className="border-t border-white/10 pt-5 animate-fade-in">
                             <div className="flex items-start gap-3 p-4 rounded-xl border border-bronze/40 bg-bronze/8" style={{ background:'rgba(193,138,104,.05)' }}>
                                 <div className="w-7 h-7 rounded-full bg-bronze/20 text-bronze flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">★</div>
@@ -785,7 +888,7 @@
                     )}
 
                     {/* ── Pendiente — OBLIGATORIO ────────────────────── */}
-                    {!activeRoof?.id === 'otro' && <div className="border-t border-white/10 pt-5">
+                    {!activeRoof?.isSpecial && <div className="border-t border-white/10 pt-5">
                         <div className="flex items-center gap-3 mb-4">
                             <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofPitchTitle}</h3>
                             <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
@@ -1326,7 +1429,7 @@
             const sliderStep = unit === 'ft2' ? 0.01 : 1;
 
             const activeRoofObj = ROOF_TYPES.find(r => r.id === roofType);
-            const isSpecialDesign = activeRoofObj?.id === 'otro';
+            const isSpecialDesign = activeRoofObj?.isSpecial || false;
 
             const isFormComplete = Boolean(
                 roofType &&
