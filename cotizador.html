@@ -868,9 +868,15 @@
         const SUPABASE_URL = "https://naxvanbiwgwfraxqtsof.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_q4zRxSUyH0uhI9OkCUY8HQ_q7mOeZiM";
 
-        // Inicializar cliente Supabase solo si hay credenciales
+        // Inicializar cliente Supabase
         const supabase = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
-            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    detectSessionInUrl: true, // Detecta el código OAuth en la URL al volver de Google
+                    persistSession: true,     // Mantiene la sesión en localStorage
+                    flowType: 'pkce',         // Flujo seguro para apps sin backend
+                }
+            })
             : null;
 
         function ServiceBanner({ language }) {
@@ -3095,52 +3101,43 @@
             };
 
             useEffect(() => {
-                const initAuth = async () => {
-                    if (supabase && supabase.auth) {
-                        try {
-                            const sessionPromise = supabase.auth.getSession();
-                            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2500));
-                            const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
-                            setSession(session);
-                        } catch (err) {
-                            console.error("Supabase Error / Pausado:", err);
-                        } finally {
-                            setLoading(false);
-                            setAuthChecked(true);
-                        }
+                if (!supabase?.auth) {
+                    setLoading(false);
+                    setAuthChecked(true);
+                    return;
+                }
 
-                        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-                            setSession(session);
-                            setAuthChecked(true);
-                            if (session) {
-                                // Normalizar metadatos de proveedores OAuth
-                                // Google usa 'name' y 'picture'; Apple usa 'name' (solo en primer login)
-                                const m = session.user.user_metadata || {};
-                                setExtraData(prev => ({
-                                    full_name:  m.full_name  || m.name    || prev?.full_name  || '',
-                                    phone:      m.phone                   || prev?.phone      || '',
-                                    role:       m.role                    || prev?.role       || 'Propietario',
-                                    id_type:    m.id_type                 || prev?.id_type    || '',
-                                    id_number:  m.id_number               || prev?.id_number  || '',
-                                    avatar_url: m.avatar_url || m.picture || prev?.avatar_url || '',
-                                    provider:   session.user.app_metadata?.provider || 'email'
-                                }));
-                            }
-                        });
-                        return subscription;
-                    } else {
-                        setLoading(false);
-                        setAuthChecked(true);
-                        return null;
-                    }
+                const normalizeExtra = (session, prev) => {
+                    const m = session?.user?.user_metadata || {};
+                    return {
+                        full_name:  m.full_name  || m.name    || prev?.full_name  || '',
+                        phone:      m.phone                   || prev?.phone      || '',
+                        role:       m.role                    || prev?.role       || 'Propietario',
+                        id_type:    m.id_type                 || prev?.id_type    || '',
+                        id_number:  m.id_number               || prev?.id_number  || '',
+                        avatar_url: m.avatar_url || m.picture || prev?.avatar_url || '',
+                        provider:   session?.user?.app_metadata?.provider || 'email'
+                    };
                 };
 
-                let sub = null;
-                initAuth().then(s => sub = s);
+                // 1. onAuthStateChange primero — captura el SIGNED_IN del redirect OAuth
+                const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+                    setSession(session);
+                    setAuthChecked(true);
+                    setLoading(false);
+                    if (session) setExtraData(prev => normalizeExtra(session, prev));
+                });
 
-                return () => {
-                    if (sub) sub.unsubscribe();
-                };
+                // 2. getSession sin timeout — deja que Supabase procese el código OAuth de la URL
+                supabase.auth.getSession()
+                    .then(({ data: { session } }) => {
+                        setSession(session);
+                        if (session) setExtraData(prev => normalizeExtra(session, prev));
+                    })
+                    .catch(err => console.error('Auth init error:', err))
+                    .finally(() => { setLoading(false); setAuthChecked(true); });
+
+                return () => subscription.unsubscribe();
             }, []);
 
             if (loading || !authChecked) {
