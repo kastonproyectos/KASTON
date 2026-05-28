@@ -301,7 +301,12 @@
             doc.rect(0, 44, pageW, 1.5, 'F');
 
             if (logoDataUrl) {
-                doc.addImage(logoDataUrl, 'PNG', col1, 10, 48, 13.3);
+                // Soportar el nuevo objeto {data, aspect} o fallback a string viejo
+                const data = typeof logoDataUrl === 'string' ? logoDataUrl : logoDataUrl.data;
+                const aspect = logoDataUrl.aspect || 3.6; // Valor por defecto aproximado
+                const logoH = 12; // Altura fija (h-12 equivalente)
+                const logoW = logoH * aspect; // Ancho automático preservando proporción
+                doc.addImage(data, 'PNG', col1, 10 + (13.3 - logoH)/2, logoW, logoH);
             } else {
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(20);
@@ -392,7 +397,22 @@
             y += 6;
 
             if (roofPngUrl) {
-                doc.addImage(roofPngUrl, 'PNG', pageW - 75, 65, 55, 34);
+                y += 4;
+                doc.setDrawColor(230, 230, 230);
+                doc.setFillColor(250, 250, 250);
+                doc.setLineWidth(0.5);
+                doc.rect(col1, y, pageW - col1 * 2, 45, 'FD'); // Caja contenedora
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(...C.dim);
+                doc.text('ILUSTRACIÓN DE REFERENCIA', col1 + 5, y + 6);
+                
+                // Centrar la imagen dentro del contenedor
+                const imgW = 60;
+                const imgH = 37;
+                doc.addImage(roofPngUrl, 'PNG', (pageW - imgW) / 2, y + 4, imgW, imgH);
+                y += 50;
             }
 
             divider();
