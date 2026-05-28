@@ -889,8 +889,9 @@
             );
         }
 
-        function ProjectsTab({ language, session, projects, onEditProject, onDeleteProject, onQuoteProject, rates }) {
+        function ProjectsTab({ language, session, projects, onEditProject, onDeleteProject, onQuoteProject, rates, setCurrentTab }) {
             const t = T[language] || T['es'];
+            const isEs = language !== 'en';
             const ASESORIA_SUBJECT = encodeURIComponent('Solicitud de Asesoría Técnica Estructural - Proyecto KASTON');
             const ASESORIA_BODY = encodeURIComponent(
                 'ESPECIFÍQUENOS SU PROYECTO PARA NOSOTROS ASESORARLOS, CUÉNTENOS DEL CASO DENOS MEDIDAS:\n\n' +
@@ -971,6 +972,17 @@
 
             return (
                 <div className="w-full max-w-5xl flex flex-col gap-6 animate-fade-in">
+                    {!session && projects.length > 0 && (
+                        <div className="flex items-center justify-between gap-4 bg-bronze/10 border border-bronze/30 rounded-xl px-5 py-4">
+                            <div className="flex items-center gap-3">
+                                <svg className="w-5 h-5 text-bronze flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                <p className="text-sm text-white/70">{isEs ? 'Estás viendo tu último acceso guardado. Inicia sesión para editar o agregar proyectos.' : 'Viewing your last saved session. Sign in to edit or add projects.'}</p>
+                            </div>
+                            <button onClick={() => setCurrentTab('profile')} className="flex-shrink-0 text-xs bg-bronze text-graphite font-bold uppercase tracking-widest px-4 py-2 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                {isEs ? 'Iniciar sesión' : 'Sign in'}
+                            </button>
+                        </div>
+                    )}
                     <h2 className="text-2xl font-heading font-bold tracking-tight text-white uppercase border-b border-white/10 pb-4">{t.myProjects}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {projects.map(proj => (
@@ -1074,10 +1086,11 @@
                 return session?.user?.user_metadata?.[field] || extraData?.[field] || defaultVal;
             };
 
-            const initialPhoto = getPersistedData('photoPreview', null);
+            const initialPhoto = session?.user?.user_metadata?.avatar_url || getPersistedData('photoPreview', null);
 
             // Settings state
             const [photoPreview, setPhotoPreview] = useState(initialPhoto);
+            const [profilePhotoFile, setProfilePhotoFile] = useState(null);
             const [phone, setPhone] = useState(getPersistedData('phone', ''));
 
             // Password state
@@ -1089,6 +1102,7 @@
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
+                    setProfilePhotoFile(file);
                     const reader = new FileReader();
                     reader.onloadend = () => setPhotoPreview(reader.result);
                     reader.readAsDataURL(file);
@@ -1123,7 +1137,23 @@
                     return;
                 }
                 if (supabase && session) {
-                    const userUpdate = { data: { phone } };
+                    const metadata = { phone };
+
+                    if (profilePhotoFile) {
+                        const ext = profilePhotoFile.name.split('.').pop();
+                        const filePath = `${session.user.id}/avatar.${ext}`;
+                        const { error: uploadErr } = await supabase.storage
+                            .from('avatars')
+                            .upload(filePath, profilePhotoFile, { upsert: true });
+                        if (uploadErr) {
+                            alert('Error al subir la foto: ' + uploadErr.message);
+                            return;
+                        }
+                        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                        metadata.avatar_url = urlData.publicUrl;
+                    }
+
+                    const userUpdate = { data: metadata };
                     if (isPasswordValidated && newPassword) {
                         userUpdate.password = newPassword;
                     }
@@ -1134,6 +1164,7 @@
                     }
                 }
                 alert(t.chgSaved);
+                setProfilePhotoFile(null);
                 setIsSettingsMode(false);
             };
 
@@ -1837,58 +1868,66 @@
                 if (editingProject) {
                     setProjects(projects.map(p => p.id === proj.id ? fullProj : p));
                     if (supabase) {
-                        try {
-                            await supabase.from('projects').update({
-                                project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: proj.divisa,
-                                total_weight_saved: proj.plastico_kg / 1000,
-                                plastic_upcycled_kg: proj.plastico_kg,
-                                estimated_savings_usd: proj.inversion_tejas,
-                                client_name: proj.nombre,
-                                project_data: JSON.stringify(fullProj)
-                            }).eq('id', proj.id).eq('user_id', session?.user?.id);
-                        } catch (err) {
-                            // Fallback: update without project_data if column doesn't exist
-                            await supabase.from('projects').update({
-                                project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: proj.divisa,
-                                total_weight_saved: proj.plastico_kg / 1000,
-                                plastic_upcycled_kg: proj.plastico_kg,
-                                estimated_savings_usd: proj.inversion_tejas,
-                                client_name: proj.nombre
-                            }).eq('id', proj.id).eq('user_id', session?.user?.id);
+                        const { error: updateErr } = await supabase.from('projects').update({
+                            project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
+                            selected_color: proj.divisa,
+                            total_weight_saved: proj.plastico_kg / 1000,
+                            plastic_upcycled_kg: proj.plastico_kg,
+                            estimated_savings_usd: proj.inversion_tejas,
+                            client_name: proj.nombre,
+                            project_data: JSON.stringify(fullProj)
+                        }).eq('id', proj.id).eq('user_id', session?.user?.id);
+                        if (updateErr) {
+                            // Si falla por la columna project_data, reintenta sin ella
+                            if (updateErr.message?.includes('project_data')) {
+                                const { error: fallbackErr } = await supabase.from('projects').update({
+                                    project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
+                                    selected_color: proj.divisa,
+                                    total_weight_saved: proj.plastico_kg / 1000,
+                                    plastic_upcycled_kg: proj.plastico_kg,
+                                    estimated_savings_usd: proj.inversion_tejas,
+                                    client_name: proj.nombre
+                                }).eq('id', proj.id).eq('user_id', session?.user?.id);
+                                if (fallbackErr) console.error('Error guardando proyecto:', fallbackErr);
+                            } else {
+                                console.error('Error guardando proyecto:', updateErr);
+                            }
                         }
                     }
                     setEditingProject(null);
                 } else {
                     setProjects([fullProj, ...projects]);
                     if (supabase) {
-                        try {
-                            await supabase.from('projects').insert([{
-                                id: proj.id,
-                                user_id: session?.user?.id,
-                                project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: proj.divisa,
-                                total_weight_saved: proj.plastico_kg / 1000,
-                                plastic_upcycled_kg: proj.plastico_kg,
-                                estimated_savings_usd: proj.inversion_tejas,
-                                client_name: proj.nombre,
-                                project_data: JSON.stringify(fullProj),
-                                created_at: new Date().toISOString()
-                            }]);
-                        } catch (err) {
-                            // Fallback: insert without project_data if column doesn't exist
-                            await supabase.from('projects').insert([{
-                                id: proj.id,
-                                user_id: session?.user?.id,
-                                project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                selected_color: proj.divisa,
-                                total_weight_saved: proj.plastico_kg / 1000,
-                                plastic_upcycled_kg: proj.plastico_kg,
-                                estimated_savings_usd: proj.inversion_tejas,
-                                client_name: proj.nombre,
-                                created_at: new Date().toISOString()
-                            }]);
+                        const { error: insertErr } = await supabase.from('projects').insert([{
+                            id: proj.id,
+                            user_id: session?.user?.id,
+                            project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
+                            selected_color: proj.divisa,
+                            total_weight_saved: proj.plastico_kg / 1000,
+                            plastic_upcycled_kg: proj.plastico_kg,
+                            estimated_savings_usd: proj.inversion_tejas,
+                            client_name: proj.nombre,
+                            project_data: JSON.stringify(fullProj),
+                            created_at: new Date().toISOString()
+                        }]);
+                        if (insertErr) {
+                            // Si falla por la columna project_data, reintenta sin ella
+                            if (insertErr.message?.includes('project_data')) {
+                                const { error: fallbackErr } = await supabase.from('projects').insert([{
+                                    id: proj.id,
+                                    user_id: session?.user?.id,
+                                    project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
+                                    selected_color: proj.divisa,
+                                    total_weight_saved: proj.plastico_kg / 1000,
+                                    plastic_upcycled_kg: proj.plastico_kg,
+                                    estimated_savings_usd: proj.inversion_tejas,
+                                    client_name: proj.nombre,
+                                    created_at: new Date().toISOString()
+                                }]);
+                                if (fallbackErr) console.error('Error guardando proyecto:', fallbackErr);
+                            } else {
+                                console.error('Error guardando proyecto:', insertErr);
+                            }
                         }
                     }
                 }
@@ -1907,10 +1946,14 @@
 
             const handleDeleteProject = async (id) => {
                 if (window.confirm(T[language]?.deleteConfirm || T['es'].deleteConfirm)) {
-                    setProjects(projects.filter(p => p.id !== id));
                     if (supabase) {
-                        await supabase.from('projects').delete().eq('id', id);
+                        const { error } = await supabase.from('projects').delete().eq('id', id).eq('user_id', session?.user?.id);
+                        if (error) {
+                            alert(T[language]?.deleteError || 'Error al eliminar el proyecto. Intenta de nuevo.');
+                            return;
+                        }
                     }
+                    setProjects(projects.filter(p => p.id !== id));
                 }
             };
 
@@ -1944,6 +1987,7 @@
                     supabase
                         .from('projects')
                         .select('*')
+                        .eq('user_id', session.user.id)
                         .order('created_at', { ascending: false })
                         .then(({ data, error }) => {
                             if (data && !error) {
@@ -1975,9 +2019,21 @@
                         })
                         .catch(console.error);
                 } else if (!session) {
-                    setProjects([]);
+                    // Cargar proyectos cacheados para vista de solo lectura
+                    try {
+                        const cached = localStorage.getItem('kaston_projects_cache');
+                        if (cached) setProjects(JSON.parse(cached));
+                        else setProjects([]);
+                    } catch (e) { setProjects([]); }
                 }
             }, [session]);
+
+            // Sincronizar proyectos a localStorage cuando cambian (solo si hay sesión activa)
+            useEffect(() => {
+                if (session && projects.length > 0) {
+                    try { localStorage.setItem('kaston_projects_cache', JSON.stringify(projects)); } catch (e) {}
+                }
+            }, [projects, session]);
 
             // Prioritize triage upon login
             const prevSession = React.useRef(null);
@@ -2033,8 +2089,9 @@
                         }} />}
                         {currentTab === 'dashboard' && <CalculatorTab language={language} defaults={settings} onSaveProject={handleSaveProject} editingProject={editingProject} defaultFlow={triageFlow || 'A'} session={session} setCurrentTab={setCurrentTab} setTriageFlow={setTriageFlow} rates={rates} />}
                         {currentTab === 'projects' && (
-                            session ? <ProjectsTab language={language} session={session} projects={projects} onEditProject={handleEditProject} onDeleteProject={handleDeleteProject} onQuoteProject={handleQuoteProject} rates={rates} /> :
-                                <div className="w-full flex-grow flex flex-col items-center justify-center p-8 mt-20 text-center animate-fade-in"><p className="text-white/50 tracking-widest uppercase mb-6 text-sm">{t.authReq}</p><h2 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">{t.loginToView}</h2><button onClick={() => setCurrentTab('profile')} className="bg-bronze hover:bg-white text-graphite px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-colors cursor-pointer shadow-[0_0_20px_rgba(193,138,104,0.3)]">{t.goToProfile}</button></div>
+                            (session || projects.length > 0)
+                                ? <ProjectsTab language={language} session={session} projects={projects} onEditProject={handleEditProject} onDeleteProject={handleDeleteProject} onQuoteProject={handleQuoteProject} rates={rates} setCurrentTab={setCurrentTab} />
+                                : <div className="w-full flex-grow flex flex-col items-center justify-center p-8 mt-20 text-center animate-fade-in"><p className="text-white/50 tracking-widest uppercase mb-6 text-sm">{t.authReq}</p><h2 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">{t.loginToView}</h2><button onClick={() => setCurrentTab('profile')} className="bg-bronze hover:bg-white text-graphite px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-colors cursor-pointer shadow-[0_0_20px_rgba(193,138,104,0.3)]">{t.goToProfile}</button></div>
                         )}
                         {currentTab === 'profile' && (
                             session ? <ProfileTab language={language} settings={settings} updateSettings={(newSets) => setSettings({ ...settings, ...newSets })} session={session} extraData={extraData} /> :
@@ -2066,9 +2123,17 @@
 
         function AuthScreen({ onAuth, language }) {
             const t = T[language] || T['es'];
-            const [isLogin, setIsLogin] = useState(true);
+            const isEs = language !== 'en';
+
+            const [mode, setMode] = useState('login');
+            const [step, setStep] = useState(1);
+
+            // Login
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
+            const [showPass, setShowPass] = useState(false);
+
+            // Register
             const [fullName, setFullName] = useState('');
             const [phone, setPhone] = useState('');
             const [role, setRole] = useState('Propietario');
@@ -2076,10 +2141,16 @@
             const [idNumber, setIdNumber] = useState('');
             const [profilePhoto, setProfilePhoto] = useState(null);
             const [photoPreview, setPhotoPreview] = useState(null);
+            const [regEmail, setRegEmail] = useState('');
+            const [regPassword, setRegPassword] = useState('');
+            const [confirmPassword, setConfirmPassword] = useState('');
+            const [showRegPass, setShowRegPass] = useState(false);
+
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
             const [confirmMsg, setConfirmMsg] = useState(null);
-            const [confirmPassword, setConfirmPassword] = useState('');
+
+            const switchMode = (m) => { setMode(m); setStep(1); setError(null); setConfirmMsg(null); };
 
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
@@ -2091,64 +2162,20 @@
                 }
             };
 
-            const handleSubmit = async (e) => {
+            const stepValid = {
+                1: fullName.trim().length > 1 && phone.trim().length > 5 && idNumber.trim().length > 3,
+                2: !!profilePhoto,
+                3: regEmail.includes('@') && regPassword.length >= 6 && regPassword === confirmPassword
+            };
+
+            const handleLogin = async (e) => {
                 e.preventDefault();
                 setError(null);
-                setConfirmMsg(null);
-                if (!isLogin && !profilePhoto) { setError(t.errPhotoReq); return; }
-                if (!isLogin && !fullName.trim()) { setError(t.errNameReq); return; }
-                if (!isLogin && !phone.trim()) { setError(t.errPhoneReq); return; }
-                if (!isLogin && !idNumber.trim()) { setError(t.errIdReq); return; }
-                if (!isLogin && password !== confirmPassword) { setError(t.passMismatch); return; }
-
-                // Identity String Validation Enforcement
-                if (!isLogin) {
-                    if (idType === 'Pasaporte') {
-                        if (!/^[a-zA-Z]{2}\d+$/.test(idNumber)) {
-                            setError(t.errPassportFmt);
-                            return;
-                        }
-                    } else {
-                        // Cédula, NIT, CE validation (Only numbers)
-                        if (!/^\d+$/.test(idNumber)) {
-                            setError(`${t.errDocPre} ${idType} ${t.errDocSuf}`);
-                            return;
-                        }
-                    }
-                }
-
                 setLoading(true);
                 try {
-
-                    if (isLogin) {
-                        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                        if (error) throw error;
-                        onAuth(data.session, {});
-                    } else {
-                        // Upload image Logic simulation (Using Base64 due to Local approach)
-                        const storePhotoInDB = photoPreview; // Uses already prepared Base64 string from handler
-
-                        const { data, error } = await supabase.auth.signUp({
-                            email,
-                            password,
-                            options: {
-                                data: {
-                                    full_name: fullName,
-                                    phone: phone,
-                                    role: role,
-                                    id_type: idType,
-                                    id_number: idNumber,
-                                    photoPreview: storePhotoInDB // Persisting Base64 string directly into metadata!
-                                }
-                            }
-                        });
-                        if (error) throw error;
-                        if (data.session) {
-                            onAuth(data.session, { fullName, phone, photoPreview, role, idType, idNumber });
-                        } else {
-                            setConfirmMsg(t.awaitConfirm);
-                        }
-                    }
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    onAuth(data.session, {});
                 } catch (err) {
                     setError(err.message === 'Invalid login credentials' ? t.errBadCreds : err.message);
                 } finally {
@@ -2156,132 +2183,294 @@
                 }
             };
 
-            return (
-                <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0E0E0E' }}>
-                    <div className="p-8 rounded-2xl w-full max-w-md border border-white/10 shadow-[0_0_30px_rgba(193,138,104,0.15)] relative overflow-hidden" style={{ backgroundColor: '#0E0E0E' }}>
-                        <div className="absolute top-[-50px] right-[-50px] w-40 h-40 bg-bronze rounded-full opacity-10 blur-[50px]"></div>
+            const handleNextStep = () => {
+                if (step === 1) {
+                    if (idType === 'Pasaporte') {
+                        if (!/^[a-zA-Z]{2}\d+$/.test(idNumber)) { setError(t.errPassportFmt); return; }
+                    } else {
+                        if (!/^\d+$/.test(idNumber)) { setError(`${t.errDocPre} ${idType} ${t.errDocSuf}`); return; }
+                    }
+                }
+                setError(null);
+                setStep(s => s + 1);
+            };
 
-                        <div className="flex justify-center mb-10 relative z-10">
-                            {typeof KASTON_LOGO !== 'undefined' ? (
-                                <img src={KASTON_LOGO} alt="KASTON Logo" width="285" height="160" style={{ height: '160px', width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))', margin: '0 auto', display: 'block' }} />
-                            ) : (
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold text-2xl shadow-[0_0_15px_rgba(193,138,104,0.5)]">K</div>
-                                    <h1 className="text-3xl font-bold tracking-wider text-white">KASTON</h1>
-                                </div>
-                            )}
+            const handleRegister = async () => {
+                setError(null);
+                if (!stepValid[3]) { setError(t.passMismatch); return; }
+                setLoading(true);
+                try {
+                    const { data, error } = await supabase.auth.signUp({
+                        email: regEmail, password: regPassword,
+                        options: { data: { full_name: fullName, phone, role, id_type: idType, id_number: idNumber } }
+                    });
+                    if (error) throw error;
+                    if (data.session) {
+                        if (profilePhoto) {
+                            const ext = profilePhoto.name.split('.').pop();
+                            const filePath = `${data.user.id}/avatar.${ext}`;
+                            const { error: uploadErr } = await supabase.storage.from('avatars').upload(filePath, profilePhoto, { upsert: true });
+                            if (!uploadErr) {
+                                const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                                await supabase.auth.updateUser({ data: { avatar_url: urlData.publicUrl } });
+                            }
+                        }
+                        onAuth(data.session, { fullName, phone, photoPreview, role, idType, idNumber });
+                    } else {
+                        setConfirmMsg(t.awaitConfirm);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const EyeIcon = ({ show }) => show
+                ? <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" /></svg>
+                : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>;
+
+            const FieldLabel = ({ children }) => (
+                <label className="block text-[10px] text-white/40 uppercase tracking-widest mb-1.5 font-semibold">{children}</label>
+            );
+
+            const inputCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-bronze transition-all text-sm";
+
+            const Spinner = () => (
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+            );
+
+            return (
+                <div className="w-full min-h-[80vh] flex items-center justify-center p-4 py-10">
+                    <div className="w-full max-w-md flex flex-col gap-6">
+
+                        {/* Logo */}
+                        <div className="flex justify-center">
+                            {typeof KASTON_LOGO !== 'undefined'
+                                ? <img src={KASTON_LOGO} alt="KASTON" style={{ height: '130px', width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))' }} />
+                                : <div className="flex items-center gap-2"><div className="w-8 h-8 rounded bg-bronze text-graphite flex items-center justify-center font-bold text-lg">K</div><span className="text-xl font-bold tracking-wider text-white">KASTON</span></div>
+                            }
                         </div>
 
-                        <h2 className="text-2xl font-heading font-semibold tracking-tight text-white mb-6 text-center relative z-10 uppercase">
-                            {isLogin ? t.corpAcc : t.techReg}
-                        </h2>
+                        {/* Mode tabs */}
+                        <div className="flex rounded-xl overflow-hidden border border-white/10 p-1 gap-1 bg-white/5">
+                            {['login', 'register'].map(m => (
+                                <button key={m} onClick={() => switchMode(m)}
+                                    className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer ${mode === m ? 'bg-bronze text-graphite shadow-[0_0_15px_rgba(193,138,104,0.3)]' : 'text-white/40 hover:text-white'}`}>
+                                    {m === 'login' ? (isEs ? 'Iniciar Sesión' : 'Sign In') : (isEs ? 'Crear Cuenta' : 'Register')}
+                                </button>
+                            ))}
+                        </div>
 
-                        {error && <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-xl mb-4 text-center mt-2">{error}</div>}
+                        {/* Alerts */}
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-3 rounded-xl flex items-start gap-2">
+                                <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                                {error}
+                            </div>
+                        )}
                         {confirmMsg && (
-                            <div className="bg-green-500/10 border border-green-500/50 text-green-400 text-sm p-4 rounded-xl mb-4 text-center mt-2 leading-relaxed">
+                            <div className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm p-4 rounded-xl flex items-start gap-2 leading-relaxed">
+                                <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                                 {confirmMsg}
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
-                            {!isLogin && (
-                                <>
-                                    <div>
-                                        <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.fullName}</label>
-                                        <input type="text" required value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner" placeholder={t.fullNPlace} />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.phoneNum} *</label>
-                                        <PhoneInput value={phone} onChange={setPhone} language={language} required />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.roleTitle}</label>
-                                            <select value={role} onChange={e => setRole(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner">
-                                                <option value="Propietario">{t.roleOwner || 'Propietario'}</option>
-                                                <option value="Arquitecto">{t.roleArch || 'Arquitecto'}</option>
-                                                <option value="Ingeniero">{t.roleEng || 'Ingeniero'}</option>
-                                                <option value="Constructor">{t.roleConst || 'Constructor'}</option>
-                                                <option value="Instalador">{t.roleInst || 'Instalador'}</option>
-                                                <option value="Desarrollador Inmobiliario">{t.roleDev || 'Desarrollador Inmobiliario'}</option>
-                                                <option value="Otro">{t.roleOther || 'Otro'}</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.idTypeLabel}</label>
-                                            <select value={idType} onChange={e => setIdType(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner">
-                                                <option value="Cédula de Ciudadanía">Cédula de C. (CC)</option>
-                                                <option value="Cédula de Extranjería">Cédula de E. (CE)</option>
-                                                <option value="NIT">NIT</option>
-                                                <option value="Pasaporte">Pasaporte</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.idNum} *</label>
-                                        <input type="text" required value={idNumber}
-                                            onChange={e => {
-                                                const raw = e.target.value;
-                                                if (idType === 'Pasaporte') {
-                                                    const letters = raw.slice(0,2).replace(/[^a-zA-Z]/g,'');
-                                                    const digits  = raw.slice(2).replace(/\D/g,'');
-                                                    setIdNumber((letters + digits).toUpperCase());
-                                                } else {
-                                                    setIdNumber(raw.replace(/\D/g,''));
-                                                }
-                                            }}
-                                            className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner"
-                                            placeholder={idType === 'Pasaporte' ? 'AB1234567' : t.idPlace}
-                                            inputMode={idType === 'Pasaporte' ? 'text' : 'numeric'} />
-                                        <p className="text-[9px] text-white/35 mt-1.5 uppercase tracking-widest">
-                                            {idType === 'Pasaporte' ? t.passportFmtHint : t.numericOnlyHint}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.profPhoto} *</label>
-                                        <div className="flex items-center gap-4">
-                                            {photoPreview ? (
-                                                <img src={photoPreview} alt="Preview" className="w-16 h-16 rounded-full object-cover border-2 border-bronze shadow-[0_0_10px_rgba(193,138,104,0.3)]" />
-                                            ) : (
-                                                <div className="w-16 h-16 rounded-full bg-white/5 border border-dashed border-white/20 flex items-center justify-center text-white/30 text-[10px] font-bold">[IMG]</div>
-                                            )}
-                                            <label className="flex-1 cursor-pointer bg-black/50 border border-white/10 rounded-xl p-3 text-center text-white/50 hover:border-bronze hover:text-white transition-all text-sm">
-                                                {profilePhoto ? profilePhoto.name : t.selectImg}
-                                                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-                                            </label>
-                                        </div>
-                                        <p className="text-[10px] text-bronze/70 mt-2 uppercase tracking-wider">{t.secWarn}</p>
-                                    </div>
-                                </>
-                            )}
-                            <div>
-                                <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.emailAdd}</label>
-                                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner" placeholder={t.emailPlace} />
-                            </div>
-                            <div>
-                                <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.passLabel}</label>
-                                <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner" placeholder={t.passPlace} />
-                            </div>
-                            {!isLogin && (
+                        {/* ── LOGIN ── */}
+                        {mode === 'login' && (
+                            <form onSubmit={handleLogin} className="flex flex-col gap-4">
                                 <div>
-                                    <label className="block text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">{t.confPass}</label>
-                                    <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className={`w-full bg-black/50 border rounded-xl p-3 text-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze transition-all shadow-inner ${password && confirmPassword && password !== confirmPassword ? 'border-red-500/50' : 'border-white/10'}`} placeholder={t.passPlace} />
-                                    {password && confirmPassword && password !== confirmPassword && (
-                                        <p className="text-red-400 text-[10px] mt-1 uppercase tracking-widest">{t.passMismatch}</p>
-                                    )}
+                                    <FieldLabel>{t.emailAdd}</FieldLabel>
+                                    <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className={inputCls} placeholder={t.emailPlace} autoComplete="email" />
                                 </div>
-                            )}
+                                <div>
+                                    <FieldLabel>{t.passLabel}</FieldLabel>
+                                    <div className="relative">
+                                        <input type={showPass ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)} className={inputCls + ' pr-12'} placeholder={t.passPlace} autoComplete="current-password" />
+                                        <button type="button" onClick={() => setShowPass(p => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors cursor-pointer"><EyeIcon show={showPass} /></button>
+                                    </div>
+                                </div>
+                                <button type="submit" disabled={loading} className="mt-1 w-full bg-bronze hover:bg-white text-graphite font-bold py-4 rounded-xl uppercase tracking-widest transition-all duration-200 cursor-pointer disabled:opacity-40 shadow-[0_0_20px_rgba(193,138,104,0.2)] flex items-center justify-center gap-2">
+                                    {loading ? <><Spinner />{isEs ? 'Ingresando...' : 'Signing in...'}</> : t.enterDash}
+                                </button>
+                            </form>
+                        )}
 
-                            <button type="submit" disabled={loading} className="w-full mt-4 bg-white/5 border border-white/20 hover:border-bronze hover:bg-bronze hover:text-graphite text-white font-bold py-4 rounded-xl uppercase tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] cursor-pointer">
-                                {loading ? '...' : (isLogin ? t.enterDash : t.createAcc)}
-                            </button>
-                            <button type="button" onClick={() => setIsLogin(!isLogin)} className="w-full text-center text-xs text-white/40 hover:text-white transition-colors mt-4 uppercase tracking-widest cursor-pointer">
-                                {isLogin ? t.noAcc : t.reqLog}
-                            </button>
-                        </form>
+                        {/* ── REGISTER ── */}
+                        {mode === 'register' && (
+                            <div className="flex flex-col gap-5">
+
+                                {/* Step indicator */}
+                                <div className="flex items-center gap-2">
+                                    {[1, 2, 3].map(s => (
+                                        <React.Fragment key={s}>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${s < step ? 'bg-bronze border-bronze text-graphite' : s === step ? 'border-bronze text-bronze bg-bronze/10' : 'border-white/15 text-white/20'}`}>
+                                                    {s < step
+                                                        ? <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                        : s}
+                                                </div>
+                                                <span className={`text-[9px] uppercase tracking-widest hidden sm:block transition-colors ${s === step ? 'text-bronze' : s < step ? 'text-white/40' : 'text-white/15'}`}>
+                                                    {s === 1 ? (isEs ? 'Identidad' : 'Identity') : s === 2 ? (isEs ? 'Foto' : 'Photo') : (isEs ? 'Acceso' : 'Access')}
+                                                </span>
+                                            </div>
+                                            {s < 3 && <div className={`flex-1 h-px transition-all duration-300 ${s < step ? 'bg-bronze' : 'bg-white/10'}`} />}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+
+                                {/* Step 1 — Identidad */}
+                                {step === 1 && (
+                                    <div className="flex flex-col gap-4">
+                                        <div>
+                                            <FieldLabel>{t.fullName}</FieldLabel>
+                                            <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className={inputCls} placeholder={t.fullNPlace} autoComplete="name" />
+                                        </div>
+                                        <div>
+                                            <FieldLabel>{t.phoneNum}</FieldLabel>
+                                            <PhoneInput value={phone} onChange={setPhone} language={language} required />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <FieldLabel>{t.roleTitle}</FieldLabel>
+                                                <select value={role} onChange={e => setRole(e.target.value)} className={inputCls}>
+                                                    <option value="Propietario">{t.roleOwner || 'Propietario'}</option>
+                                                    <option value="Arquitecto">{t.roleArch}</option>
+                                                    <option value="Ingeniero">{t.roleEng}</option>
+                                                    <option value="Constructor">{t.roleConst || 'Constructor'}</option>
+                                                    <option value="Instalador">{t.roleInst || 'Instalador'}</option>
+                                                    <option value="Desarrollador Inmobiliario">{t.roleDev || 'Desarrollador'}</option>
+                                                    <option value="Otro">{t.roleOther || 'Otro'}</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <FieldLabel>{t.idTypeLabel}</FieldLabel>
+                                                <select value={idType} onChange={e => setIdType(e.target.value)} className={inputCls}>
+                                                    <option value="Cédula de Ciudadanía">CC</option>
+                                                    <option value="Cédula de Extranjería">CE</option>
+                                                    <option value="NIT">NIT</option>
+                                                    <option value="Pasaporte">Pasaporte</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <FieldLabel>{t.idNum}</FieldLabel>
+                                            <input type="text" value={idNumber}
+                                                onChange={e => {
+                                                    const raw = e.target.value;
+                                                    if (idType === 'Pasaporte') {
+                                                        const l = raw.slice(0,2).replace(/[^a-zA-Z]/g,'');
+                                                        const d = raw.slice(2).replace(/\D/g,'');
+                                                        setIdNumber((l + d).toUpperCase());
+                                                    } else {
+                                                        setIdNumber(raw.replace(/\D/g,''));
+                                                    }
+                                                }}
+                                                className={inputCls}
+                                                placeholder={idType === 'Pasaporte' ? 'AB1234567' : t.idPlace}
+                                                inputMode={idType === 'Pasaporte' ? 'text' : 'numeric'} />
+                                            <p className="text-[9px] text-white/25 mt-1.5 tracking-widest">{idType === 'Pasaporte' ? t.passportFmtHint : t.numericOnlyHint}</p>
+                                        </div>
+                                        <button onClick={handleNextStep} disabled={!stepValid[1]}
+                                            className="w-full py-4 rounded-xl bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(193,138,104,0.2)]">
+                                            {isEs ? 'Continuar' : 'Continue'} →
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Step 2 — Foto */}
+                                {step === 2 && (
+                                    <div className="flex flex-col items-center gap-6">
+                                        <p className="text-white/40 text-sm text-center">{isEs ? 'Sube una foto clara de tu rostro para identificación corporativa.' : 'Upload a clear face photo for corporate identification.'}</p>
+
+                                        <label className="cursor-pointer flex flex-col items-center gap-3 group">
+                                            {photoPreview ? (
+                                                <div className="relative">
+                                                    <img src={photoPreview} alt="Preview" className="w-36 h-36 rounded-full object-cover border-4 border-bronze shadow-[0_0_30px_rgba(193,138,104,0.35)]" />
+                                                    <div className="absolute bottom-1 right-1 w-9 h-9 bg-bronze rounded-full flex items-center justify-center text-graphite shadow-lg">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="w-36 h-36 rounded-full border-2 border-dashed border-bronze/40 bg-white/5 flex flex-col items-center justify-center text-white/30 group-hover:border-bronze group-hover:text-bronze transition-all">
+                                                    <svg className="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                    <span className="text-[10px] uppercase tracking-widest">{isEs ? 'Subir foto' : 'Upload photo'}</span>
+                                                </div>
+                                            )}
+                                            <span className="text-[10px] text-white/25 uppercase tracking-widest">
+                                                {photoPreview ? (isEs ? 'Toca para cambiar' : 'Tap to change') : (isEs ? 'Toca para seleccionar' : 'Tap to select')}
+                                            </span>
+                                            <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                                        </label>
+
+                                        <div className="flex gap-3 w-full">
+                                            <button onClick={() => { setStep(1); setError(null); }} className="flex-shrink-0 px-5 py-3 rounded-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 text-sm uppercase tracking-widest transition-all cursor-pointer">
+                                                ←
+                                            </button>
+                                            <button onClick={() => { setError(null); setStep(3); }} disabled={!stepValid[2]}
+                                                className="flex-1 py-3 rounded-xl bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+                                                {isEs ? 'Continuar' : 'Continue'} →
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Step 3 — Acceso */}
+                                {step === 3 && (
+                                    <div className="flex flex-col gap-4">
+                                        <div>
+                                            <FieldLabel>{t.emailAdd}</FieldLabel>
+                                            <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} className={inputCls} placeholder={t.emailPlace} autoComplete="email" />
+                                        </div>
+                                        <div>
+                                            <FieldLabel>{t.passLabel}</FieldLabel>
+                                            <div className="relative">
+                                                <input type={showRegPass ? 'text' : 'password'} value={regPassword} onChange={e => setRegPassword(e.target.value)} className={inputCls + ' pr-12'} placeholder={isEs ? 'Mínimo 6 caracteres' : 'Min. 6 characters'} autoComplete="new-password" />
+                                                <button type="button" onClick={() => setShowRegPass(p => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors cursor-pointer"><EyeIcon show={showRegPass} /></button>
+                                            </div>
+                                            {regPassword.length > 0 && regPassword.length < 6 && (
+                                                <p className="text-yellow-500/70 text-[10px] mt-1.5 tracking-widest">{isEs ? 'Mínimo 6 caracteres' : 'Minimum 6 characters'}</p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <FieldLabel>{t.confPass}</FieldLabel>
+                                            <div className="relative">
+                                                <input type={showRegPass ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                                                    className={`${inputCls} pr-12 border ${confirmPassword && regPassword !== confirmPassword ? 'border-red-500/50 focus:border-red-500' : confirmPassword && regPassword === confirmPassword ? 'border-green-500/50 focus:border-green-500' : 'border-white/10'}`}
+                                                    placeholder={t.passPlace} autoComplete="new-password" />
+                                            </div>
+                                            {confirmPassword && regPassword !== confirmPassword && (
+                                                <p className="text-red-400 text-[10px] mt-1.5 tracking-widest flex items-center gap-1">
+                                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                                                    {t.passMismatch}
+                                                </p>
+                                            )}
+                                            {confirmPassword && regPassword === confirmPassword && regPassword.length >= 6 && (
+                                                <p className="text-green-400 text-[10px] mt-1.5 tracking-widest flex items-center gap-1">
+                                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                    {isEs ? 'Contraseñas coinciden' : 'Passwords match'}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-3 mt-1">
+                                            <button onClick={() => { setStep(2); setError(null); }} className="flex-shrink-0 px-5 py-3 rounded-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 text-sm uppercase tracking-widest transition-all cursor-pointer">
+                                                ←
+                                            </button>
+                                            <button onClick={handleRegister} disabled={loading || !stepValid[3]}
+                                                className="flex-1 py-3 rounded-xl bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(193,138,104,0.2)] flex items-center justify-center gap-2">
+                                                {loading ? <><Spinner />{isEs ? 'Creando cuenta...' : 'Creating...'}</> : t.createAcc}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
-            )
+            );
         }
 
         const T = {
