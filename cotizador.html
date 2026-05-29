@@ -872,9 +872,9 @@
         const supabase = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
             ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                 auth: {
-                    detectSessionInUrl: true, // Detecta el código OAuth en la URL al volver de Google
-                    persistSession: true,     // Mantiene la sesión en localStorage
-                    flowType: 'pkce',         // Flujo seguro para apps sin backend
+                    detectSessionInUrl: true,
+                    persistSession: true,
+                    flowType: 'implicit', // Más compatible con sitios estáticos sin backend
                 }
             })
             : null;
