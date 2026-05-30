@@ -2224,17 +2224,14 @@
                 setError(null);
                 setLoading(true);
                 try {
-                    // redirectTo: la URL base del archivo (sin query params ni hash)
-                    const redirectTo = window.location.href.replace(/[?#].*$/, '');
                     const { error } = await supabase.auth.signInWithOAuth({
                         provider,
                         options: {
-                            redirectTo,
+                            redirectTo: 'https://www.kastonproyectos.com/cotizador.html',
                             scopes: provider === 'google' ? 'email profile' : undefined,
                         }
                     });
                     if (error) throw error;
-                    // El navegador redirige automáticamente — no hay acción adicional aquí
                 } catch (err) {
                     setError(err.message);
                     setLoading(false);
