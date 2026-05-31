@@ -2214,25 +2214,13 @@
 
             const switchMode = (m) => { setMode(m); setStep(1); setError(null); setConfirmMsg(null); };
 
-            const handleOAuth = async (provider) => {
-                setError(null);
-                setLoading(true);
-                try {
-                    const redirectTo = 'https://www.kastonproyectos.com/cotizador.html';
-                    const { data, error } = await supabase.auth.signInWithOAuth({
-                        provider,
-                        options: {
-                            redirectTo,
-                            scopes: provider === 'google' ? 'email profile' : undefined,
-                            queryParams: { access_type: 'offline', prompt: 'consent' },
-                        }
-                    });
-                    if (data?.url) window.location.href = data.url;
-                    if (error) throw error;
-                } catch (err) {
-                    setError(err.message);
-                    setLoading(false);
-                }
+            const handleOAuth = (provider) => {
+                // Directo al servidor de Supabase — genera y guarda el estado server-side
+                const url = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
+                url.searchParams.set('provider', provider);
+                url.searchParams.set('redirect_to', 'https://www.kastonproyectos.com/cotizador.html');
+                if (provider === 'google') url.searchParams.set('scopes', 'email profile');
+                window.location.href = url.toString();
             };
 
             const handlePhotoChange = (e) => {
