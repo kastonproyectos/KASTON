@@ -870,13 +870,7 @@
 
         // Inicializar cliente Supabase
         const supabase = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
-            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                auth: {
-                    detectSessionInUrl: true,
-                    persistSession: true,
-                    flowType: 'implicit', // Más compatible con sitios estáticos sin backend
-                }
-            })
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
             : null;
 
         function ServiceBanner({ language }) {
