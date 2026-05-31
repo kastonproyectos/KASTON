@@ -13,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script>
         tailwind.config = {
@@ -2214,13 +2215,56 @@
 
             const switchMode = (m) => { setMode(m); setStep(1); setError(null); setConfirmMsg(null); };
 
+            const GOOGLE_CLIENT_ID = '90020836207-82o12lfhkluhgbs4nh0rusv4b402j0gt.apps.googleusercontent.com';
+
             const handleOAuth = (provider) => {
-                // Directo al servidor de Supabase — genera y guarda el estado server-side
-                const url = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
-                url.searchParams.set('provider', provider);
-                url.searchParams.set('redirect_to', 'https://www.kastonproyectos.com/cotizador.html');
-                if (provider === 'google') url.searchParams.set('scopes', 'email profile');
-                window.location.href = url.toString();
+                if (provider !== 'google' || !window.google?.accounts?.id) {
+                    setError(isEs ? 'Google no está disponible aún, intenta en unos segundos.' : 'Google not ready yet, try in a moment.');
+                    return;
+                }
+                setError(null);
+                setLoading(true);
+                window.google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: async (response) => {
+                        try {
+                            const { data, error } = await supabase.auth.signInWithIdToken({
+                                provider: 'google',
+                                token: response.credential,
+                            });
+                            if (error) throw error;
+                            onAuth(data.session, {});
+                        } catch (err) {
+                            setError(err.message);
+                        } finally {
+                            setLoading(false);
+                        }
+                    },
+                    use_fedcm_for_prompt: false,
+                });
+                window.google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        // Si One Tap no funciona, abrir popup
+                        window.google.accounts.oauth2.initTokenClient({
+                            client_id: GOOGLE_CLIENT_ID,
+                            scope: 'email profile openid',
+                            callback: async (tokenResponse) => {
+                                try {
+                                    const { data, error } = await supabase.auth.signInWithIdToken({
+                                        provider: 'google',
+                                        token: tokenResponse.access_token,
+                                    });
+                                    if (error) throw error;
+                                    onAuth(data.session, {});
+                                } catch (err) {
+                                    setError(err.message);
+                                } finally {
+                                    setLoading(false);
+                                }
+                            },
+                        }).requestAccessToken();
+                    }
+                });
             };
 
             const handlePhotoChange = (e) => {
