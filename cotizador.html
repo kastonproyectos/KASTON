@@ -2218,13 +2218,16 @@
                 setError(null);
                 setLoading(true);
                 try {
-                    const { error } = await supabase.auth.signInWithOAuth({
+                    const redirectTo = 'https://www.kastonproyectos.com/cotizador.html';
+                    const { data, error } = await supabase.auth.signInWithOAuth({
                         provider,
                         options: {
-                            redirectTo: 'https://www.kastonproyectos.com/cotizador.html',
+                            redirectTo,
                             scopes: provider === 'google' ? 'email profile' : undefined,
+                            queryParams: { access_type: 'offline', prompt: 'consent' },
                         }
                     });
+                    if (data?.url) window.location.href = data.url;
                     if (error) throw error;
                 } catch (err) {
                     setError(err.message);
