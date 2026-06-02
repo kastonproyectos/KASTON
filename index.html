@@ -390,6 +390,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.9s ease;
+        }
+
+        .hero-bg video.active {
             opacity: 0.22;
         }
 
@@ -1041,8 +1046,11 @@
      ================================================ -->
     <section class="hero" id="hero">
         <div class="hero-bg">
-            <video autoplay loop muted playsinline>
-                <source src="Country_House_Hailstorm_Cinematic_Scene.mov" type="video/mp4">
+            <video id="drone-vid1" autoplay muted playsinline class="active">
+                <source src="drone1.mp4" type="video/mp4">
+            </video>
+            <video id="drone-vid2" muted playsinline>
+                <source src="drone2.mp4" type="video/mp4">
             </video>
         </div>
         <div class="container">
@@ -1875,6 +1883,33 @@
             <p style="margin-top:16px;" data-i18n="footer.copy">&copy; 2026 KASTON. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- ================================================
+     DRONE VIDEO LOOP
+     ================================================ -->
+    <script>
+        (function () {
+            var v1 = document.getElementById('drone-vid1');
+            var v2 = document.getElementById('drone-vid2');
+            if (!v1 || !v2) return;
+
+            function switchTo(show, hide) {
+                hide.classList.remove('active');
+                show.currentTime = 0;
+                show.play().catch(function () {});
+                show.classList.add('active');
+            }
+
+            v1.addEventListener('ended', function () { switchTo(v2, v1); });
+            v2.addEventListener('ended', function () { switchTo(v1, v2); });
+
+            // Fallback: si autoplay es bloqueado, intentar al primer click
+            document.addEventListener('click', function onFirstClick() {
+                if (v1.paused) v1.play().catch(function () {});
+                document.removeEventListener('click', onFirstClick);
+            }, { once: true });
+        })();
+    </script>
 
     <!-- ================================================
      JAVASCRIPT
