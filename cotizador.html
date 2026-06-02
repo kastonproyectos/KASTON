@@ -1597,22 +1597,57 @@
                             </div>
                         </div>
                     )}
-                    <div className="glass-panel rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-                        <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-bronze rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
-                        <div className="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-bronze rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
-                        <div className="flex-1 space-y-4 relative z-10 w-full md:w-auto">
-                            <h2 className="text-2xl font-heading font-semibold tracking-tight text-white mb-2 uppercase text-white/70">
-                                {t.typeAreaProj}
-                            </h2>
-                            <div className="mb-4">
-                                <label className="block text-xs text-white/50 uppercase tracking-widest mb-2 font-semibold">{t.constType}</label>
-                                <select value={constructionType} onChange={(e) => setConstructionType(e.target.value)} className="w-full md:w-auto bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-bronze transition-all appearance-none cursor-pointer">
+                    <div className="glass-panel rounded-2xl p-8 flex flex-col gap-7 relative overflow-hidden">
+                        <div className="absolute top-[-60px] right-[-60px] w-72 h-72 bg-bronze rounded-full opacity-8 blur-[120px] pointer-events-none"></div>
+                        <div className="absolute bottom-[-60px] left-[-60px] w-72 h-72 bg-bronze rounded-full opacity-8 blur-[120px] pointer-events-none"></div>
+
+                        {/* Título */}
+                        <h2 className="text-lg font-heading font-bold tracking-widest text-white uppercase relative z-10">
+                            {t.typeAreaProj}
+                        </h2>
+
+                        {/* Fila: Tipo de construcción + Material actual */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative z-10">
+                            {/* Tipo de construcción */}
+                            <div>
+                                <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-2 font-bold">{t.constType}</label>
+                                <select value={constructionType} onChange={(e) => setConstructionType(e.target.value)}
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-medium focus:outline-none focus:border-bronze transition-all appearance-none cursor-pointer hover:border-white/25">
                                     {[{ val: 'Residencial', label: t.constRes }, { val: 'Comercial', label: t.constCom }, { val: 'Industrial', label: t.constInd }, { val: 'Institucional', label: t.constInst }, { val: 'Agropecuario', label: t.constAgro }, { val: 'Otros', label: t.constOth }].map(tipo => (
                                         <option key={tipo.val} value={tipo.val}>{tipo.label}</option>
                                     ))}
                                 </select>
                             </div>
-                            <div className="flex items-end gap-3 text-bronze font-black drop-shadow-[0_0_15px_rgba(193,138,104,0.4)]">
+
+                            {/* Material actual (Ruta A) o badge Ruta B */}
+                            {flowActive === 'A' ? (
+                                <div>
+                                    <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-2 font-bold">{language === 'en' ? 'Current material' : 'Material actual'}</label>
+                                    <div className="flex gap-2">
+                                        {Object.entries(MATERIAL_CONSTANTS).filter(([key]) => key !== 'zinc').map(([key, data]) => {
+                                            const isActive = material === key;
+                                            return (
+                                                <button key={key} onClick={() => setMaterial(key)}
+                                                    className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 uppercase border ${isActive ? 'bg-white/10 border-bronze/60 text-white shadow-[0_0_14px_rgba(193,138,104,0.25)]' : 'border-white/8 text-white/40 hover:text-white/70 hover:border-white/20 hover:bg-white/5'}`}>
+                                                    {data.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col justify-end">
+                                    <div className="w-full flex items-center justify-center py-3 px-4 bg-bronze/10 rounded-xl border border-bronze/30 text-bronze uppercase text-xs font-bold tracking-widest text-center">
+                                        {t.routeBActive}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Área del proyecto */}
+                        <div className="relative z-10">
+                            <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-4 font-bold">{language === 'en' ? 'Project area' : 'Área del proyecto'}</label>
+                            <div className="flex items-end gap-4 mb-6">
                                 <input
                                     type="number"
                                     min={sliderMin} max={unit === 'ft2' ? 16145.85 : 1500}
@@ -1640,58 +1675,35 @@
                                         setInputValue(clamped);
                                         setInputText(String(clamped));
                                     }}
-                                    className="bg-transparent text-5xl md:text-7xl w-36 md:w-48 outline-none border-b-2 border-bronze/40 focus:border-bronze text-bronze text-center font-black transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    className="bg-transparent text-7xl w-44 outline-none border-b-2 border-bronze/40 focus:border-bronze text-bronze text-center font-black transition-colors drop-shadow-[0_0_20px_rgba(193,138,104,0.35)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
-                                <select value={unit} onChange={handleUnitChange} className="bg-transparent text-2xl md:text-3xl font-light text-white/50 mb-3 outline-none cursor-pointer hover:text-white transition-colors appearance-none">
-                                    <option value="m2" className="bg-graphite text-lg">m²</option>
-                                    <option value="ft2" className="bg-graphite text-lg">ft²</option>
+                                <select value={unit} onChange={handleUnitChange}
+                                    className="bg-transparent text-3xl font-light text-white/40 mb-2 outline-none cursor-pointer hover:text-white/70 transition-colors appearance-none">
+                                    <option value="m2" className="bg-graphite text-base">m²</option>
+                                    <option value="ft2" className="bg-graphite text-base">ft²</option>
                                 </select>
                             </div>
-                            <div className="w-full pt-4">
-                                <input
-                                    type="range" min={sliderMin} max={sliderMax} step={sliderStep} value={inputValue}
-                                    onChange={(e) => {
-                                        const val = parseInt(e.target.value, 10);
-                                        if (val > (unit === 'ft2' ? 16145 : 1500)) {
-                                            alert(T[language]?.redirectRouteC || "Área límite superada. Bloqueo de seguridad activado, será redireccionado al Plan de Ingeniería Integral.");
-                                            setFlowActive('C');
-                                            const maxVal = unit === 'ft2' ? 16145 : 1500;
-                                            setInputValue(maxVal);
-                                            setInputText(String(maxVal));
-                                        } else {
-                                            setInputValue(val);
-                                            setInputText(String(val));
-                                        }
-                                    }} className="w-full cursor-pointer h-8"
-                                />
-                                <div className="flex justify-between text-xs text-white/30 uppercase mt-2 tracking-widest w-full">
-                                    <span>{sliderMin} {unit}</span>
-                                    <span>{sliderMax} {unit}</span>
-                                </div>
+                            <input
+                                type="range" min={sliderMin} max={sliderMax} step={sliderStep} value={inputValue}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value, 10);
+                                    if (val > (unit === 'ft2' ? 16145 : 1500)) {
+                                        alert(T[language]?.redirectRouteC || "Área límite superada. Bloqueo de seguridad activado, será redireccionado al Plan de Ingeniería Integral.");
+                                        setFlowActive('C');
+                                        const maxVal = unit === 'ft2' ? 16145 : 1500;
+                                        setInputValue(maxVal);
+                                        setInputText(String(maxVal));
+                                    } else {
+                                        setInputValue(val);
+                                        setInputText(String(val));
+                                    }
+                                }} className="w-full cursor-pointer h-8"
+                            />
+                            <div className="flex justify-between text-xs text-white/25 uppercase mt-2 tracking-widest">
+                                <span>{sliderMin} {unit}</span>
+                                <span>{sliderMax} {unit}</span>
                             </div>
                         </div>
-
-                        {flowActive === 'A' ? (
-                            <div className="w-full md:w-auto grid grid-cols-1 md:grid-cols-3 gap-2 bg-black/40 p-2 rounded-xl border border-white/5 relative z-10">
-                                {Object.entries(MATERIAL_CONSTANTS).filter(([key]) => key !== 'zinc').map(([key, data]) => {
-                                    const isActive = material === key;
-                                    return (
-                                        <button
-                                            key={key}
-                                            onClick={() => setMaterial(key)}
-                                            className={`py-3 px-6 rounded-lg text-sm font-semibold tracking-wide transition-all duration-300 relative uppercase ${isActive ? 'text-white shadow-lg border border-bronze/50' : 'text-white/40 hover:text-white/70 hover:bg-white/5 shadow-none border-transparent'}`}
-                                            style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.1)' : 'transparent', boxShadow: isActive ? '0 0 15px rgba(193,138,104,0.2)' : 'none' }}
-                                        >
-                                            {data.label}
-                                        </button>
-                                    )
-                                })}
-                            </div>
-                        ) : (
-                            <div className="w-full md:w-auto flex items-center justify-center p-4 bg-bronze/10 rounded-xl border border-bronze/30 text-bronze uppercase text-xs font-bold tracking-widest text-center mt-2 md:mt-0 relative z-10">
-                                {t.routeBActive}
-                            </div>
-                        )}
                     </div>
 
                     {/* ── Configurador de Techo ─────────────────────── */}
