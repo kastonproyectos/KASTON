@@ -1176,9 +1176,9 @@
                     if (profilePhotoFile) {
                         const ext = profilePhotoFile.name.split('.').pop();
                         const filePath = `${session.user.id}/avatar.${ext}`;
-                        const { error: upErr } = await supabase.storage.from('avatars').upload(filePath, profilePhotoFile, { upsert: true });
+                        const { error: upErr } = await supabase.storage.from('Avatars').upload(filePath, profilePhotoFile, { upsert: true });
                         if (upErr) { setFeedback({ type: 'error', text: isEs ? 'Error subiendo foto: ' + upErr.message : 'Photo upload error: ' + upErr.message }); setSaving(false); return; }
-                        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                        const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
                         metadata.avatar_url = urlData.publicUrl;
                     }
                     const userUpdate = { data: metadata };
@@ -2440,9 +2440,9 @@
                         if (profilePhoto) {
                             const ext = profilePhoto.name.split('.').pop();
                             const filePath = `${data.user.id}/avatar.${ext}`;
-                            const { error: uploadErr } = await supabase.storage.from('avatars').upload(filePath, profilePhoto, { upsert: true });
+                            const { error: uploadErr } = await supabase.storage.from('Avatars').upload(filePath, profilePhoto, { upsert: true });
                             if (!uploadErr) {
-                                const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                                const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
                                 await supabase.auth.updateUser({ data: { avatar_url: urlData.publicUrl } });
                             }
                         }
