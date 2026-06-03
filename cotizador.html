@@ -2451,8 +2451,7 @@
                     if (error) throw error;
                     if (data.session) {
                         if (profilePhoto) {
-                            const { error: uploadErr } = await supabase.auth.updateUser({ data: { avatar_url: profilePhoto } });
-                            if (!uploadErr) {
+                            await supabase.auth.updateUser({ data: { avatar_url: profilePhoto } });
                         }
                         onAuth(data.session, { fullName, phone, photoPreview, role, idType, idNumber });
                     } else {
