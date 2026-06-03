@@ -1994,77 +1994,46 @@
 
             const handleSaveProject = async (proj) => {
                 const fullProj = { ...proj };
+                const uid = session?.user?.id;
+                const m2 = proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area;
+                const baseFields = {
+                    project_m2: m2,
+                    selected_color: proj.divisa,
+                    total_weight_saved: proj.plastico_kg / 1000,
+                    plastic_upcycled_kg: proj.plastico_kg,
+                    estimated_savings_usd: proj.inversion_tejas,
+                    client_name: proj.nombre,
+                };
 
                 if (editingProject) {
                     setProjects(projects.map(p => p.id === proj.id ? fullProj : p));
-                    if (supabase) {
-                        const { error: updateErr } = await supabase.from('projects').update({
-                            project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                            selected_color: proj.divisa,
-                            total_weight_saved: proj.plastico_kg / 1000,
-                            plastic_upcycled_kg: proj.plastico_kg,
-                            estimated_savings_usd: proj.inversion_tejas,
-                            client_name: proj.nombre,
-                            project_data: JSON.stringify(fullProj)
-                        }).eq('id', proj.id).eq('user_id', session?.user?.id);
-                        if (updateErr) {
-                            // Si falla por la columna project_data, reintenta sin ella
-                            if (updateErr.message?.includes('project_data')) {
-                                const { error: fallbackErr } = await supabase.from('projects').update({
-                                    project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                    selected_color: proj.divisa,
-                                    total_weight_saved: proj.plastico_kg / 1000,
-                                    plastic_upcycled_kg: proj.plastico_kg,
-                                    estimated_savings_usd: proj.inversion_tejas,
-                                    client_name: proj.nombre
-                                }).eq('id', proj.id).eq('user_id', session?.user?.id);
-                                if (fallbackErr) console.error('Error guardando proyecto:', fallbackErr);
-                            } else {
-                                console.error('Error guardando proyecto:', updateErr);
-                            }
+                    if (supabase && uid) {
+                        // Intenta con project_data; si falla por cualquier razón, reintenta sin ella
+                        const { error: e1 } = await supabase.from('projects')
+                            .update({ ...baseFields, project_data: JSON.stringify(fullProj) })
+                            .eq('id', proj.id).eq('user_id', uid);
+                        if (e1) {
+                            const { error: e2 } = await supabase.from('projects')
+                                .update(baseFields)
+                                .eq('id', proj.id).eq('user_id', uid);
+                            if (e2) console.error('Error actualizando proyecto:', e2);
                         }
                     }
                     setEditingProject(null);
                 } else {
                     setProjects([fullProj, ...projects]);
-                    if (supabase) {
-                        const { error: insertErr } = await supabase.from('projects').insert([{
-                            id: proj.id,
-                            user_id: session?.user?.id,
-                            project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                            selected_color: proj.divisa,
-                            total_weight_saved: proj.plastico_kg / 1000,
-                            plastic_upcycled_kg: proj.plastico_kg,
-                            estimated_savings_usd: proj.inversion_tejas,
-                            client_name: proj.nombre,
-                            project_data: JSON.stringify(fullProj),
-                            created_at: new Date().toISOString()
-                        }]);
-                        if (insertErr) {
-                            // Si falla por la columna project_data, reintenta sin ella
-                            if (insertErr.message?.includes('project_data')) {
-                                const { error: fallbackErr } = await supabase.from('projects').insert([{
-                                    id: proj.id,
-                                    user_id: session?.user?.id,
-                                    project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
-                                    selected_color: proj.divisa,
-                                    total_weight_saved: proj.plastico_kg / 1000,
-                                    plastic_upcycled_kg: proj.plastico_kg,
-                                    estimated_savings_usd: proj.inversion_tejas,
-                                    client_name: proj.nombre,
-                                    created_at: new Date().toISOString()
-                                }]);
-                                if (fallbackErr) console.error('Error guardando proyecto:', fallbackErr);
-                            } else {
-                                console.error('Error guardando proyecto:', insertErr);
-                            }
+                    if (supabase && uid) {
+                        const now = new Date().toISOString();
+                        const { error: e1 } = await supabase.from('projects')
+                            .insert([{ ...baseFields, id: proj.id, user_id: uid, created_at: now, project_data: JSON.stringify(fullProj) }]);
+                        if (e1) {
+                            const { error: e2 } = await supabase.from('projects')
+                                .insert([{ ...baseFields, id: proj.id, user_id: uid, created_at: now }]);
+                            if (e2) console.error('Error guardando proyecto:', e2);
                         }
                     }
                 }
-                setTimeout(() => {
-                    setTriageFlow(null);
-                    setCurrentTab('triage');
-                }, 100);
+                setTimeout(() => { setTriageFlow(null); setCurrentTab('triage'); }, 100);
             };
 
             const handleEditProject = (proj) => {
@@ -2121,7 +2090,7 @@
                 document.documentElement.lang = savedLang;
             }, []);
 
-            // Load projects from Supabase when session changes
+            // Carga proyectos desde Supabase al iniciar sesión
             useEffect(() => {
                 if (session && supabase) {
                     supabase
@@ -2130,15 +2099,27 @@
                         .eq('user_id', session.user.id)
                         .order('created_at', { ascending: false })
                         .then(({ data, error }) => {
-                            if (data && !error) {
+                            if (error) {
+                                console.error('Error cargando proyectos:', error);
+                                // Intenta cargar caché local como respaldo
+                                try {
+                                    const cached = localStorage.getItem('kaston_projects_cache');
+                                    if (cached) setProjects(JSON.parse(cached));
+                                } catch {}
+                                return;
+                            }
+                            if (data) {
                                 const loaded = data.map(p => {
-                                    // Try to restore full project from project_data JSON
+                                    // Preferir project_data (JSON completo)
                                     if (p.project_data) {
-                                        try { return JSON.parse(p.project_data); } catch (e) { }
+                                        try { return JSON.parse(p.project_data); } catch {}
                                     }
-                                    // Fallback: reconstruct from individual columns
+                                    // Reconstruir desde columnas individuales
                                     const storedVal = p.selected_color || '';
                                     const isCurrency = ['COP', 'USD', 'EUR'].includes(storedVal);
+                                    const fechaFallback = p.created_at
+                                        ? new Date(p.created_at).toLocaleDateString('es-CO')
+                                        : new Date().toLocaleDateString('es-CO');
                                     return {
                                         id: p.id,
                                         nombre: p.client_name || 'Sin nombre',
@@ -2147,24 +2128,23 @@
                                         inversion_tejas: p.estimated_savings_usd || 0,
                                         plastico_kg: p.plastic_upcycled_kg || 0,
                                         divisa: isCurrency ? storedVal : 'COP',
+                                        fecha: fechaFallback,
                                         material: 'clay',
-                                        tipoConstruccion: 'clay',
-                                        inclinacion: 15,
+                                        tipoConstruccion: 'Residencial',
                                         flow: 'A',
-                                        tasas: null
                                     };
                                 });
                                 setProjects(loaded);
+                                try { localStorage.setItem('kaston_projects_cache', JSON.stringify(loaded)); } catch {}
                             }
                         })
-                        .catch(console.error);
+                        .catch(e => console.error('Error de red cargando proyectos:', e));
                 } else if (!session) {
-                    // Cargar proyectos cacheados para vista de solo lectura
                     try {
                         const cached = localStorage.getItem('kaston_projects_cache');
                         if (cached) setProjects(JSON.parse(cached));
                         else setProjects([]);
-                    } catch (e) { setProjects([]); }
+                    } catch { setProjects([]); }
                 }
             }, [session]);
 
