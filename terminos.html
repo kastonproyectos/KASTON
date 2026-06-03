@@ -248,6 +248,31 @@
             margin-bottom: 8px;
         }
 
+        .footer-instagram {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 28px;
+            border: 1.5px solid rgba(193, 138, 104, 0.5);
+            border-radius: 8px;
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-instagram:hover {
+            border-color: var(--gold);
+            background: rgba(193, 138, 104, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(193, 138, 104, 0.15);
+        }
+
         /* ---- RESPONSIVE ---- */
         @media (max-width: 768px) {
             :root { --nav-height: 90px; }
@@ -377,10 +402,8 @@
         <div class="container" style="max-width:1200px;">
             <div class="footer-brand">KASTON</div>
             <p>Innovación para siempre. Cubiertas de polímero recuperado.</p>
-            <a href="https://www.instagram.com/kaston.proyectos" target="_blank" rel="noopener noreferrer"
-                style="color: var(--gold); text-decoration: none; margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-heading); letter-spacing: 1px; transition: opacity 0.3s ease;"
-                onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <a href="https://www.instagram.com/kaston.proyectos" target="_blank" rel="noopener noreferrer" class="footer-instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
