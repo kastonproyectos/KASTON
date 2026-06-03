@@ -2093,12 +2093,14 @@
             // Carga proyectos desde Supabase al iniciar sesión
             useEffect(() => {
                 if (session && supabase) {
+                    console.log('[KASTON] Cargando proyectos para user_id:', session.user.id);
                     supabase
                         .from('projects')
                         .select('*')
                         .eq('user_id', session.user.id)
                         .order('created_at', { ascending: false })
                         .then(({ data, error }) => {
+                            console.log('[KASTON] Respuesta Supabase - filas:', data?.length, 'error:', error?.message);
                             if (error) {
                                 console.error('Error cargando proyectos:', error);
                                 // Intenta cargar caché local como respaldo
