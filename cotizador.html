@@ -1146,17 +1146,31 @@
                     : <div className={`rounded-full bg-bronze/15 border-bronze flex items-center justify-center font-bold text-bronze ${cls}`}>{fallbackInitial}</div>;
             };
 
+            const resizeToBase64 = (file) => new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const MAX = 300;
+                        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+                        const canvas = document.createElement('canvas');
+                        canvas.width  = Math.round(img.width  * ratio);
+                        canvas.height = Math.round(img.height * ratio);
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.75));
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const dataUrl = reader.result;
+                resizeToBase64(file).then(dataUrl => {
                     setPhotoPreview(dataUrl);
-                    // Guardar como dataUrl para evitar invalidación de File en Safari
-                    setProfilePhotoFile({ name: file.name, type: file.type, dataUrl });
-                };
-                reader.readAsDataURL(file);
+                    setProfilePhotoFile(dataUrl);
+                });
             };
 
             const handleValidatePassword = async () => {
@@ -1178,15 +1192,7 @@
                 try {
                     const metadata = { phone };
                     if (profilePhotoFile) {
-                        const ext = profilePhotoFile.name.split('.').pop();
-                        const filePath = `${session.user.id}/avatar.${ext}`;
-                        const b64 = profilePhotoFile.dataUrl.split(',')[1];
-                        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-                        const blob = new Blob([bytes], { type: profilePhotoFile.type });
-                        const { error: upErr } = await supabase.storage.from('Avatars').upload(filePath, blob, { upsert: true, contentType: profilePhotoFile.type });
-                        if (upErr) { setFeedback({ type: 'error', text: isEs ? 'Error subiendo foto: ' + upErr.message : 'Photo upload error: ' + upErr.message }); setSaving(false); return; }
-                        const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
-                        metadata.avatar_url = urlData.publicUrl;
+                        metadata.avatar_url = profilePhotoFile;
                     }
                     const userUpdate = { data: metadata };
                     if (passValidated && newPassword) userUpdate.password = newPassword;
@@ -2393,13 +2399,10 @@
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const dataUrl = reader.result;
+                    resizeToBase64(file).then(dataUrl => {
                         setPhotoPreview(dataUrl);
-                        setProfilePhoto({ name: file.name, type: file.type, dataUrl });
-                    };
-                    reader.readAsDataURL(file);
+                        setProfilePhoto(dataUrl);
+                    });
                 }
             };
 
@@ -2448,16 +2451,8 @@
                     if (error) throw error;
                     if (data.session) {
                         if (profilePhoto) {
-                            const ext = profilePhoto.name.split('.').pop();
-                            const filePath = `${data.user.id}/avatar.${ext}`;
-                            const b64r = profilePhoto.dataUrl.split(',')[1];
-                            const bytesR = Uint8Array.from(atob(b64r), c => c.charCodeAt(0));
-                            const blobR = new Blob([bytesR], { type: profilePhoto.type });
-                            const { error: uploadErr } = await supabase.storage.from('Avatars').upload(filePath, blobR, { upsert: true, contentType: profilePhoto.type });
+                            const { error: uploadErr } = await supabase.auth.updateUser({ data: { avatar_url: profilePhoto } });
                             if (!uploadErr) {
-                                const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
-                                await supabase.auth.updateUser({ data: { avatar_url: urlData.publicUrl } });
-                            }
                         }
                         onAuth(data.session, { fullName, phone, photoPreview, role, idType, idNumber });
                     } else {
