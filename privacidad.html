@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad — KASTON</title>
+    <meta name="description" content="Política de privacidad de KASTON: cómo recopilamos, usamos y protegemos tus datos personales.">
+    <link rel="icon" type="image/svg+xml" href="isotipo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --gold: #C18A68;
+            --gold-dark: #8a6f4e;
+            --white: #FFFFFF;
+            --light: #F4F4F4;
+            --muted: #a0a0a0;
+            --surface: #111111;
+            --surface-light: #1a1a1a;
+            --font-heading: 'Oswald', 'Now', 'Gotham', sans-serif;
+            --font-body: 'Inter', 'Now', 'Gotham', sans-serif;
+            --nav-height: 110px;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 32px;
+            width: 100%;
+        }
+
+        /* ---- NAVBAR ---- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--nav-height);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 1px 0 rgba(193, 138, 104, 0.15);
+        }
+
+        .navbar .container { max-width: 1200px; display: flex; align-items: center; justify-content: space-between; }
+
+        .nav-logo { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--white); letter-spacing: 4px; text-decoration: none; }
+
+        .nav-logo-img { height: 44px; width: auto; display: block; transition: opacity 0.25s; }
+        .nav-logo-img:hover { opacity: 0.8; }
+
+        .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+
+        .nav-links a {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.25s;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        .nav-cta {
+            font-family: var(--font-heading) !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 2px !important;
+            text-transform: uppercase;
+            background: var(--gold) !important;
+            color: var(--bg) !important;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600 !important;
+            transition: background 0.25s, transform 0.25s !important;
+        }
+
+        .nav-cta:hover { background: var(--gold-dark) !important; transform: translateY(-1px); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(193, 138, 104, 0.25);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .lang-toggle button {
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            padding: 7px 12px;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .lang-toggle button.active { background: var(--gold); color: var(--bg); }
+        .lang-toggle button:hover:not(.active) { color: var(--white); background: rgba(255, 255, 255, 0.06); }
+
+        .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+        .hamburger span { width: 24px; height: 2px; background: var(--white); border-radius: 2px; transition: all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        /* ---- CONTENIDO ---- */
+        .legal-page {
+            padding-top: calc(var(--nav-height) + 60px);
+            padding-bottom: 80px;
+        }
+
+        .legal-page .page-label {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .legal-page h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.15;
+            margin-bottom: 8px;
+        }
+
+        .legal-page .meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .legal-page section {
+            margin-bottom: 40px;
+        }
+
+        .legal-page h2 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .legal-page p {
+            font-size: 0.95rem;
+            color: var(--light);
+            font-weight: 300;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .legal-page ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 12px;
+        }
+
+        .legal-page ul li {
+            font-size: 0.95rem;
+            color: var(--light);
+            font-weight: 300;
+            line-height: 1.75;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .legal-page ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+        }
+
+        .legal-page a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: opacity 0.25s;
+        }
+
+        .legal-page a:hover { opacity: 0.75; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 40px;
+            transition: color 0.25s;
+        }
+
+        .back-link:hover { color: var(--gold); }
+
+        /* ---- FOOTER ---- */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer p { font-size: 0.8rem; color: var(--muted); }
+
+        .footer .footer-brand {
+            font-family: var(--font-heading);
+            letter-spacing: 3px;
+            color: var(--gold);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 768px) {
+            :root { --nav-height: 90px; }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: var(--nav-height);
+                left: 0; right: 0;
+                background: rgba(0, 0, 0, 0.97);
+                padding: 24px 32px;
+                gap: 20px;
+                border-top: 1px solid rgba(193, 138, 104, 0.15);
+            }
+
+            .nav-links.open { display: flex; }
+
+            .hamburger { display: flex; }
+
+            .nav-links .nav-cta { display: none; }
+
+            .legal-page { padding-top: calc(var(--nav-height) + 40px); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="container" style="max-width:1200px;">
+            <a href="index.html" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#problema">Problema</a></li>
+                <li><a href="index.html#solucion">Solución</a></li>
+                <li><a href="index.html#k-lock">K-Lock</a></li>
+                <li><a href="index.html#colores">Colores</a></li>
+                <li><a href="index.html#cotizacion">Cotización</a></li>
+                <li><a href="cotizador.html" class="nav-cta">Cotiza Ahora</a></li>
+            </ul>
+            <div class="nav-right">
+                <button class="hamburger" id="hamburger" aria-label="Menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="legal-page">
+        <div class="container">
+
+            <a href="index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Volver al inicio
+            </a>
+
+            <div class="page-label">Legal</div>
+            <h1>Política de Privacidad</h1>
+            <p class="meta">Vigente desde: junio de 2025 &nbsp;·&nbsp; Última actualización: junio de 2025</p>
+
+            <section>
+                <h2>1. ¿Quién es el responsable del tratamiento?</h2>
+                <p>Kaston es una empresa de Ingeniería de Protección con sede en Medellín, Antioquia, Colombia, con planta de producción en Itagüí.</p>
+                <ul>
+                    <li>Sitio web: <a href="https://kastonproyectos.com">kastonproyectos.com</a></li>
+                    <li>Correo: <a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a></li>
+                    <li>Teléfono: <a href="tel:+573188978552">+57 318 897 8552</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>2. ¿Qué datos recopilamos?</h2>
+                <p>Recopilamos únicamente los datos que el usuario proporciona de forma directa:</p>
+                <ul>
+                    <li>Formularios de contacto: nombre y correo electrónico.</li>
+                    <li>App de cotización: datos técnicos del proyecto como área, tipo de cubierta, ubicación y otros parámetros necesarios para calcular la cotización.</li>
+                </ul>
+                <p>No recopilamos datos sensibles ni hacemos seguimiento de comportamiento sin conocimiento del usuario.</p>
+            </section>
+
+            <section>
+                <h2>3. ¿Para qué usamos tus datos?</h2>
+                <p>Los datos recopilados tienen una finalidad clara y limitada:</p>
+                <ul>
+                    <li>Responder al usuario cuando nos contacta a través del formulario web.</li>
+                    <li>Generar cotizaciones técnicas personalizadas en la app.</li>
+                    <li>Enviar información relacionada con la solicitud.</li>
+                </ul>
+                <p>No usamos los datos para publicidad de terceros ni los vendemos bajo ninguna circunstancia.</p>
+            </section>
+
+            <section>
+                <h2>4. ¿Con quién compartimos tus datos?</h2>
+                <p>Kaston trabaja con proveedores de infraestructura tecnológica confiables para operar sus servicios digitales. Los datos pueden ser procesados por:</p>
+                <ul>
+                    <li>Supabase: base de datos y autenticación de la app de cotización.</li>
+                    <li>Vercel: plataforma de despliegue del sitio web y la app.</li>
+                    <li>Herramientas de correo: para gestionar las comunicaciones con el usuario.</li>
+                    <li>Colaboradores internos: personal administrativo con acceso restringido y necesario para el funcionamiento de la empresa, como la gestión contable.</li>
+                </ul>
+                <p>Todos estos terceros actúan como encargados del tratamiento bajo instrucciones de Kaston. No tienen autorización para usar los datos para fines distintos a los descritos. En el futuro, Kaston podrá integrar herramientas de CRM para la gestión comercial. Cuando eso ocurra, esta política se actualizará.</p>
+            </section>
+
+            <section>
+                <h2>5. Base legal del tratamiento</h2>
+                <p>El tratamiento de los datos se realiza con base en:</p>
+                <ul>
+                    <li>El consentimiento del usuario al diligenciar formularios o usar la app.</li>
+                    <li>El interés legítimo de Kaston para responder solicitudes comerciales y técnicas.</li>
+                </ul>
+                <p>En Colombia, el tratamiento de datos personales se rige por la Ley 1581 de 2012 y el Decreto 1377 de 2013.</p>
+            </section>
+
+            <section>
+                <h2>6. ¿Cuánto tiempo guardamos tus datos?</h2>
+                <p>Conservamos los datos durante el tiempo necesario para atender la solicitud y, en caso de relación comercial, mientras dure esa relación más el período que exija la ley colombiana para efectos contables o legales.</p>
+            </section>
+
+            <section>
+                <h2>7. Tus derechos</h2>
+                <p>Como titular de los datos, el usuario tiene derecho a:</p>
+                <ul>
+                    <li>Conocer qué datos tenemos sobre él.</li>
+                    <li>Actualizar o corregir información inexacta.</li>
+                    <li>Solicitar la eliminación de sus datos cuando no exista obligación legal de conservarlos.</li>
+                    <li>Revocar el consentimiento otorgado.</li>
+                    <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
+                </ul>
+                <p>Para ejercer cualquiera de estos derechos: <a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a> o <a href="tel:+573188978552">+57 318 897 8552</a>.</p>
+            </section>
+
+            <section>
+                <h2>8. Cambios a esta política</h2>
+                <p>Podemos actualizar esta política cuando sea necesario. Los cambios se publicarán en esta misma página con la fecha de actualización. Se recomienda revisarla periódicamente.</p>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container" style="max-width:1200px;">
+            <div class="footer-brand">KASTON</div>
+            <p>Innovación para siempre. Cubiertas de polímero recuperado.</p>
+            <a href="https://www.instagram.com/kaston.proyectos?igsh=MWp0bDFkOTh3Yzd3NA==" target="_blank"
+                style="color: var(--gold); text-decoration: none; margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-heading); letter-spacing: 1px; transition: opacity 0.3s ease;"
+                onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                @kaston.proyectos
+            </a>
+            <p style="margin-top:16px;">&copy; 2026 KASTON. Todos los derechos reservados.</p>
+            <p style="margin-top:12px;">
+                <a href="privacidad.html" style="color:var(--gold); text-decoration:none;">Política de Privacidad</a>
+                <span style="color:var(--muted); margin:0 10px;">·</span>
+                <a href="terminos.html" style="color:var(--muted); text-decoration:none; transition:color 0.25s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Términos y Condiciones</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var hamburger = document.getElementById('hamburger');
+            var navLinks = document.getElementById('navLinks');
+
+            hamburger.addEventListener('click', function () {
+                hamburger.classList.toggle('open');
+                navLinks.classList.toggle('open');
+            });
+
+            navLinks.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    hamburger.classList.remove('open');
+                    navLinks.classList.remove('open');
+                });
+            });
+        })();
+    </script>
+
+</body>
+</html>

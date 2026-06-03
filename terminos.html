@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones — KASTON</title>
+    <meta name="description" content="Términos y condiciones de uso de los servicios digitales de KASTON.">
+    <link rel="icon" type="image/svg+xml" href="isotipo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --gold: #C18A68;
+            --gold-dark: #8a6f4e;
+            --white: #FFFFFF;
+            --light: #F4F4F4;
+            --muted: #a0a0a0;
+            --surface: #111111;
+            --surface-light: #1a1a1a;
+            --font-heading: 'Oswald', 'Now', 'Gotham', sans-serif;
+            --font-body: 'Inter', 'Now', 'Gotham', sans-serif;
+            --nav-height: 110px;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 32px;
+            width: 100%;
+        }
+
+        /* ---- NAVBAR ---- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--nav-height);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 1px 0 rgba(193, 138, 104, 0.15);
+        }
+
+        .navbar .container { max-width: 1200px; display: flex; align-items: center; justify-content: space-between; }
+
+        .nav-logo { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--white); letter-spacing: 4px; text-decoration: none; }
+
+        .nav-logo-img { height: 44px; width: auto; display: block; transition: opacity 0.25s; }
+        .nav-logo-img:hover { opacity: 0.8; }
+
+        .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+
+        .nav-links a {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.25s;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        .nav-cta {
+            font-family: var(--font-heading) !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 2px !important;
+            text-transform: uppercase;
+            background: var(--gold) !important;
+            color: var(--bg) !important;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600 !important;
+            transition: background 0.25s, transform 0.25s !important;
+        }
+
+        .nav-cta:hover { background: var(--gold-dark) !important; transform: translateY(-1px); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(193, 138, 104, 0.25);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .lang-toggle button {
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            padding: 7px 12px;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .lang-toggle button.active { background: var(--gold); color: var(--bg); }
+        .lang-toggle button:hover:not(.active) { color: var(--white); background: rgba(255, 255, 255, 0.06); }
+
+        .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+        .hamburger span { width: 24px; height: 2px; background: var(--white); border-radius: 2px; transition: all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        /* ---- CONTENIDO ---- */
+        .legal-page {
+            padding-top: calc(var(--nav-height) + 60px);
+            padding-bottom: 80px;
+        }
+
+        .legal-page .page-label {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .legal-page h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.15;
+            margin-bottom: 8px;
+        }
+
+        .legal-page .meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .legal-page section {
+            margin-bottom: 40px;
+        }
+
+        .legal-page h2 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .legal-page p {
+            font-size: 0.95rem;
+            color: var(--light);
+            font-weight: 300;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .legal-page ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 12px;
+        }
+
+        .legal-page ul li {
+            font-size: 0.95rem;
+            color: var(--light);
+            font-weight: 300;
+            line-height: 1.75;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .legal-page ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+        }
+
+        .legal-page a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: opacity 0.25s;
+        }
+
+        .legal-page a:hover { opacity: 0.75; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 40px;
+            transition: color 0.25s;
+        }
+
+        .back-link:hover { color: var(--gold); }
+
+        /* ---- FOOTER ---- */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer p { font-size: 0.8rem; color: var(--muted); }
+
+        .footer .footer-brand {
+            font-family: var(--font-heading);
+            letter-spacing: 3px;
+            color: var(--gold);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 768px) {
+            :root { --nav-height: 90px; }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: var(--nav-height);
+                left: 0; right: 0;
+                background: rgba(0, 0, 0, 0.97);
+                padding: 24px 32px;
+                gap: 20px;
+                border-top: 1px solid rgba(193, 138, 104, 0.15);
+            }
+
+            .nav-links.open { display: flex; }
+
+            .hamburger { display: flex; }
+
+            .nav-links .nav-cta { display: none; }
+
+            .legal-page { padding-top: calc(var(--nav-height) + 40px); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="container" style="max-width:1200px;">
+            <a href="index.html" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#problema">Problema</a></li>
+                <li><a href="index.html#solucion">Solución</a></li>
+                <li><a href="index.html#k-lock">K-Lock</a></li>
+                <li><a href="index.html#colores">Colores</a></li>
+                <li><a href="index.html#cotizacion">Cotización</a></li>
+                <li><a href="cotizador.html" class="nav-cta">Cotiza Ahora</a></li>
+            </ul>
+            <div class="nav-right">
+                <button class="hamburger" id="hamburger" aria-label="Menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="legal-page">
+        <div class="container">
+
+            <a href="index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Volver al inicio
+            </a>
+
+            <div class="page-label">Legal</div>
+            <h1>Términos y Condiciones</h1>
+            <p class="meta">Vigentes desde: junio de 2025</p>
+
+            <section>
+                <h2>1. Aceptación</h2>
+                <p>Al navegar en <a href="https://kastonproyectos.com">kastonproyectos.com</a> o usar la app de cotización de Kaston, el usuario acepta estos Términos y Condiciones en su totalidad. Si no está de acuerdo, se le pide no usar los servicios digitales de Kaston.</p>
+            </section>
+
+            <section>
+                <h2>2. Descripción del servicio</h2>
+                <p>Kaston ofrece:</p>
+                <ul>
+                    <li>Información comercial y técnica sobre sus productos de cubierta estructural en su sitio web.</li>
+                    <li>Una app de cotización que permite calcular presupuestos estimados para proyectos de techado, con base en parámetros técnicos ingresados por el usuario.</li>
+                </ul>
+                <p>Las cotizaciones generadas por la app son estimaciones técnicas de referencia. No constituyen una oferta vinculante hasta que Kaston las confirme formalmente por escrito.</p>
+            </section>
+
+            <section>
+                <h2>3. Uso permitido</h2>
+                <p>Está permitido usar los servicios digitales de Kaston para consultar información sobre productos y proyectos, y para generar cotizaciones para proyectos propios o de clientes a cargo del usuario.</p>
+                <p>Está prohibido:</p>
+                <ul>
+                    <li>Usar la app para fines distintos a la cotización legítima de proyectos.</li>
+                    <li>Reproducir, distribuir o comercializar el contenido de Kaston sin autorización escrita.</li>
+                    <li>Intentar acceder a áreas restringidas del sistema o comprometer su seguridad.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>4. Propiedad intelectual</h2>
+                <p>Todo el contenido de kastonproyectos.com y de la app, incluyendo textos, diseños, imágenes, lógica de cálculo y marca, es propiedad de Kaston o está licenciado a su favor. Queda prohibida su reproducción sin autorización expresa.</p>
+                <p>El diseño estructural de la teja Kaston, su sistema de ensamble K-LOCK y sus desarrollos de fabricación son propiedad exclusiva de Kaston.</p>
+            </section>
+
+            <section>
+                <h2>5. Limitación de responsabilidad</h2>
+                <p>Kaston hace su mejor esfuerzo para mantener la precisión de la información publicada. Sin embargo:</p>
+                <ul>
+                    <li>Las cotizaciones son estimativas. El precio final depende de variables de obra, transporte y condiciones específicas del proyecto.</li>
+                    <li>Kaston no se hace responsable por decisiones tomadas con base exclusiva en la información del sitio web o la app sin consulta técnica directa con el equipo.</li>
+                    <li>No se garantiza disponibilidad ininterrumpida de los servicios digitales.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>6. Modificaciones</h2>
+                <p>Kaston puede modificar estos términos en cualquier momento. La versión vigente siempre estará publicada en esta página. El uso continuado de los servicios implica aceptación de los cambios.</p>
+            </section>
+
+            <section>
+                <h2>7. Ley aplicable y jurisdicción</h2>
+                <p>Estos términos se rigen por las leyes de la República de Colombia. Cualquier controversia se resolverá ante los tribunales competentes de la ciudad de Medellín, Antioquia.</p>
+            </section>
+
+            <section>
+                <h2>8. Contacto</h2>
+                <p>Para cualquier consulta sobre estos términos:</p>
+                <ul>
+                    <li>Correo: <a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a></li>
+                    <li>Teléfono: <a href="tel:+573188978552">+57 318 897 8552</a></li>
+                    <li>Sitio web: <a href="https://kastonproyectos.com">kastonproyectos.com</a></li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container" style="max-width:1200px;">
+            <div class="footer-brand">KASTON</div>
+            <p>Innovación para siempre. Cubiertas de polímero recuperado.</p>
+            <a href="https://www.instagram.com/kaston.proyectos?igsh=MWp0bDFkOTh3Yzd3NA==" target="_blank"
+                style="color: var(--gold); text-decoration: none; margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-heading); letter-spacing: 1px; transition: opacity 0.3s ease;"
+                onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                @kaston.proyectos
+            </a>
+            <p style="margin-top:16px;">&copy; 2026 KASTON. Todos los derechos reservados.</p>
+            <p style="margin-top:12px;">
+                <a href="privacidad.html" style="color:var(--muted); text-decoration:none; transition:color 0.25s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Política de Privacidad</a>
+                <span style="color:var(--muted); margin:0 10px;">·</span>
+                <a href="terminos.html" style="color:var(--gold); text-decoration:none;">Términos y Condiciones</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var hamburger = document.getElementById('hamburger');
+            var navLinks = document.getElementById('navLinks');
+
+            hamburger.addEventListener('click', function () {
+                hamburger.classList.toggle('open');
+                navLinks.classList.toggle('open');
+            });
+
+            navLinks.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    hamburger.classList.remove('open');
+                    navLinks.classList.remove('open');
+                });
+            });
+        })();
+    </script>
+
+</body>
+</html>
