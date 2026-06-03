@@ -1103,6 +1103,24 @@
             );
         }
 
+        const resizeToBase64 = (file) => new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const img = new Image();
+                img.onload = () => {
+                    const MAX = 300;
+                    const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = Math.round(img.width  * ratio);
+                    canvas.height = Math.round(img.height * ratio);
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
         function ProfileTab({ language, settings, updateSettings, session, extraData }) {
             const t = T[language] || T['es'];
             const isEs = language !== 'en';
@@ -1145,24 +1163,6 @@
                     ? <img src={photoPreview} alt={userName} className={`rounded-full object-cover border-bronze ${cls}`} />
                     : <div className={`rounded-full bg-bronze/15 border-bronze flex items-center justify-center font-bold text-bronze ${cls}`}>{fallbackInitial}</div>;
             };
-
-            const resizeToBase64 = (file) => new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const MAX = 300;
-                        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
-                        const canvas = document.createElement('canvas');
-                        canvas.width  = Math.round(img.width  * ratio);
-                        canvas.height = Math.round(img.height * ratio);
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.75));
-                    };
-                    img.src = reader.result;
-                };
-                reader.readAsDataURL(file);
-            });
 
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
