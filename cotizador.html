@@ -2024,13 +2024,24 @@
                     setProjects([fullProj, ...projects]);
                     if (supabase && uid) {
                         const now = new Date().toISOString();
+                        console.log('[KASTON] Guardando proyecto para uid:', uid);
                         const { error: e1 } = await supabase.from('projects')
                             .insert([{ ...baseFields, id: proj.id, user_id: uid, created_at: now, project_data: JSON.stringify(fullProj) }]);
                         if (e1) {
+                            console.warn('[KASTON] Reintentando sin project_data. Error e1:', e1.message);
                             const { error: e2 } = await supabase.from('projects')
                                 .insert([{ ...baseFields, id: proj.id, user_id: uid, created_at: now }]);
-                            if (e2) console.error('Error guardando proyecto:', e2);
+                            if (e2) {
+                                console.error('[KASTON] Error guardando proyecto (e2):', e2.message);
+                                alert('⚠️ No se pudo guardar en la nube: ' + e2.message);
+                            } else {
+                                console.log('[KASTON] Proyecto guardado (sin project_data) ✓');
+                            }
+                        } else {
+                            console.log('[KASTON] Proyecto guardado correctamente ✓');
                         }
+                    } else {
+                        console.warn('[KASTON] Sin sesión activa al guardar. uid:', uid);
                     }
                 }
                 setTimeout(() => { setTriageFlow(null); setCurrentTab('triage'); }, 100);
