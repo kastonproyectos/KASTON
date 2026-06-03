@@ -1180,8 +1180,9 @@
                     if (profilePhotoFile) {
                         const ext = profilePhotoFile.name.split('.').pop();
                         const filePath = `${session.user.id}/avatar.${ext}`;
-                        const res = await fetch(profilePhotoFile.dataUrl);
-                        const blob = await res.blob();
+                        const b64 = profilePhotoFile.dataUrl.split(',')[1];
+                        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+                        const blob = new Blob([bytes], { type: profilePhotoFile.type });
                         const { error: upErr } = await supabase.storage.from('Avatars').upload(filePath, blob, { upsert: true, contentType: profilePhotoFile.type });
                         if (upErr) { setFeedback({ type: 'error', text: isEs ? 'Error subiendo foto: ' + upErr.message : 'Photo upload error: ' + upErr.message }); setSaving(false); return; }
                         const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
@@ -2392,9 +2393,12 @@
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    setProfilePhoto(file);
                     const reader = new FileReader();
-                    reader.onloadend = () => setPhotoPreview(reader.result);
+                    reader.onloadend = () => {
+                        const dataUrl = reader.result;
+                        setPhotoPreview(dataUrl);
+                        setProfilePhoto({ name: file.name, type: file.type, dataUrl });
+                    };
                     reader.readAsDataURL(file);
                 }
             };
@@ -2446,7 +2450,10 @@
                         if (profilePhoto) {
                             const ext = profilePhoto.name.split('.').pop();
                             const filePath = `${data.user.id}/avatar.${ext}`;
-                            const { error: uploadErr } = await supabase.storage.from('Avatars').upload(filePath, profilePhoto, { upsert: true });
+                            const b64r = profilePhoto.dataUrl.split(',')[1];
+                            const bytesR = Uint8Array.from(atob(b64r), c => c.charCodeAt(0));
+                            const blobR = new Blob([bytesR], { type: profilePhoto.type });
+                            const { error: uploadErr } = await supabase.storage.from('Avatars').upload(filePath, blobR, { upsert: true, contentType: profilePhoto.type });
                             if (!uploadErr) {
                                 const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
                                 await supabase.auth.updateUser({ data: { avatar_url: urlData.publicUrl } });
