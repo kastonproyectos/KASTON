@@ -874,7 +874,14 @@
 
         // Inicializar cliente Supabase
         const supabase = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
-            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    storage: window.sessionStorage,
+                    autoRefreshToken: true,
+                    persistSession: true,
+                    detectSessionInUrl: false
+                }
+              })
             : null;
 
         function ServiceBanner({ language }) {
@@ -2022,8 +2029,7 @@
                             alert('⚠️ No hay sesión activa. Inicia sesión de nuevo.');
                             return;
                         }
-                        const { error } = await supabase.from('projects').upsert({
-                            id: proj.id,
+                        const payload = {
                             user_id: activeUid,
                             client_name: proj.nombre,
                             project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
@@ -2032,8 +2038,23 @@
                             selected_color: proj.divisa,
                             project_data: JSON.stringify(fullProj),
                             created_at: new Date().toISOString()
+                        };
+                        // Usar fetch() directo para evitar TypeError: Load failed de Safari
+                        const token = authData?.session?.access_token;
+                        const resp = await fetch(`${SUPABASE_URL}/rest/v1/projects`, {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(payload)
                         });
-                        if (error) alert('⚠️ Error al guardar: ' + error.message);
+                        if (!resp.ok) {
+                            const txt = await resp.text();
+                            alert('⚠️ Error al guardar: ' + txt);
+                        }
                     }
                 }
                 setTimeout(() => { setTriageFlow(null); setCurrentTab('triage'); }, 100);
