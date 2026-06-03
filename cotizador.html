@@ -1779,11 +1779,36 @@
                                     </div>
                                 )}
 
-                                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group hover:border-greenNeon/50 transition-colors duration-500">
-                                    <Gauge value={metrics.co2Reduced} max={28000} label={t.esgImpact} sublabel={t.co2Red} color="#00FF88" decimals={0} suffix=" kg" />
-                                    <div className="mt-4 text-xs text-greenNeon/40 text-center uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
-                                        <AnimatedNumber value={metrics.plasticUpcycled} /> {t.polymerKg}
-                                        <InfoTooltip title={t.circEcon} technicalValue={t.polyUpcycled} description={t.circEconDesc} />
+                                <div className="glass-panel p-6 rounded-2xl flex flex-col gap-5 relative overflow-hidden group hover:border-greenNeon/50 transition-colors duration-500">
+                                    <div className="text-[10px] text-greenNeon/70 uppercase tracking-[0.15em] font-bold border-b border-greenNeon/20 pb-3">
+                                        {t.esgImpact}
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">🌿</span>
+                                        <p className="text-xs text-white/70 leading-relaxed">
+                                            {language === 'en'
+                                                ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1}/> kg</strong> of plastic removed from the planet, transformed into an indestructible roof.</>
+                                                : <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1}/> kg</strong> de plástico quitados del planeta, transformados en un techo indestructible.</>
+                                            }
+                                        </p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">💨</span>
+                                        <p className="text-xs text-white/70 leading-relaxed">
+                                            {language === 'en'
+                                                ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0}/> kg</strong> of CO₂ that won't pollute the air. That's what an entire forest absorbs in a year!</>
+                                                : <>Evitaste que <strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0}/> kg</strong> de CO₂ contaminaran el aire. ¡Eso equivale a lo que absorbe un bosque entero en un año!</>
+                                            }
+                                        </p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">♻️</span>
+                                        <p className="text-xs text-white/70 leading-relaxed">
+                                            {language === 'en'
+                                                ? <>Your roof will last generations <strong className="text-white/90">(50–100 years, zero maintenance)</strong>. At end of life, 100% of tiles can be remelted into new products. <strong className="text-greenNeon">Zero waste.</strong></>
+                                                : <>Tu techo durará generaciones <strong className="text-white/90">(50–100 años sin mantenimiento)</strong>. Al final de su vida útil, el 100% de tus tejas se pueden fundir de nuevo. <strong className="text-greenNeon">Cero basura.</strong></>
+                                            }
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -2705,23 +2730,23 @@
                 bottomDash: "Inicio",
                 bottomProj: "Proyectos",
                 bottomProf: "Perfil",
-                trTitle: "Triage de Proyecto",
-                trSub: "Seleccione el perfil técnico de su requerimiento",
+                trTitle: "Diagnóstico Rápido",
+                trSub: "Cuéntanos cómo está tu techo hoy y calculamos todo",
                 welcomeTag: "Cotizador Técnico KASTON",
                 welcomeTitle: "¡Hola! Te damos la bienvenida al Cotizador Técnico de KASTON.",
                 welcomeBody: "Queremos que el proceso de cotizar tu proyecto sea lo más sencillo, transparente y rápido posible. Diseñamos esta herramienta para que funcione como nuestro primer filtro de ahorro de tiempo: tú nos compartes lo que ya conoces de tu espacio y nosotros avanzamos de inmediato. Así, cuando programemos tu visita técnica presencial, iremos directo al grano para concluir los detalles finales de tu instalación sin hacerte perder tiempo en papeleos previos.",
                 welcomeAccept: "Lo acepto — entrar al cotizador",
                 welcomeDecline: "No acepto — regresar al sitio",
                 formIncompleteHint: "Completa todas las secciones del formulario (modalidad, tipo de techo, pendiente y color) para habilitar la descarga del PDF.",
-                routeA: "Plan de Reemplazo",
-                routeASub: "Sustitución de techo existente",
-                routeADesc: "Deseo sustituir un techo existente (Barro, Zinc, Fibrocemento) por el Sistema KASTON. KASTON instala exclusivamente el Sistema KASTON; no realizamos mampostería ni construcción desde cero.",
-                routeB: "Plan de Especificación",
-                routeBSub: "Proyecto en planos",
-                routeBDesc: "Deseo cotizar el Sistema KASTON para mi proyecto en fase de diseño o construcción desde cero. KASTON se encarga de la instalación del sistema sobre la estructura indicada en planos.",
-                routeC: "Ruta C — Ingeniería Integral",
-                routeCSub: "Estructura + Sistema KASTON",
-                routeCDesc: "Requiero diseño y montaje de la estructura portante antes de instalar el Sistema KASTON. Esta ruta incluye asesoría estructural completa desde cero.",
+                routeA: "Quiero cambiar mi techo viejo",
+                routeASub: "Barro o Fibrocemento",
+                routeADesc: "Al ser cubiertas pesadas, antes de hacer el reemplazo revisaremos juntos el estado de tu estructura actual (madera o metal) para comprobar si necesita alguna reparación o refuerzo para recibir tus nuevas tejas KASTON de forma 100% segura.",
+                routeB: "Solo necesito las tejas",
+                routeBSub: "Únicamente Material",
+                routeBDesc: "Te entregamos las tejas exactas para tu obra y te regalamos un Manual de Instalación súper detallado paso a paso para que tu constructor lo deje impecable.",
+                routeC: "Proyecto desde cero o cambiar Zinc",
+                routeCSub: "Estructura + Tejas KASTON",
+                routeCDesc: "Las láminas de zinc son delgadas y no tienen la base de soporte que nuestras tejas necesitan. Nuestro equipo de ingeniería te diseña la estructura ideal desde cero para que tu techo quede blindado e inamovible.",
                 noSavedProj: "No hay proyectos guardados",
                 noSavedD: "Los cálculos que guardes en el dashboard aparecerán aquí.",
                 myProjects: "Mis Proyectos",
@@ -2787,14 +2812,14 @@
                 constAgro: "Agropecuario",
                 constOth: "Otros",
                 limitAlert: "Límite superado automatizado. Escríbanos a kaston.proyectos@gmail.com.",
-                routeBActive: "[RUTA B: ESPECIFICACIÓN ACTIVA]",
-                kastonUnitsReq: "Unidades KASTON",
-                required: "Requeridas",
-                netSupplyObj: "Suministro Neto Exacto",
-                calcPrec: "Cálculo de Precisión",
-                netSupplyNoWaste: "Suministro Neto — Sin Factor de Merma",
-                calcPrecDesc: "Ingeniería exacta para blindar tu hogar contra eventos climáticos extremos. Te mostramos el material exacto que necesitas sin gastos ocultos.",
-                wasteNote: "+ 5–10% de merma constructiva recomendada",
+                routeBActive: "OPCIÓN B: SOLO MATERIAL (SIN INSTALACIÓN)",
+                kastonUnitsReq: "Cantidad de tejas",
+                required: "para tu techo",
+                netSupplyObj: "Conteo exacto sin merma",
+                calcPrec: "¿Cómo se mide cada teja?",
+                netSupplyNoWaste: "42 tejas por metro cuadrado",
+                calcPrecDesc: "Cada teja KASTON mide 17×25 cm y encajan entre sí como un rompecabezas perfecto para que no se filtre el agua. Son livianas, resistentes y no necesitan mantenimiento.",
+                wasteNote: "Tejas de respaldo: +3% extra para cortes en esquinas. Así no te quedas faltando.",
                 structRelief: "Alivio Estructural",
                 stabLoad: "Carga de Estabilidad",
                 earthqResp: "MEJORA DE RESPUESTA SÍSMICA",
@@ -2818,9 +2843,9 @@
                 izodShield: "BLINDAJE IZOD: 29.4 J/m",
                 impactRes: "Resiliencia a Impactos (con muesca)",
                 impactResDesc: "Nuestra fórmula absorbe los golpes de granizo extremo o caídas de ramas sin agrietarse ni astillarse jamás.",
-                esgImpact: "Impacto ESG",
-                co2Red: "Reducción CO₂",
-                polymerKg: "kg de polímero",
+                esgImpact: "Tu impacto en el planeta",
+                co2Red: "CO₂ evitado",
+                polymerKg: "kg de plástico recuperado",
                 circEcon: "Métrica de Economía Circular",
                 polyUpcycled: "Polímero Upcycled",
                 circEconDesc: "Cada techo KASTON recicla miles de kilos de plástico, transformando contaminación en un escudo eterno para tu familia.",
@@ -2959,23 +2984,23 @@
                 bottomDash: "Dashboard",
                 bottomProj: "Projects",
                 bottomProf: "Profile",
-                trTitle: "Project Triage",
-                trSub: "Select the technical profile for your requirement",
+                trTitle: "Quick Diagnosis",
+                trSub: "Tell us about your roof today and we'll calculate everything",
                 welcomeTag: "KASTON Technical Quoter",
                 welcomeTitle: "Hello! Welcome to KASTON's Technical Quoter.",
                 welcomeBody: "We want the process of quoting your project to be as simple, transparent, and fast as possible. We designed this tool as our first time-saving filter: you share what you already know about your space and we move forward immediately. When we schedule your in-person technical visit, we'll go straight to the point to finalize installation details without wasting your time on paperwork.",
                 welcomeAccept: "I accept — enter the quoter",
                 welcomeDecline: "I don't accept — go back to site",
                 formIncompleteHint: "Complete all sections (modality, roof type, pitch, and color) to enable the PDF download.",
-                routeA: "Replacement Plan",
-                routeASub: "Existing roof substitution",
-                routeADesc: "I want to replace an existing roof (Clay, Zinc, Fiber Cement) with the KASTON System. KASTON installs exclusively the KASTON System; we do not perform masonry or build from scratch.",
-                routeB: "Specification Plan",
-                routeBSub: "Project in design",
-                routeBDesc: "I want to quote the KASTON System for my project in the design or new-build phase. KASTON handles installation of the system over the structure indicated in the plans.",
-                routeC: "Route C — Comprehensive Engineering",
-                routeCSub: "Structure + KASTON System",
-                routeCDesc: "I need design and installation of the supporting structure before installing the KASTON System. This route includes full structural consulting from scratch.",
+                routeA: "Replace my old roof",
+                routeASub: "Clay or Fiber Cement",
+                routeADesc: "Since these are heavy covers, we'll check your current structure together (wood or metal) to see if it needs any reinforcement before safely receiving your new KASTON tiles.",
+                routeB: "I only need the tiles",
+                routeBSub: "Material Only",
+                routeBDesc: "We deliver the exact tiles for your project and include a detailed step-by-step Installation Manual so your builder can do a perfect job.",
+                routeC: "New project or replace Zinc",
+                routeCSub: "Structure + KASTON Tiles",
+                routeCDesc: "Zinc sheets are thin and lack the support base our tiles need. Our engineering team designs the ideal structure from scratch so your roof is solid and unmovable.",
                 noSavedProj: "No saved projects",
                 noSavedD: "Calculations saved in the dashboard will appear here.",
                 myProjects: "My Projects",
@@ -3041,14 +3066,14 @@
                 constAgro: "Agricultural",
                 constOth: "Others",
                 limitAlert: "Automated limit exceeded. Please contact kaston.proyectos@gmail.com.",
-                routeBActive: "[ROUTE B: ACTIVE SPECIFICATION]",
-                kastonUnitsReq: "KASTON Units",
-                required: "Required",
-                netSupplyObj: "Exact Net Supply",
-                calcPrec: "Precision Calculation",
-                netSupplyNoWaste: "Net Supply — Without Waste Factor",
-                calcPrecDesc: "Exact engineering to shield your home against extreme weather events. We show you the exact material you need with no hidden costs.",
-                wasteNote: "+ 5–10% construction waste recommended",
+                routeBActive: "OPTION B: MATERIAL ONLY (NO INSTALLATION)",
+                kastonUnitsReq: "Number of tiles",
+                required: "for your roof",
+                netSupplyObj: "Exact count, no waste",
+                calcPrec: "How is each tile measured?",
+                netSupplyNoWaste: "42 tiles per square meter",
+                calcPrecDesc: "Each KASTON tile measures 17×25 cm and fits together like a perfect puzzle so water can't get through. Lightweight, tough, and maintenance-free.",
+                wasteNote: "Backup tiles: +3% extra for corner cuts. So you never run short.",
                 structRelief: "Structural Relief",
                 stabLoad: "Stability Load",
                 earthqResp: "SEISMIC RESPONSE IMPROVEMENT",
@@ -3072,9 +3097,9 @@
                 izodShield: "IZOD SHIELD: 29.4 J/m",
                 impactRes: "Impact Resilience (notched)",
                 impactResDesc: "Our formula absorbs impacts from extreme hail or falling branches without ever cracking or splintering.",
-                esgImpact: "ESG Impact",
-                co2Red: "CO₂ Reduction",
-                polymerKg: "kg of polymer",
+                esgImpact: "Your impact on the planet",
+                co2Red: "CO₂ avoided",
+                polymerKg: "kg of recovered plastic",
                 circEcon: "Circular Economy Metric",
                 polyUpcycled: "Upcycled Polymer",
                 circEconDesc: "Each KASTON roof recycles thousands of kilos of plastic, transforming pollution into an eternal shield for your family.",
