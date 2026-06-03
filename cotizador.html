@@ -2014,10 +2014,17 @@
                     setEditingProject(null);
                 } else {
                     setProjects([fullProj, ...projects]);
-                    if (supabase && userId) {
+                    if (supabase) {
+                        // Siempre obtenemos la sesión fresca del cliente para evitar closure stale
+                        const { data: authData } = await supabase.auth.getSession();
+                        const activeUid = authData?.session?.user?.id || userId;
+                        if (!activeUid) {
+                            alert('⚠️ No hay sesión activa. Inicia sesión de nuevo.');
+                            return;
+                        }
                         const { error } = await supabase.from('projects').upsert({
                             id: proj.id,
-                            user_id: userId,
+                            user_id: activeUid,
                             client_name: proj.nombre,
                             project_m2: proj.unidad === 'ft2' ? proj.area / 10.764 : proj.area,
                             plastic_upcycled_kg: proj.plastico_kg,
@@ -2089,14 +2096,12 @@
             // Carga proyectos desde Supabase al iniciar sesión
             useEffect(() => {
                 if (session && supabase) {
-                    console.log('[KASTON] Cargando proyectos para user_id:', session.user.id);
                     supabase
                         .from('projects')
                         .select('*')
                         .eq('user_id', session.user.id)
                         .order('created_at', { ascending: false })
                         .then(({ data, error }) => {
-                            console.log('[KASTON] Respuesta Supabase - filas:', data?.length, 'error:', error?.message);
                             if (error) {
                                 console.error('Error cargando proyectos:', error);
                                 // Intenta cargar caché local como respaldo
