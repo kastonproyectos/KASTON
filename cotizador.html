@@ -1149,9 +1149,13 @@
             const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                setProfilePhotoFile(file);
                 const reader = new FileReader();
-                reader.onloadend = () => setPhotoPreview(reader.result);
+                reader.onloadend = () => {
+                    const dataUrl = reader.result;
+                    setPhotoPreview(dataUrl);
+                    // Guardar como dataUrl para evitar invalidación de File en Safari
+                    setProfilePhotoFile({ name: file.name, type: file.type, dataUrl });
+                };
                 reader.readAsDataURL(file);
             };
 
@@ -1176,7 +1180,9 @@
                     if (profilePhotoFile) {
                         const ext = profilePhotoFile.name.split('.').pop();
                         const filePath = `${session.user.id}/avatar.${ext}`;
-                        const { error: upErr } = await supabase.storage.from('Avatars').upload(filePath, profilePhotoFile, { upsert: true });
+                        const res = await fetch(profilePhotoFile.dataUrl);
+                        const blob = await res.blob();
+                        const { error: upErr } = await supabase.storage.from('Avatars').upload(filePath, blob, { upsert: true, contentType: profilePhotoFile.type });
                         if (upErr) { setFeedback({ type: 'error', text: isEs ? 'Error subiendo foto: ' + upErr.message : 'Photo upload error: ' + upErr.message }); setSaving(false); return; }
                         const { data: urlData } = supabase.storage.from('Avatars').getPublicUrl(filePath);
                         metadata.avatar_url = urlData.publicUrl;
