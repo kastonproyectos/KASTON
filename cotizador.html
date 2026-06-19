@@ -9,7 +9,8 @@
     <!-- Dependencias Externas CND para ejecutar React localmente sin servidor -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Babel fijado a 7.29.7: la v8 (latest) usa el runtime JSX "automatic" e inyecta un import que rompe el script no-module → pantalla negra -->
+    <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
