@@ -540,7 +540,7 @@
             let finalCostOnlyTeja = costOnlyTejaCOP * rate;
             let finalCostTodoCosto = costTodoCostoCOP * rate;
 
-            const plasticUpcycled = m2 * 11;
+            const plasticUpcycled = m2 * 12.6;
             const co2Reduced = m2 * 18.5;
 
             return {
@@ -1416,14 +1416,15 @@
 
         function CalculatorTab({ defaults, onSaveProject, editingProject, defaultFlow, session, setCurrentTab, setTriageFlow, rates, language }) {
             const t = T[language] || T['es'];
-            const [flowActive, setFlowActive] = useState(editingProject ? editingProject.flow : (defaultFlow || 'A'));
+            // defaultFlow ahora transporta la MODALIDAD elegida en la pantalla de inicio: 'supply' (solo tejas) o 'full' (todo costo)
+            const [flowActive, setFlowActive] = useState('B');
             const [constructionType, setConstructionType] = useState(editingProject ? (editingProject.tipoConstruccion || 'Residencial') : 'Residencial');
             const [inputValue, setInputValue] = useState(defaults.area || 150);
             const [inputText, setInputText] = useState(String(defaults.area || 150));
             const [unit, setUnit] = useState(defaults.unit);
             const [currency, setCurrency] = useState(defaults.currency);
             const [material, setMaterial] = useState('clay');
-            const [modality, setModality] = useState(editingProject ? editingProject.modality : null);
+            const [modality, setModality] = useState(editingProject ? editingProject.modality : ((defaultFlow === 'supply' || defaultFlow === 'full') ? defaultFlow : null));
             const [isSaving, setIsSaving] = useState(false);
             const [isPdfDownloaded, setIsPdfDownloaded] = useState(false);
             const [showZincModal, setShowZincModal] = useState(false);
@@ -1461,14 +1462,10 @@
             const activeRoofObj = ROOF_TYPES.find(r => r.id === roofType);
             const isSpecialDesign = activeRoofObj?.id === 'otro';
 
+            // Nuevo flujo: modalidad (de inicio) + tipo de construcción + tipo de techo + pendiente válida + área
             const isFormComplete = Boolean(
-                roofType &&
-                selectedColor &&
-                (isSpecialDesign || (
-                    modality &&
-                    pendiente !== undefined &&
-                    (pendiente === null || (typeof pendiente === 'number' && pendiente >= 15))
-                ))
+                modality && areaM2 > 0 && constructionType && roofType &&
+                (isSpecialDesign || (pendiente !== undefined && (pendiente === null || (typeof pendiente === 'number' && pendiente >= 15))))
             );
 
             const handlePDF = async (options = {}) => {
@@ -1569,26 +1566,6 @@
                     return;
                 }
 
-                if (!roofType) {
-                    alert(t.roofTypeRequired);
-                    return;
-                }
-
-                if (!isSpecialDesign && pendiente === undefined) {
-                    alert(t.pitchSelectReqAlert);
-                    return;
-                }
-
-                if (!isSpecialDesign && typeof pendiente === 'number' && pendiente < 15) {
-                    alert(t.pitchMinErrorAlert);
-                    return;
-                }
-
-                if (material === 'zinc') {
-                    setShowZincModal(true);
-                    return;
-                }
-
                 promptAndSaveProject(false);
             };
 
@@ -1623,42 +1600,24 @@
                             {t.typeAreaProj}
                         </h2>
 
-                        {/* Fila: Tipo de construcción + Material actual */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative z-10">
-                            {/* Tipo de construcción */}
+                        {/* Modalidad elegida */}
+                        <div className="relative z-10 flex items-center justify-between gap-4 p-4 rounded-xl bg-bronze/10 border border-bronze/30">
                             <div>
-                                <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-2 font-bold">{t.constType}</label>
-                                <select value={constructionType} onChange={(e) => setConstructionType(e.target.value)}
-                                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-medium focus:outline-none focus:border-bronze transition-all appearance-none cursor-pointer hover:border-white/25">
-                                    {[{ val: 'Residencial', label: t.constRes }, { val: 'Comercial', label: t.constCom }, { val: 'Industrial', label: t.constInd }, { val: 'Institucional', label: t.constInst }, { val: 'Agropecuario', label: t.constAgro }, { val: 'Otros', label: t.constOth }].map(tipo => (
-                                        <option key={tipo.val} value={tipo.val}>{tipo.label}</option>
-                                    ))}
-                                </select>
+                                <div className="text-[10px] text-white/50 uppercase tracking-[0.15em] font-bold mb-1">{t.chosenModality}</div>
+                                <div className="text-bronze text-sm font-bold uppercase tracking-widest">{modality === 'full' ? t.allInc : t.onlyTile}</div>
                             </div>
+                            <button onClick={() => { setTriageFlow(null); setCurrentTab('triage'); }} className="text-[10px] text-white/40 hover:text-bronze uppercase tracking-widest underline transition-colors cursor-pointer">{t.changeModality}</button>
+                        </div>
 
-                            {/* Material actual (Ruta A) o badge Ruta B */}
-                            {flowActive === 'A' ? (
-                                <div>
-                                    <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-2 font-bold">{language === 'en' ? 'Current material' : 'Material actual'}</label>
-                                    <div className="flex gap-2">
-                                        {Object.entries(MATERIAL_CONSTANTS).filter(([key]) => key !== 'zinc').map(([key, data]) => {
-                                            const isActive = material === key;
-                                            return (
-                                                <button key={key} onClick={() => setMaterial(key)}
-                                                    className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 uppercase border ${isActive ? 'bg-white/10 border-bronze/60 text-white shadow-[0_0_14px_rgba(193,138,104,0.25)]' : 'border-white/8 text-white/40 hover:text-white/70 hover:border-white/20 hover:bg-white/5'}`}>
-                                                    {data.label}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col justify-end">
-                                    <div className="w-full flex items-center justify-center py-3 px-4 bg-bronze/10 rounded-xl border border-bronze/30 text-bronze uppercase text-xs font-bold tracking-widest text-center">
-                                        {t.routeBActive}
-                                    </div>
-                                </div>
-                            )}
+                        {/* Tipo de construcción (opcional) */}
+                        <div className="relative z-10">
+                            <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-2 font-bold">{t.constType}</label>
+                            <select value={constructionType} onChange={(e) => setConstructionType(e.target.value)}
+                                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-medium focus:outline-none focus:border-bronze transition-all appearance-none cursor-pointer hover:border-white/25">
+                                {[{ val: 'Residencial', label: t.constRes }, { val: 'Comercial', label: t.constCom }, { val: 'Industrial', label: t.constInd }, { val: 'Institucional', label: t.constInst }, { val: 'Agropecuario', label: t.constAgro }, { val: 'Otros', label: t.constOth }].map(tipo => (
+                                    <option key={tipo.val} value={tipo.val}>{tipo.label}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {/* Área del proyecto */}
@@ -1723,7 +1682,7 @@
                         </div>
                     </div>
 
-                    {/* ── Configurador de Techo ─────────────────────── */}
+                    {/* Configurador de techo (tipo + pendiente) */}
                     <RoofConfigurator
                         selectedType={roofType}
                         onSelectType={setRoofType}
@@ -1732,165 +1691,80 @@
                         language={language}
                     />
 
-                    {/* ── Color Picker ──────────────────────────────── */}
-                    <div className="glass-panel rounded-2xl p-6">
-                        <ColorPicker selectedColor={selectedColor} onSelectColor={setSelectedColor} language={language} />
+                    {isSpecialDesign ? (
+                        <div className="glass-panel rounded-2xl p-8 flex flex-col items-center justify-center border border-bronze/30 bg-bronze/5 text-center mt-2 animate-fade-in">
+                            <div className="w-12 h-12 rounded-full bg-bronze/20 text-bronze flex items-center justify-center text-xl font-black mb-4">&#9733;</div>
+                            <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-3">{t.specialTitle}</h3>
+                            <p className="text-white/80 text-sm leading-relaxed max-w-2xl mx-auto">{t.specialBody}</p>
+                        </div>
+                    ) : (
+                    <>
+                    {/* Requisitos de obra (todo costo) o nota de manual (solo tejas) */}
+                    {modality === 'full' ? (
+                        <div className="glass-panel rounded-2xl p-6 border border-bronze/30 bg-bronze/5 flex flex-col gap-3 mt-2">
+                            <div className="text-[10px] text-bronze uppercase tracking-[0.15em] font-bold border-b border-bronze/20 pb-3">{t.reqObraTitle}</div>
+                            <ul className="flex flex-col gap-3 text-xs text-white/75 leading-relaxed list-none">
+                                <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#10003;</span><span>{t.reqObra1}</span></li>
+                                <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#10003;</span><span>{t.reqObra2}</span></li>
+                                <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#8505;</span><span>{t.reqObra3}</span></li>
+                            </ul>
+                        </div>
+                    ) : (
+                        <div className="glass-panel rounded-2xl p-6 border border-bronze/30 bg-bronze/5 flex items-start gap-3 mt-2">
+                            <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p className="text-bronze text-xs leading-relaxed">{t.manualNote}</p>
+                        </div>
+                    )}
+
+                    {/* Métricas del proyecto (ambas modalidades) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="glass-panel p-5 rounded-2xl flex flex-col items-center text-center">
+                            <div className="text-3xl font-black text-bronze tabular-nums"><AnimatedNumber value={metrics.units} /></div>
+                            <div className="text-[10px] text-white/40 uppercase tracking-widest mt-2">{t.tilesNeeded}</div>
+                        </div>
+                        <div className="glass-panel p-5 rounded-2xl flex flex-col items-center text-center">
+                            <div className="text-3xl font-black text-bronze tabular-nums"><AnimatedNumber value={areaM2 * 12.6} decimals={0} /> <span className="text-base font-light">kg</span></div>
+                            <div className="text-[10px] text-white/40 uppercase tracking-widest mt-2">{t.totalWeight}</div>
+                        </div>
+                        <div className="glass-panel p-5 rounded-2xl flex flex-col items-center text-center">
+                            <div className="text-3xl font-black text-bronze tabular-nums">225 <span className="text-base font-light">km/h</span></div>
+                            <div className="text-[10px] text-white/40 uppercase tracking-widest mt-2">{t.windResist}</div>
+                        </div>
                     </div>
 
-                    {!isSpecialDesign ? (
-                        <>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group hover:border-bronze/50 transition-colors duration-500">
-                                    <Gauge value={metrics.units} max={Math.ceil(1500 * (unit === 'ft2' ? 10.7639 : 1) * KASTON_UNITS_PER_M2)} label={t.kastonUnitsReq} sublabel={t.required} color="#C18A68" />
-                                    <div className="mt-4 text-xs text-white/40 text-center uppercase tracking-wider flex items-center justify-center">
-                                        {t.netSupplyObj}
-                                        <InfoTooltip title={t.calcPrec} technicalValue={t.netSupplyNoWaste} description={t.calcPrecDesc} />
-                                    </div>
-                                    <div className="mt-2 text-[10px] text-yellow-400/60 text-center uppercase tracking-wider">{t.wasteNote}</div>
-                                </div>
-
-                                {flowActive === 'A' ? (
-                                    <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group hover:border-slateBlue/50 transition-colors duration-500">
-                                        {metrics.weightSavedTons > 0 ? (
-                                            <>
-                                                <Gauge value={Math.abs(metrics.weightSavedTons * 1000 / areaM2)} max={100} label={t.structRelief} sublabel="kg / m²" color="#0066FF" decimals={1} prefix="~" />
-                                                <div className="mt-4 text-[10px] text-white/70 text-center uppercase tracking-wider px-2 flex flex-col items-center gap-1">
-                                                    <div className="flex items-center text-center">
-                                                        {t.earthqResp} <InfoTooltip title={t.deadLoadRed} technicalValue={`${(Math.abs(metrics.weightSavedTons * 1000 / areaM2)).toFixed(1)} kg/m²`} description={t.deadLoadDesc} />
-                                                    </div>
-                                                    <div className="text-white/40 mt-1">{t.substituting} {MATERIAL_CONSTANTS[material]?.label}</div>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Gauge value={Math.abs(metrics.weightSavedTons * 1000 / areaM2)} max={100} label={t.stabLoad} sublabel="kg / m²" color="#0066FF" decimals={1} prefix="+" />
-                                                <div className="mt-4 text-[10px] text-white/70 text-center uppercase tracking-wider px-2 flex flex-col items-center gap-1">
-                                                    <div className="flex items-center text-center">
-                                                        {t.hurricaneAnch} <InfoTooltip title={t.protectMass} technicalValue={`+${(Math.abs(metrics.weightSavedTons * 1000 / areaM2)).toFixed(1)} kg/m²`} description={t.protectMassDesc} />
-                                                    </div>
-                                                    <div className="text-white/40 mt-2">{t.substituting} {MATERIAL_CONSTANTS[material]?.label}</div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden group hover:border-slateBlue/50 transition-colors duration-500">
-                                        <div className="text-xs text-white/40 tracking-widest uppercase mb-1">{t.kastonShield}</div>
-                                        <div className="text-2xl font-black text-white/90 uppercase tracking-tighter mb-2">8,000 <span className="text-slateBlue text-lg">{t.microns}</span></div>
-                                        <h3 className="text-bronze font-bold uppercase tracking-widest mb-1 text-xs flex items-center justify-center gap-1">
-                                            {t.uvInvul} <InfoTooltip title={t.microShield} technicalValue="8,000 Micras (8mm)" description={t.microShieldDesc} />
-                                        </h3>
-                                        <div className="text-white/70 text-[10px] uppercase mb-3 flex items-center gap-1">
-                                            {t.operatingTemp} <InfoTooltip title={t.thermoRange} technicalValue="Amplitud Térmica" description={t.thermoRangeDesc} />
-                                        </div>
-                                        <div className="w-full bg-white/5 rounded-lg py-2 uppercase tracking-widest text-[#0066FF] text-[10px] font-bold border border-[#0066FF]/30 flex flex-col gap-1 px-2">
-                                            <div className="flex items-center justify-center">
-                                                {t.flexMod}
-                                                <InfoTooltip title={t.surfHard} technicalValue="82.5 Shore D / 1406.1 MPa" description={t.surfHardDesc} />
-                                            </div>
-                                            <div className="text-white/50 border-t border-white/5 pt-1 flex items-center justify-center">
-                                                {t.izodShield}
-                                                <InfoTooltip title={t.impactRes} technicalValue="29.4 J/m" description={t.impactResDesc} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="glass-panel p-6 rounded-2xl flex flex-col gap-5 relative overflow-hidden group hover:border-greenNeon/50 transition-colors duration-500">
-                                    <div className="text-[10px] text-greenNeon/70 uppercase tracking-[0.15em] font-bold border-b border-greenNeon/20 pb-3">
-                                        {t.esgImpact}
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">🌿</span>
-                                        <p className="text-xs text-white/70 leading-relaxed">
-                                            {language === 'en'
-                                                ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1}/> kg</strong> of plastic removed from the planet, transformed into an indestructible roof.</>
-                                                : <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1}/> kg</strong> de plástico quitados del planeta, transformados en un techo indestructible.</>
-                                            }
-                                        </p>
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">💨</span>
-                                        <p className="text-xs text-white/70 leading-relaxed">
-                                            {language === 'en'
-                                                ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0}/> kg</strong> of CO₂ that won't pollute the air. That's what an entire forest absorbs in a year!</>
-                                                : <>Evitaste que <strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0}/> kg</strong> de CO₂ contaminaran el aire. ¡Eso equivale a lo que absorbe un bosque entero en un año!</>
-                                            }
-                                        </p>
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">♻️</span>
-                                        <p className="text-xs text-white/70 leading-relaxed">
-                                            {language === 'en'
-                                                ? <>Your roof will last generations <strong className="text-white/90">(50–100 years, zero maintenance)</strong>. At end of life, 100% of tiles can be remelted into new products. <strong className="text-greenNeon">Zero waste.</strong></>
-                                                : <>Tu techo durará generaciones <strong className="text-white/90">(50–100 años sin mantenimiento)</strong>. Al final de su vida útil, el 100% de tus tejas se pueden fundir de nuevo. <strong className="text-greenNeon">Cero basura.</strong></>
-                                            }
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="glass-panel rounded-2xl p-6 flex flex-col items-center justify-between border-l-4 border-l-bronze bg-gradient-to-r from-bronze/5 to-transparent relative overflow-hidden mt-6">
-                                <div className="flex flex-col mb-4 relative z-10 w-full text-center">
-                                    <h3 className="text-2xl tracking-tight text-white mb-1 uppercase font-semibold">{t.estInvest}</h3>
-                                    <p className="text-sm text-white/50 tracking-wider flex items-center justify-center gap-1">
-                                        {t.supplyOpt} <InfoTooltip title={t.finEst} technicalValue="Suministro vs. Todo Costo" description={t.finEstDesc} />
-                                    </p>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full relative z-10">
-                                    <button
-                                        onClick={() => { setModality('supply'); setIsPdfDownloaded(false); }}
-                                        className={`rounded-xl p-4 flex flex-col items-center justify-center border transition-all duration-300 text-left cursor-pointer ${modality === 'supply' ? 'bg-black/50 border-bronze shadow-[0_0_15px_rgba(193,138,104,0.3)]' : 'bg-black/30 border-white/5 hover:border-bronze/50'}`}
-                                    >
-                                        <span className="text-xs text-white/50 uppercase tracking-widest mb-2 font-bold flex items-center justify-center gap-1 w-full relative z-10">
-                                            <input type="radio" checked={modality === 'supply'} readOnly className="mr-1 accent-bronze" />
-                                            {t.onlyTile}
-                                            <InfoTooltip title={t.netSupply} description={t.netSupplyDesc} />
-                                        </span>
-                                        <div className="flex items-baseline gap-1 relative z-10">
-                                            <span className="text-bronze text-xl font-light">{currency === 'EUR' ? '€' : '$'}</span>
-                                            <span className="text-bronze text-4xl mt-1 font-black tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(193,138,104,0.3)]">
-                                                {formatCurrency(metrics.finalCost, currency)}
-                                            </span>
-                                        </div>
-                                        <span className="text-white/30 text-[10px] font-sans uppercase tracking-widest mt-1 relative z-10">{currency}</span>
-                                    </button>
-                                    <button
-                                        onClick={() => { setModality('full'); setIsPdfDownloaded(false); }}
-                                        className={`rounded-xl p-4 flex flex-col items-center justify-center border transition-all duration-300 text-left cursor-pointer ${modality === 'full' ? 'bg-bronze/20 border-bronze shadow-[0_0_20px_rgba(193,138,104,0.4)]' : 'bg-bronze/10 border-bronze/30 hover:border-bronze shadow-[0_0_20px_rgba(193,138,104,0.15)]'}`}
-                                    >
-                                        <span className="text-xs text-bronze uppercase tracking-widest mb-2 font-bold flex items-center justify-center gap-1 w-full relative z-10">
-                                            <input type="radio" checked={modality === 'full'} readOnly className="mr-1 accent-bronze" />
-                                            {t.allInc}
-                                            <InfoTooltip title={t.intSol} description={t.intSolDesc} />
-                                        </span>
-                                        <div className="flex items-baseline gap-1 relative z-10">
-                                            <span className="text-bronze text-xl font-light">{currency === 'EUR' ? '€' : '$'}</span>
-                                            <span className="text-bronze text-4xl mt-1 font-black tabular-nums tracking-tighter drop-shadow-[0_0_20px_rgba(193,138,104,0.4)]">
-                                                {formatCurrency(metrics.finalCostTodoCosto, currency)}
-                                            </span>
-                                        </div>
-                                        <span className="text-bronze/50 text-[10px] font-sans uppercase tracking-widest mt-1 relative z-10">{currency}</span>
-                                    </button>
-                                </div>
-                                {modality === 'supply' && (
-                                    <div className="w-full mt-3 p-4 rounded-xl border border-bronze/50 bg-bronze/10 flex items-start gap-3 animate-fade-in">
-                                        <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <p className="text-bronze text-xs leading-relaxed">
-                                            <strong className="uppercase tracking-wide">Nota:</strong> Con la compra de tus tejas KASTON, te entregaremos un manual de instalación detallado paso a paso para asegurar el éxito de tu proyecto.
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="glass-panel rounded-2xl p-8 flex flex-col items-center justify-center border border-bronze/30 bg-bronze/5 text-center mt-6 animate-fade-in">
-                            <div className="w-12 h-12 rounded-full bg-bronze/20 text-bronze flex items-center justify-center text-xl font-black mb-4">★</div>
-                            <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-3">Diseño Arquitectónico Especial</h3>
-                            <p className="text-white/80 text-sm leading-relaxed max-w-2xl mx-auto">
-                                ¡Tu techo suena único! Para estructuras con diseños arquitectónicos especiales, preferimos darte una asesoría completamente personalizada. Déjanos tus datos al finalizar y un ingeniero de nuestro equipo te contactará directamente para evaluar tu estructura mediante una visita técnica sin costo.
+                    {/* Impacto ambiental */}
+                    <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4 relative overflow-hidden">
+                        <div className="text-[10px] text-greenNeon/70 uppercase tracking-[0.15em] font-bold border-b border-greenNeon/20 pb-3">{t.esgImpact}</div>
+                        <div className="flex items-start gap-3">
+                            <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">&#127807;</span>
+                            <p className="text-xs text-white/70 leading-relaxed">
+                                {language === 'en'
+                                    ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1} /> kg</strong> of plastic removed from the planet, transformed into an indestructible roof.</>
+                                    : <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1} /> kg</strong> de plástico quitados del planeta, transformados en un techo indestructible.</>}
                             </p>
                         </div>
+                        <div className="flex items-start gap-3">
+                            <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">&#128168;</span>
+                            <p className="text-xs text-white/70 leading-relaxed">
+                                {language === 'en'
+                                    ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0} /> kg</strong> of CO&#8322; that won&#39;t pollute the air.</>
+                                    : <>Evitaste que <strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0} /> kg</strong> de CO&#8322; contaminaran el aire.</>}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Inversión estimada */}
+                    <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-bronze bg-gradient-to-r from-bronze/5 to-transparent relative overflow-hidden mt-2">
+                        <h3 className="text-2xl tracking-tight text-white mb-1 uppercase font-semibold text-center">{t.estInvest}</h3>
+                        <p className="text-sm text-white/50 tracking-wider mb-4 text-center">{modality === 'full' ? t.allInc : t.onlyTile}</p>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-bronze text-2xl font-light">{currency === 'EUR' ? '\u20ac' : '$'}</span>
+                            <span className="text-bronze text-5xl font-black tabular-nums tracking-tighter drop-shadow-[0_0_20px_rgba(193,138,104,0.4)]">{formatCurrency(modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost, currency)}</span>
+                            <span className="text-bronze/50 text-xs uppercase tracking-widest ml-1">{currency}</span>
+                        </div>
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest mt-3 text-center">{t.pdfVisitNote}</p>
+                    </div>
+                    </>
                     )}
 
                     {!isFormComplete && !isPdfDownloaded && (
@@ -2736,23 +2610,35 @@
                 bottomDash: "Inicio",
                 bottomProj: "Proyectos",
                 bottomProf: "Perfil",
-                trTitle: "Diagnóstico Rápido",
-                trSub: "Cuéntanos cómo está tu techo hoy y calculamos todo",
+                trTitle: "Cotiza tu proyecto",
+                trSub: "Elige cómo quieres tu cubierta KASTON",
                 welcomeTag: "Cotizador Técnico KASTON",
                 welcomeTitle: "¡Hola! Te damos la bienvenida al Cotizador Técnico de KASTON.",
                 welcomeBody: "Queremos que el proceso de cotizar tu proyecto sea lo más sencillo, transparente y rápido posible. Diseñamos esta herramienta para que funcione como nuestro primer filtro de ahorro de tiempo: tú nos compartes lo que ya conoces de tu espacio y nosotros avanzamos de inmediato. Así, cuando programemos tu visita técnica presencial, iremos directo al grano para concluir los detalles finales de tu instalación sin hacerte perder tiempo en papeleos previos.",
                 welcomeAccept: "Lo acepto — entrar al cotizador",
                 welcomeDecline: "No acepto — regresar al sitio",
-                formIncompleteHint: "Completa todas las secciones del formulario (modalidad, tipo de techo, pendiente y color) para habilitar la descarga del PDF.",
-                routeA: "QUIERO CAMBIAR MI TECHO VIEJO",
-                routeASub: "BARRO O FIBROCEMENTO",
-                routeADesc: "Como tus tejas actuales ya son pesadas, solo debemos echarle un ojo a los listones o vigas que ya tienes (sean de madera o metal). Así nos aseguramos de que todo esté firme y tu casa quede lista para estrenar el nuevo techo KASTON sin ningún riesgo.",
-                routeB: "YA TENGO MI TECHO HECHO",
-                routeBSub: "ESTRUCTURA LISTA",
-                routeBDesc: "Si ya estás construyendo, tienes los planos listos o tu estructura ya está armada esperando por las tejas, ¡esta es tu opción!",
-                routeC: "PROYECTO DESDE CERO O CAMBIAR ZINC",
-                routeCSub: "DISEÑO DESDE EL PRINCIPIO",
-                routeCDesc: "Si vas a construir desde cero o si tu techo actual es de láminas de zinc, esta es tu ruta. Como el zinc es muy delgado y no tiene la base que necesitamos, o si aún no hay nada construido, aquí te ayudamos a planear y diseñar todo el armazón desde el principio para que quede indestructible.",
+                formIncompleteHint: "Ingresa el área de tu proyecto para habilitar la descarga del PDF.",
+                routeA: "Solo tejas",
+                routeASub: "$85.000 / m² · suministro",
+                routeADesc: "Te entregamos las tejas KASTON en obra y tú las instalas siguiendo nuestro manual paso a paso.",
+                routeB: "Todo costo",
+                routeBSub: "$106.623 / m² · instalación",
+                routeBDesc: "Instalamos por ti: tejas, malla, alambre, caballete y transporte dentro del área metropolitana.",
+                routeC: "Proyecto especial o a gran escala",
+                routeCSub: "Asesoría personalizada",
+                routeCDesc: "¿Diseño arquitectónico fuera de lo común o un proyecto muy grande? Déjanos tus datos y un ingeniero te contacta para una visita técnica sin costo.",
+                chosenModality: "Modalidad elegida",
+                changeModality: "Cambiar",
+                reqObraTitle: "Requisitos de obra",
+                reqObra1: "Tu estructura debe soportar 12.6 kg/m².",
+                reqObra2: "Debes entregar la estructura con manto asfáltico ya instalado. KASTON no instala estructura ni manto.",
+                reqObra3: "Transporte incluido dentro del área metropolitana; fuera del área se cotiza aparte según lugar y cantidad.",
+                manualNote: "Con tu compra recibirás un manual de instalación detallado paso a paso.",
+                specialTitle: "Diseño arquitectónico especial",
+                specialBody: "¡Tu techo suena único! Para estructuras con diseños especiales preferimos una asesoría personalizada. Déjanos tus datos al finalizar y un ingeniero te contactará para una visita técnica sin costo.",
+                tilesNeeded: "Tejas necesarias",
+                totalWeight: "Peso total del techo",
+                windResist: "Resiste vientos de",
                 noSavedProj: "No hay proyectos guardados",
                 noSavedD: "Los cálculos que guardes en el dashboard aparecerán aquí.",
                 myProjects: "Mis Proyectos",
@@ -2990,23 +2876,35 @@
                 bottomDash: "Dashboard",
                 bottomProj: "Projects",
                 bottomProf: "Profile",
-                trTitle: "Quick Diagnosis",
-                trSub: "Tell us about your roof today and we'll calculate everything",
+                trTitle: "Quote your project",
+                trSub: "Choose how you want your KASTON roof",
                 welcomeTag: "KASTON Technical Quoter",
                 welcomeTitle: "Hello! Welcome to KASTON's Technical Quoter.",
                 welcomeBody: "We want the process of quoting your project to be as simple, transparent, and fast as possible. We designed this tool as our first time-saving filter: you share what you already know about your space and we move forward immediately. When we schedule your in-person technical visit, we'll go straight to the point to finalize installation details without wasting your time on paperwork.",
                 welcomeAccept: "I accept — enter the quoter",
                 welcomeDecline: "I don't accept — go back to site",
-                formIncompleteHint: "Complete all sections (modality, roof type, pitch, and color) to enable the PDF download.",
-                routeA: "Replace my old roof",
-                routeASub: "Clay or Fiber Cement",
-                routeADesc: "Since these are heavy covers, we'll check your current structure together (wood or metal) to see if it needs any reinforcement before safely receiving your new KASTON tiles.",
-                routeB: "I only need the tiles",
-                routeBSub: "Material Only",
-                routeBDesc: "We deliver the exact tiles for your project and include a detailed step-by-step Installation Manual so your builder can do a perfect job.",
-                routeC: "New project or replace Zinc",
-                routeCSub: "Structure + KASTON Tiles",
-                routeCDesc: "Zinc sheets are thin and lack the support base our tiles need. Our engineering team designs the ideal structure from scratch so your roof is solid and unmovable.",
+                formIncompleteHint: "Enter your project area to enable the PDF download.",
+                routeA: "Tiles only",
+                routeASub: "$85,000 / m² · supply",
+                routeADesc: "We deliver the KASTON tiles to your site and you install them following our step-by-step manual.",
+                routeB: "All-inclusive",
+                routeBSub: "$106,623 / m² · installation",
+                routeBDesc: "We install for you: tiles, mesh, wire, ridge cap and transport within the metro area.",
+                routeC: "Special or large-scale project",
+                routeCSub: "Personalized advice",
+                routeCDesc: "Unusual architectural design or a very large project? Leave your details and an engineer will contact you for a free technical visit.",
+                chosenModality: "Chosen option",
+                changeModality: "Change",
+                reqObraTitle: "Site requirements",
+                reqObra1: "Your structure must support 12.6 kg/m².",
+                reqObra2: "You must hand over the structure with the asphalt membrane already installed. KASTON does not install structure or membrane.",
+                reqObra3: "Transport included within the metro area; outside the metro area it is quoted separately.",
+                manualNote: "With your purchase you'll receive a detailed step-by-step installation manual.",
+                specialTitle: "Special architectural design",
+                specialBody: "Your roof sounds unique! For special designs we prefer personalized advice. Leave your details and an engineer will contact you for a free technical visit.",
+                tilesNeeded: "Tiles needed",
+                totalWeight: "Total roof weight",
+                windResist: "Withstands winds of",
                 noSavedProj: "No saved projects",
                 noSavedD: "Calculations saved in the dashboard will appear here.",
                 myProjects: "My Projects",
@@ -3321,13 +3219,13 @@
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                            <button onClick={() => onSelectFlow('A')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
+                            <button onClick={() => onSelectFlow('supply')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
                                 <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeA}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeASub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeADesc}"</p>
                             </button>
 
-                            <button onClick={() => onSelectFlow('B')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
+                            <button onClick={() => onSelectFlow('full')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
                                 <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeB}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeBSub}</div>
                                 <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeBDesc}"</p>
