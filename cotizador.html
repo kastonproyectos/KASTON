@@ -210,23 +210,23 @@
             { id: 'militar', hex: '#4B5320', nameEs: 'Verde Militar',  nameEn: 'Military Green', descEs: 'Integración natural.',         star: false },
         ];
 
-                const ROOF_TYPES = [
-  { id: "dos-aguas", name: "A Dos Aguas", imagePath: './Tipos de techos/dos-aguas.png', description: "Estructura de dos caras inclinadas que suben y se unen en el centro, formando un triángulo en el frente." },
-  { id: "cuatro-aguas", name: "A Cuatro Aguas", imagePath: './Tipos de techos/cuatro-aguas.png', description: "Estructura de cuatro caras inclinadas que bajan hacia cada esquina de la propiedad, sin dejar paredes altas." },
-  { id: "mansarda", name: "Mansarda", imagePath: './Tipos de techos/hastial-holandes.png', description: "Techo de cuatro lados con un quiebre de doble pendiente: muy empinado en la base y casi plano en la parte superior." },
-  { id: "gambrel", name: "Gambrel / Tipo Granero", imagePath: './Tipos de techos/gambrel.png', description: "Techo que presenta dos pendientes laterales a cada lado, quebrándose hacia afuera en los costados." },
-  { id: "mariposa", name: "Mariposa", imagePath: './Tipos de techos/mariposa.png', description: "Diseño invertido en forma de 'V', donde los extremos exteriores son elevados y el centro es hondo." },
-  { id: "saltbox", name: "Saltbox", imagePath: './Tipos de techos/saltbox.png', description: "Diseño asimétrico donde una caída del techo es corta y la otra es un plano largo que baja casi hasta el suelo." },
-  { id: "jerkinhead", name: "Jerkinhead", imagePath: './Tipos de techos/jerkinhead.png', description: "Base a dos aguas tradicional, pero con las puntas superiores de los extremos recortadas por una pequeña caída diagonal." },
-  { id: "bonete", name: "Techo con Bonete", imagePath: './Tipos de techos/bonete.png', description: "Techo a cuatro aguas que en la parte inferior cambia de inclinación, extendiéndose hacia afuera con una pendiente más plana." },
-  { id: "combinado", name: "Combinado", imagePath: './Tipos de techos/dos-aguas-alt.png', description: "Unión de varias formas y caídas de techo distintas sobre una estructura que se cruza en forma de L." },
-  { id: "piramidal", name: "Techo Piramidal", imagePath: './Tipos de techos/cobertizo-alt.png', description: "Diseño de cuatro caras triangulares idénticas que suben de forma simétrica hasta unirse en una sola punta central." },
-  { id: "hastial-holandes", name: "Hastial Holandés", imagePath: './Tipos de techos/mansarda.png', description: "Base inclinada a cuatro aguas que lleva un pequeño triángulo clásico montado en la parte más alta de la cumbrera." },
-  { id: "buhardilla", name: "Techo con Buhardilla", imagePath: './Tipos de techos/piramidal.png', description: "Techo inclinado del cual sobresale una pequeña estructura vertical independiente con su propia ventana y tejado." },
-  { id: "monitor", name: "Monitor", imagePath: './Tipos de techos/monitor.png', description: "Techo interrumpido por un volumen central que se eleva hacia arriba y lleva ventanas rectangulares en los laterales." },
-  { id: "dientes-sierra", name: "Dientes de Sierra", imagePath: './Tipos de techos/dientes-sierra.png', description: "Secuencia repetitiva de techos asimétricos en cadena, combinando rampas inclinadas con paredes verticales." },
-  { id: "cobertizo", name: "Cobertizo / Una Sola Vertiente", imagePath: './Tipos de techos/hexagonal-copy.png', description: "Estructura compuesta por una sola rampa recta e inclinada que va de un extremo al otro de la construcción." },
-  { id: "otro", name: "Otro / Diseño Especial", imagePath: null, description: "Estructuras personalizadas, techos curvos o configuraciones arquitectónicas complejas que no entran en los modelos estándar." }
+                                const ROOF_TYPES = [
+  { id: "dos-aguas", name: "A Dos Aguas", nameEn: "Gable", imagePath: './Tipos de techos/dos-aguas.png', description: "Estructura de dos caras inclinadas que suben y se unen en el centro, formando un triángulo en el frente.", descEn: "Two sloped sides that rise and meet in the center, forming a triangle at the front." },
+  { id: "cuatro-aguas", name: "A Cuatro Aguas", nameEn: "Hip", imagePath: './Tipos de techos/cuatro-aguas.png', description: "Estructura de cuatro caras inclinadas que bajan hacia cada esquina de la propiedad, sin dejar paredes altas.", descEn: "Four sloped sides descending toward each corner, with no tall walls." },
+  { id: "mansarda", name: "Mansarda", nameEn: "Mansard", imagePath: './Tipos de techos/hastial-holandes.png', description: "Techo de cuatro lados con un quiebre de doble pendiente: muy empinado en la base y casi plano en la parte superior.", descEn: "Four-sided roof with a double-slope break: very steep at the base and nearly flat on top." },
+  { id: "gambrel", name: "Gambrel / Tipo Granero", nameEn: "Gambrel / Barn", imagePath: './Tipos de techos/gambrel.png', description: "Techo que presenta dos pendientes laterales a cada lado, quebrándose hacia afuera en los costados.", descEn: "Roof with two side slopes on each side, breaking outward on the flanks." },
+  { id: "mariposa", name: "Mariposa", nameEn: "Butterfly", imagePath: './Tipos de techos/mariposa.png', description: "Diseño invertido en forma de 'V', donde los extremos exteriores son elevados y el centro es hondo.", descEn: "Inverted 'V' design where the outer ends are raised and the center is deep." },
+  { id: "saltbox", name: "Saltbox", nameEn: "Saltbox", imagePath: './Tipos de techos/saltbox.png', description: "Diseño asimétrico donde una caída del techo es corta y la otra es un plano largo que baja casi hasta el suelo.", descEn: "Asymmetric design where one slope is short and the other is a long plane going almost to the ground." },
+  { id: "jerkinhead", name: "Jerkinhead", nameEn: "Jerkinhead", imagePath: './Tipos de techos/jerkinhead.png', description: "Base a dos aguas tradicional, pero con las puntas superiores de los extremos recortadas por una pequeña caída diagonal.", descEn: "A traditional gable base, but with the top tips of the ends clipped by a small diagonal slope." },
+  { id: "bonete", name: "Techo con Bonete", nameEn: "Bonnet", imagePath: './Tipos de techos/bonete.png', description: "Techo a cuatro aguas que en la parte inferior cambia de inclinación, extendiéndose hacia afuera con una pendiente más plana.", descEn: "A hip roof that changes pitch near the bottom, extending outward with a flatter slope." },
+  { id: "combinado", name: "Combinado", nameEn: "Combination", imagePath: './Tipos de techos/dos-aguas-alt.png', description: "Unión de varias formas y caídas de techo distintas sobre una estructura que se cruza en forma de L.", descEn: "A combination of several roof shapes and slopes over an L-shaped intersecting structure." },
+  { id: "piramidal", name: "Techo Piramidal", nameEn: "Pyramid", imagePath: './Tipos de techos/cobertizo-alt.png', description: "Diseño de cuatro caras triangulares idénticas que suben de forma simétrica hasta unirse en una sola punta central.", descEn: "Four identical triangular faces rising symmetrically to a single central point." },
+  { id: "hastial-holandes", name: "Hastial Holandés", nameEn: "Dutch Gable", imagePath: './Tipos de techos/mansarda.png', description: "Base inclinada a cuatro aguas que lleva un pequeño triángulo clásico montado en la parte más alta de la cumbrera.", descEn: "A hipped base with a small classic triangle mounted at the highest part of the ridge." },
+  { id: "buhardilla", name: "Techo con Buhardilla", nameEn: "Dormer", imagePath: './Tipos de techos/piramidal.png', description: "Techo inclinado del cual sobresale una pequeña estructura vertical independiente con su propia ventana y tejado.", descEn: "A sloped roof with a small independent vertical structure (a dormer) with its own window and roof." },
+  { id: "monitor", name: "Monitor", nameEn: "Monitor", imagePath: './Tipos de techos/monitor.png', description: "Techo interrumpido por un volumen central que se eleva hacia arriba y lleva ventanas rectangulares en los laterales.", descEn: "A roof interrupted by a central raised volume with rectangular windows on the sides." },
+  { id: "dientes-sierra", name: "Dientes de Sierra", nameEn: "Sawtooth", imagePath: './Tipos de techos/dientes-sierra.png', description: "Secuencia repetitiva de techos asimétricos en cadena, combinando rampas inclinadas con paredes verticales.", descEn: "A repetitive chain of asymmetric roofs combining sloped ramps with vertical walls." },
+  { id: "cobertizo", name: "Cobertizo / Una Sola Vertiente", nameEn: "Skillion / Single Slope", imagePath: './Tipos de techos/hexagonal-copy.png', description: "Estructura compuesta por una sola rampa recta e inclinada que va de un extremo al otro de la construcción.", descEn: "A single straight, sloped ramp running from one end of the building to the other." },
+  { id: "otro", name: "Otro / Diseño Especial", nameEn: "Other / Special Design", imagePath: null, description: "Estructuras personalizadas, techos curvos o configuraciones arquitectónicas complejas que no entran en los modelos estándar.", descEn: "Custom structures, curved roofs or complex architectural configurations outside the standard models." },
 ];
 
         /* ── Carga una imagen local para el PDF ── */
@@ -772,7 +772,7 @@
                                             ? 'border-[#4E5154] bg-[#4E5154]/20 shadow-md shadow-black/40'
                                             : 'border-white/10 bg-white/5 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20'}`}>
                                     <div className="absolute top-1 right-1 z-10" onClick={(e) => e.stopPropagation()}>
-                                        <InfoTooltip title={rt.name} description={rt.description} />
+                                        <InfoTooltip title={language === 'en' ? rt.nameEn : rt.name} description={language === 'en' ? rt.descEn : rt.description} />
                                     </div>
                                     <div className="flex-1 flex items-center justify-center w-full">
                                         {rt.imagePath ? (
@@ -784,7 +784,7 @@
                                         )}
                                     </div>
                                     <span className={`text-[10px] mt-auto font-bold tracking-wide text-center leading-tight w-full ${selectedType === rt.id ? 'text-white' : 'text-white/60'}`}>
-                                        {rt.name}
+                                        {language === 'en' ? rt.nameEn : rt.name}
                                     </span>
                                 </button>
                             ))}
@@ -792,7 +792,7 @@
                         <div className="mt-3 min-h-[16px]">
                             {!selectedType
                                 ? <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.roofTypeReq}</p>
-                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">{activeRoof?.name}</p>
+                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">{language === 'en' ? activeRoof?.nameEn : activeRoof?.name}</p>
                             }
                         </div>
                     </div>
@@ -2620,13 +2620,14 @@
                 formIncompleteHint: "Ingresa el área de tu proyecto para habilitar la descarga del PDF.",
                 routeA: "Solo tejas",
                 routeASub: "$85.000 / m² · suministro",
-                routeADesc: "Te entregamos las tejas KASTON en obra y tú las instalas siguiendo nuestro manual paso a paso.",
+                routeADesc: "Te llevamos las tejas KASTON hasta tu obra y tú te encargas de instalarlas con la ayuda de nuestro manual, que te explica el paso a paso.",
                 routeB: "Todo costo",
                 routeBSub: "$106.623 / m² · instalación",
-                routeBDesc: "Instalamos por ti: tejas, malla, alambre, caballete y transporte dentro del área metropolitana.",
+                routeBDesc: "Nosotros nos encargamos de todo: llevamos las tejas, la malla, el alambre y el caballete hasta tu obra dentro del área metropolitana, y las instalamos por ti. No tienes que conseguir materiales ni preocuparte por la instalación.",
                 routeC: "Proyecto especial o a gran escala",
                 routeCSub: "Asesoría personalizada",
-                routeCDesc: "¿Diseño arquitectónico fuera de lo común o un proyecto muy grande? Déjanos tus datos y un ingeniero te contacta para una visita técnica sin costo.",
+                routeCDesc: "¿Tu techo tiene un diseño poco común o es un proyecto muy grande? Déjanos tus datos y un ingeniero te contacta para visitarte y asesorarte sin ningún costo.",
+                emailBtn: "Correo electrónico",
                 chosenModality: "Modalidad elegida",
                 changeModality: "Cambiar",
                 reqObraTitle: "Requisitos de obra",
@@ -2886,13 +2887,14 @@
                 formIncompleteHint: "Enter your project area to enable the PDF download.",
                 routeA: "Tiles only",
                 routeASub: "$85,000 / m² · supply",
-                routeADesc: "We deliver the KASTON tiles to your site and you install them following our step-by-step manual.",
+                routeADesc: "We bring the KASTON tiles to your site and you install them with the help of our step-by-step manual.",
                 routeB: "All-inclusive",
                 routeBSub: "$106,623 / m² · installation",
-                routeBDesc: "We install for you: tiles, mesh, wire, ridge cap and transport within the metro area.",
+                routeBDesc: "We take care of everything: we bring the tiles, mesh, wire and ridge cap to your site within the metro area, and install them for you. You don't have to source materials or worry about the installation.",
                 routeC: "Special or large-scale project",
                 routeCSub: "Personalized advice",
-                routeCDesc: "Unusual architectural design or a very large project? Leave your details and an engineer will contact you for a free technical visit.",
+                routeCDesc: "Does your roof have an unusual design or is it a very large project? Leave your details and an engineer will contact you to visit and advise you at no cost.",
+                emailBtn: "Email",
                 chosenModality: "Chosen option",
                 changeModality: "Change",
                 reqObraTitle: "Site requirements",
@@ -3222,19 +3224,19 @@
                             <button onClick={() => onSelectFlow('supply')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
                                 <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeA}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeASub}</div>
-                                <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeADesc}"</p>
+                                <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">{t.routeADesc}</p>
                             </button>
 
                             <button onClick={() => onSelectFlow('full')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
                                 <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeB}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeBSub}</div>
-                                <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">"{t.routeBDesc}"</p>
+                                <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">{t.routeBDesc}</p>
                             </button>
 
                             <div className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/30 transition-all duration-300 relative overflow-hidden">
                                 <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeC}</h3>
                                 <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeCSub}</div>
-                                <p className="text-sm text-white/50 flex-grow mb-5">"{t.routeCDesc}"</p>
+                                <p className="text-sm text-white/50 flex-grow mb-5">{t.routeCDesc}</p>
                                 <div className="flex flex-col gap-2 mt-auto border-t border-bronze/20 pt-4">
                                     <a
                                         href={`https://wa.me/573188978552?text=${encodeURIComponent('¡Hola! Elegí la opción de proyecto desde cero o cambiar zinc en la web y me gustaría recibir la asesoría personalizada para diseñar mi techo.')}`}
@@ -3247,7 +3249,7 @@
                                         href={`mailto:kaston.proyectos@gmail.com?subject=${encodeURIComponent('Asesoría Personalizada - Proyecto desde Cero / Zinc')}`}
                                         className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-bronze/10 border border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite transition-all no-underline">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                        Correo electrónico
+                                        {t.emailBtn}
                                     </a>
                                 </div>
                             </div>
