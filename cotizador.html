@@ -1527,6 +1527,8 @@
                     fecha: editingProject ? editingProject.fecha : new Date().toISOString().split('T')[0],
                     hasOwnStructure
                 });
+
+                alert(t.transportNoticeAlert);
             };
 
             const handleZincYes = () => {
@@ -1704,7 +1706,6 @@
                             <ul className="flex flex-col gap-3 text-xs text-white/75 leading-relaxed list-none">
                                 <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#10003;</span><span>{t.reqObra1}</span></li>
                                 <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#10003;</span><span>{t.reqObra2}</span></li>
-                                <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#8505;</span><span>{t.reqObra3}</span></li>
                             </ul>
                         </div>
                     ) : (
@@ -2618,10 +2619,10 @@
                 formIncompleteHint: "Ingresa el área de tu proyecto para habilitar la descarga del PDF.",
                 routeA: "Solo tejas",
                 routeASub: "$85.000 / m² · suministro",
-                routeADesc: "Te llevamos las tejas KASTON hasta tu obra y tú te encargas de instalarlas con la ayuda de nuestro manual, que te explica el paso a paso.",
+                routeADesc: "Te suministramos las tejas KASTON y tú te encargas de instalarlas con la ayuda de nuestro manual, que te explica el paso a paso.",
                 routeB: "Todo costo",
                 routeBSub: "$106.623 / m² · instalación",
-                routeBDesc: "Nosotros nos encargamos de todo: llevamos las tejas, la malla, el alambre y el caballete hasta tu obra dentro del área metropolitana, y las instalamos por ti. No tienes que conseguir materiales ni preocuparte por la instalación.",
+                routeBDesc: "Nosotros nos encargamos de todo: te brindamos la teja y la instalación completa de tu techo. No tienes que conseguir materiales ni preocuparte por la instalación.",
                 routeC: "Proyecto especial o a gran escala",
                 routeCSub: "Asesoría personalizada",
                 routeCDesc: "¿Tu techo tiene un diseño poco común o es un proyecto muy grande? Déjanos tus datos y un ingeniero te contacta para visitarte y asesorarte sin ningún costo.",
@@ -2631,7 +2632,6 @@
                 reqObraTitle: "Requisitos de obra",
                 reqObra1: "Tu estructura debe soportar 12.6 kg/m².",
                 reqObra2: "Debes entregar la estructura con manto asfáltico ya instalado. KASTON no instala estructura ni manto.",
-                reqObra3: "Transporte incluido dentro del área metropolitana; fuera del área se cotiza aparte según lugar y cantidad.",
                 manualNote: "Con tu compra recibirás un manual de instalación detallado paso a paso.",
                 specialTitle: "Diseño arquitectónico especial",
                 specialBody: "¡Tu techo suena único! Para estructuras con diseños especiales preferimos una asesoría personalizada. Déjanos tus datos al finalizar y un ingeniero te contactará para una visita técnica sin costo.",
@@ -2746,7 +2746,7 @@
                 finEstDesc: "Únicamente Teja cubre el valor EXW del material. Todo Costo incluye la teja y los componentes de instalación sugeridos.",
                 onlyTile: "Únicamente Teja",
                 netSupply: "SUMINISTRO NETO",
-                netSupplyDesc: "Este valor incluye exclusivamente la entrega en puerta de obra de las tejas KASTON de 8mm (rendimiento de 42 unidades por metro cuadrado). No incluye: materiales de refuerzo, mallas, alambres, remates, perfiles ni mano de obra de instalación.",
+                netSupplyDesc: "Este valor incluye exclusivamente el valor EXW (en bodega) de las tejas KASTON de 8mm (rendimiento de 42 unidades por metro cuadrado). No incluye: materiales de refuerzo, mallas, alambres, remates, perfiles ni mano de obra de instalación.",
                 allInc: "Todo Costo (Instalado)",
                 intSol: "SOLUCIÓN INTEGRAL",
                 intSolDesc: "Valorización total bajo estándar de Ingeniería de Protección. Incluye: Suministro de tejas KASTON, malla electrosoldada estándar de refuerzo, alambre de amarre industrial y ejecución por cuadrilla especializada.",
@@ -2759,6 +2759,7 @@
                 saveThisProj: "GUARDAR ESTE PROYECTO",
                 saveProjAlert: "Debe descargar el reporte en PDF antes de guardar el proyecto.",
                 loginToSave: "Debe iniciar sesión para guardar proyectos.",
+                transportNoticeAlert: "Recuerda: el transporte no está incluido en esta cotización. Cuando te comuniques con nosotros por WhatsApp o correo electrónico, indícanos tu ubicación para poder calcular su costo.",
                 zincAlertTitle: "REQUERIMIENTO TÉCNICO",
                 zincAlertBody1: "Vemos que usted escogió la opción de láminas de zinc. Conociendo los estándares habituales de instalación de este material, lo más probable es que su estructura actual no posea la capacidad de carga requerida para el blindaje KASTON. Para su requerimiento de",
                 zincAlertBody2: "calcularíamos",
@@ -2885,10 +2886,10 @@
                 formIncompleteHint: "Enter your project area to enable the PDF download.",
                 routeA: "Tiles only",
                 routeASub: "$85,000 / m² · supply",
-                routeADesc: "We bring the KASTON tiles to your site and you install them with the help of our step-by-step manual.",
+                routeADesc: "We supply the KASTON tiles and you install them with the help of our step-by-step manual.",
                 routeB: "All-inclusive",
                 routeBSub: "$106,623 / m² · installation",
-                routeBDesc: "We take care of everything: we bring the tiles, mesh, wire and ridge cap to your site within the metro area, and install them for you. You don't have to source materials or worry about the installation.",
+                routeBDesc: "We take care of everything: we provide the tiles and the complete installation of your roof. You don't have to source materials or worry about the installation.",
                 routeC: "Special or large-scale project",
                 routeCSub: "Personalized advice",
                 routeCDesc: "Does your roof have an unusual design or is it a very large project? Leave your details and an engineer will contact you to visit and advise you at no cost.",
@@ -2898,7 +2899,6 @@
                 reqObraTitle: "Site requirements",
                 reqObra1: "Your structure must support 12.6 kg/m².",
                 reqObra2: "You must hand over the structure with the asphalt membrane already installed. KASTON does not install structure or membrane.",
-                reqObra3: "Transport included within the metro area; outside the metro area it is quoted separately.",
                 manualNote: "With your purchase you'll receive a detailed step-by-step installation manual.",
                 specialTitle: "Special architectural design",
                 specialBody: "Your roof sounds unique! For special designs we prefer personalized advice. Leave your details and an engineer will contact you for a free technical visit.",
@@ -3013,7 +3013,7 @@
                 finEstDesc: "Only Tile covers the EXW value of the material. All-Inclusive covers the tile and suggested installation components.",
                 onlyTile: "Only Tile",
                 netSupply: "NET SUPPLY",
-                netSupplyDesc: "This value exclusively includes the door-to-door delivery of 8mm KASTON tiles (yield of 42 units per square meter). Does not include: reinforcement materials, mesh, wires, trims, profiles, or installation labor.",
+                netSupplyDesc: "This value exclusively includes the EXW (ex-warehouse) value of 8mm KASTON tiles (yield of 42 units per square meter). Does not include: reinforcement materials, mesh, wires, trims, profiles, or installation labor.",
                 allInc: "All-Inclusive (Installed)",
                 intSol: "INTEGRAL SOLUTION",
                 intSolDesc: "Total valuation under Protection Engineering standard. Includes: Supply of KASTON tiles, standard electro-welded reinforcement mesh, industrial tie wire, and execution by specialized crew.",
@@ -3026,6 +3026,7 @@
                 saveThisProj: "SAVE THIS PROJECT",
                 saveProjAlert: "You must download the PDF report before saving the project.",
                 loginToSave: "You must log in to save projects.",
+                transportNoticeAlert: "Please note: transport is not included in this quote. When you contact us via WhatsApp or email, please provide your location so we can calculate its cost.",
                 zincAlertTitle: "TECHNICAL REQUIREMENT",
                 zincAlertBody1: "We see you chose the zinc sheet option. Knowing the standard installation of this material, it is highly likely that your current structure lacks the load-bearing capacity required for KASTON shielding. For your requirement of",
                 zincAlertBody2: "we calculate",
