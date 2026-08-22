@@ -894,6 +894,42 @@
             to { stroke-dashoffset: -18; }
         }
 
+        /* Características: el visto se redibuja al pasar el cursor */
+        .shield-check {
+            stroke-dasharray: 42;
+            stroke-dashoffset: 0;
+        }
+
+        .card:hover .shield-check {
+            animation: drawCheck 0.6s var(--ease);
+        }
+
+        @keyframes drawCheck {
+            from { stroke-dashoffset: 42; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Características: la onda de calor fluye y se atenúa */
+        .card:hover .insul-wave {
+            stroke-dasharray: 6 3;
+            animation: flowDash 1.1s linear infinite;
+        }
+
+        /* Características: el ícono liviano flota */
+        .light-icon {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .card:hover .light-icon {
+            animation: floatUp 1.9s ease-in-out infinite;
+        }
+
+        @keyframes floatUp {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
         .card h4 {
             color: var(--gold);
             margin-bottom: 12px;
@@ -1048,6 +1084,76 @@
         .swatch-info p {
             font-size: 0.82rem;
             color: var(--muted);
+        }
+
+        /* =============================================
+           COLORES: vista previa interactiva
+           ============================================= */
+        /* Dos versiones de la MISMA foto, recoloreadas solo en el techo
+           (el fondo queda natural). Se cruzan con opacidad al elegir color. */
+        .color-preview {
+            position: relative;
+            max-width: 760px;
+            height: 280px;
+            margin: 36px auto 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(193, 138, 104, 0.18);
+        }
+
+        .cp-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s var(--ease);
+        }
+
+        .color-preview[data-active="grafito"] .cp-layer[data-color="grafito"],
+        .color-preview[data-active="basalto"] .cp-layer[data-color="basalto"] {
+            opacity: 1;
+        }
+
+        .color-preview-tag {
+            position: absolute;
+            left: 18px;
+            bottom: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(193, 138, 104, 0.35);
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        .color-note {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 14px;
+            font-style: italic;
+        }
+
+        .swatch {
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .swatch.active {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(193, 138, 104, 0.18);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .cp-layer {
+                transition: none;
+            }
         }
 
         /* =============================================
@@ -1755,11 +1861,11 @@
             <div class="section-divider fade-in" style="margin:24px auto;"></div>
 
             <div class="card-grid fade-in fade-in-d1" style="margin-top:40px;">
-                <div class="card" style="text-align:center;">
+                <div class="card spot" style="text-align:center;">
                     <div class="card-icon" style="margin:0 auto 20px;">
                         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="50" cy="50" r="38" fill="#C18A68" />
-                            <path d="M35 50 L45 60 L65 40" stroke="#000" stroke-width="6" fill="none"
+                            <path class="shield-check" d="M35 50 L45 60 L65 40" stroke="#000" stroke-width="6" fill="none"
                                 stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </div>
@@ -1767,11 +1873,11 @@
                     <p data-i18n="feat.card1.desc">¿Granizo? ¿Pisar el techo? ¿Golpes? Nuestras tejas absorben el
                         impacto sin quebrarse. Cero mermas en obra.</p>
                 </div>
-                <div class="card" style="text-align:center;">
+                <div class="card spot" style="text-align:center;">
                     <div class="card-icon" style="margin:0 auto 20px;">
                         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="20" y="25" width="60" height="50" rx="6" fill="#C18A68" />
-                            <path d="M30 60 Q40 40 50 55 Q60 70 70 45" stroke="#000" stroke-width="3" fill="none"
+                            <path class="insul-wave" d="M30 60 Q40 40 50 55 Q60 70 70 45" stroke="#000" stroke-width="3" fill="none"
                                 stroke-linecap="round" />
                             <line x1="20" y1="50" x2="80" y2="50" stroke="#8a6f4e" stroke-width="1"
                                 stroke-dasharray="3,3" />
@@ -1781,14 +1887,16 @@
                     <p data-i18n="feat.card2.desc">A diferencia del Zinc que convierte tu casa en un horno, nuestro
                         polímero denso aísla mejor la temperatura y el ruido.</p>
                 </div>
-                <div class="card" style="text-align:center;">
+                <div class="card spot" style="text-align:center;">
                     <div class="card-icon" style="margin:0 auto 20px;">
                         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <ellipse cx="50" cy="50" rx="30" ry="20" fill="none" stroke="#C18A68" stroke-width="3" />
-                            <path d="M50 30 L50 15" stroke="#C18A68" stroke-width="3" stroke-linecap="round" />
-                            <path d="M50 70 L50 85" stroke="#C18A68" stroke-width="3" stroke-linecap="round" />
-                            <circle cx="50" cy="50" r="8" fill="#C18A68" />
-                            <circle cx="50" cy="50" r="4" fill="#000" />
+                            <g class="light-icon">
+                                <ellipse cx="50" cy="50" rx="30" ry="20" fill="none" stroke="#C18A68" stroke-width="3" />
+                                <path d="M50 30 L50 15" stroke="#C18A68" stroke-width="3" stroke-linecap="round" />
+                                <path d="M50 70 L50 85" stroke="#C18A68" stroke-width="3" stroke-linecap="round" />
+                                <circle cx="50" cy="50" r="8" fill="#C18A68" />
+                                <circle cx="50" cy="50" r="4" fill="#000" />
+                            </g>
                         </svg>
                     </div>
                     <h4 data-i18n="feat.card3.title">Ultra Liviana</h4>
@@ -1993,14 +2101,14 @@
             </p>
 
             <div class="swatch-row fade-in fade-in-d1">
-                <div class="swatch">
+                <div class="swatch active" data-color="grafito" tabindex="0" role="button" aria-pressed="true">
                     <div class="swatch-color star" style="background:#2a2a2a;"></div>
                     <div class="swatch-info">
                         <h4 data-i18n="col.n1">Negro Grafito</h4>
                         <p data-i18n="colors.s1">Color estrella. Nuestra firma.</p>
                     </div>
                 </div>
-                <div class="swatch">
+                <div class="swatch" data-color="basalto" tabindex="0" role="button" aria-pressed="false">
                     <div class="swatch-color" style="background:#6b6b6b;"></div>
                     <div class="swatch-info">
                         <h4 data-i18n="col.n3">Gris Basalto</h4>
@@ -2008,6 +2116,17 @@
                     </div>
                 </div>
             </div>
+
+            <div class="color-preview fade-in fade-in-d2" id="colorPreview" data-active="grafito">
+                <img class="cp-layer" data-color="grafito" src="color-negro-grafito.jpg"
+                    alt="Techo KASTON instalado en Negro Grafito">
+                <img class="cp-layer" data-color="basalto" src="color-gris-basalto.jpg"
+                    alt="Techo KASTON instalado en Gris Basalto">
+                <div class="color-preview-tag" id="colorPreviewTag">Negro Grafito</div>
+            </div>
+            <p class="color-note fade-in fade-in-d2" data-i18n="colors.note">
+                Vista de referencia. El tono final puede variar según la luz del día y la pantalla.
+            </p>
         </div>
     </section>
 
@@ -2017,7 +2136,7 @@
     <section id="especificaciones" style="background:var(--surface-light);">
         <div class="container">
             <div class="section-label fade-in" style="text-align:center;" data-i18n="sp.label">Ingeniería de Materiales</div>
-            <h2 class="fade-in" style="text-align:center;" data-i18n-html="sp.title">Ficha <span class="gold">Técnica Maestra</span><br><span
+            <h2 class="fade-in" style="text-align:center;" data-i18n-html="sp.title">Ficha técnica de nuestro producto <span class="gold">a tu alcance</span><br><span
                     style="font-size:0.6em; color:var(--muted);">(SISTEMA KASTON 8MM)</span></h2>
             <div class="section-divider fade-in" style="margin:24px auto;"></div>
 
@@ -2110,7 +2229,7 @@
                         Solo Tejas (Suministro)</div>
                     <div
                         style="font-size: 3.5rem; font-weight: 700; color: var(--white); font-family: var(--font-heading); line-height:1;">
-                        $85.000 <span style="font-size:1.5rem; color:var(--muted);">COP/m²</span></div>
+                        <span data-i18n="svc.card1.price">$85.000</span> <span style="font-size:1.5rem; color:var(--muted);">COP/m²</span></div>
                     <div style="font-size: 0.95rem; color: var(--light); margin-top: 12px;" data-i18n="svc.card1.note">Te suministramos las tejas KASTON; tú las instalas con nuestro manual.</div>
                 </div>
 
@@ -2121,9 +2240,9 @@
                         Todo Costo (Instalado)</div>
                     <div
                         style="font-size: 3.5rem; font-weight: 700; color: var(--gold); font-family: var(--font-heading); line-height:1;">
-                        $106.623 <span style="font-size:1.5rem; color:var(--muted);">COP/m²</span></div>
+                        <span style="font-size:1.5rem; color:var(--muted); display:block; margin-bottom:4px;" data-i18n="svc.card2.from">Desde</span><span data-i18n="svc.card2.price">$124.500</span> <span style="font-size:1.5rem; color:var(--muted);">COP/m²</span></div>
                     <div style="font-size: 0.95rem; color: var(--light); margin-top: 12px;" data-i18n="svc.card2.note">
-                        Te brindamos la teja y la instalación completa de tu techo.
+                        Te brindamos la teja y la instalación completa de tu techo. El precio final depende de la zona de tu obra: calcúlalo en el cotizador.
                     </div>
                 </div>
             </div>
@@ -2238,50 +2357,6 @@
                 <a href="cotizador.html" class="btn btn-gold"
                     style="font-size:1.1rem; padding:20px 56px; font-weight:700; display:inline-block;"
                     data-i18n="cta.btn">INICIAR COTIZACIÓN TÉCNICA</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================================================
-     VALIDACIÓN DE MERCADO
-     ================================================ -->
-    <section id="validacion" style="background:var(--surface-light);">
-        <div class="container">
-            <div class="section-label fade-in" data-i18n="val.label">Validación de Mercado</div>
-            <h2 class="fade-in" data-i18n-html="val.title">Voice of the <span class="gold">Customer</span></h2>
-            <div class="section-divider fade-in" style="margin:24px auto;"></div>
-
-            <div class="two-col fade-in fade-in-d1" style="margin-top:32px;">
-                <div class="card" style="text-align:center; border-left:3px solid #8a4e4e;">
-                    <h4 style="color:var(--white); margin-bottom:12px;" data-i18n="val.pain.title">El Dolor</h4>
-                    <div
-                        style="font-family:var(--font-heading); font-size:3.5rem; color:#8a4e4e; font-weight:700; line-height:1; margin-bottom:12px;">
-                        8/10</div>
-                    <p style="font-size:0.95rem; color:var(--light); line-height:1.7;" data-i18n-html="val.pain.desc">8
-                        de cada 10 arquitectos coinciden en que la <strong style="color:var(--white);">fragilidad y el
-                            peso del barro</strong> encarecen la obra estructural en un <strong
-                            style="color:#8a4e4e;">30%</strong>.</p>
-                </div>
-                <div class="card" style="text-align:center; border-left:3px solid #6b8a4e;">
-                    <h4 style="color:var(--white); margin-bottom:12px;" data-i18n="val.sol.title">La Solución</h4>
-                    <div
-                        style="font-family:var(--font-heading); font-size:3.5rem; color:#6b8a4e; font-weight:700; line-height:1; margin-bottom:12px;">
-                        100%</div>
-                    <p style="font-size:0.95rem; color:var(--light); line-height:1.7;" data-i18n-html="val.sol.desc">
-                        100% de los entrevistados mostraron <strong style="color:var(--white);">alta intención de
-                            compra</strong> al conocer el Sistema K-LOCK frente a vendavales.</p>
-                </div>
-            </div>
-
-            <div class="fade-in fade-in-d2"
-                style="margin-top:32px; background:var(--surface); border-left:3px solid var(--gold); border-radius:0 12px 12px 0; padding:28px 32px;">
-                <blockquote
-                    style="font-size:1.1rem; font-style:italic; color:var(--light); line-height:1.7; margin-bottom:12px;"
-                    data-i18n="val.quote">
-                    "El sistema de anclaje de KASTON resuelve el mayor miedo de mis clientes en zonas de vientos fuertes
-                    y granizo."
-                </blockquote>
-                <cite style="font-style:normal; font-size:0.85rem; color:var(--gold);" data-i18n="comp.cite">— Arquitecto, Medellín</cite>
             </div>
         </div>
     </section>
@@ -2461,13 +2536,16 @@
                     'svc.card1.label': 'Solo Tejas (Suministro)',
                     'svc.card1.note': 'Te suministramos las tejas KASTON; tú las instalas con nuestro manual.',
                     'svc.card2.label': 'Todo Costo (Instalado)',
-                    'svc.card2.note': 'Te brindamos la teja y la instalación completa de tu techo.',
+                    'svc.card1.price': '$85.000',
+                    'svc.card2.price': '$124.500',
+                    'svc.card2.from': 'Desde',
+                    'svc.card2.note': 'Te brindamos la teja y la instalación completa de tu techo. El precio final depende de la zona de tu obra: calcúlalo en el cotizador.',
                     'svc.feat1.title': 'Requisitos de obra',
                     'svc.feat1.desc': 'Tu estructura debe llegar terminada y con manto asfáltico ya instalado. KASTON no construye estructura ni instala manto: iniciamos la instalación desde ese punto.',
                     'svc.feat2.title': 'Tú eliges cómo instalar',
                     'svc.feat2.desc': 'Con "Solo tejas" instalas por tu cuenta siguiendo el manual; con "Todo costo" lo hacemos nosotros. KASTON responde por la calidad de sus tejas y de su instalación.',
                     'sp.label': 'Ingeniería de Materiales',
-                    'sp.title': 'Ficha <span class="gold">Técnica Maestra</span><br><span style="font-size:0.6em; color:var(--muted);">(SISTEMA KASTON 8MM)</span>',
+                    'sp.title': 'Ficha técnica de nuestro producto <span class="gold">a tu alcance</span><br><span style="font-size:0.6em; color:var(--muted);">(SISTEMA KASTON 8MM)</span>',
                     'sp.units': 'Unidades / m²',
                     'sp.thick': 'Espesor de Blindaje',
                     'sp.unitweight': 'Peso por Unidad',
@@ -2492,7 +2570,6 @@
                     'int.l3': '<strong style="color:var(--gold);">Intervención:</strong> Reparar el manto asfáltico para asegurar la impermeabilización.',
                     'int.l4': '<strong style="color:var(--gold);">Cierre:</strong> Bajar la malla y unir nuevamente los bordes al resto de la estructura.',
                     'int.l5': '<strong style="color:var(--gold);">Reinstalación:</strong> Colocar las tejas originales asegurando el anclaje mecánico.',
-                    'comp.cite': '— Arquitecto, Medellín',
                     'comp.title2': 'Análisis de <span class="gold">Superioridad Técnica</span>',
                     'footer.ig': 'Explora más de KASTON en Instagram',
                     'footer.priv': 'Política de Privacidad',
@@ -2569,6 +2646,7 @@
                     'colors.s1': 'Color estrella. Nuestra firma.',
                     'colors.s2': 'Calidez natural.',
                     'colors.s3': 'Arquitectura moderna.',
+                    'colors.note': 'Vista de referencia. El tono final puede variar según la luz del día y la pantalla.',
                     'colors.s4': 'Integración natural.',
                     'specs.label': 'Especificaciones',
                     'specs.title': 'Ficha <span class="gold">Técnica</span>',
@@ -2594,13 +2672,6 @@
                     'quote.step4.num': 'PASO 4',
                     'quote.step4.title': 'Recibe tu cotización',
                     'quote.step4.desc': 'Descarga el PDF y, si quieres, agenda tu visita técnica por WhatsApp o correo. Crea una cuenta solo si deseas guardar tu proyecto.',
-                    'val.label': 'Validación de Mercado',
-                    'val.title': 'Voice of the <span class="gold">Customer</span>',
-                    'val.pain.title': 'El Dolor',
-                    'val.pain.desc': '8 de cada 10 arquitectos coinciden en que la <strong style="color:var(--white);">fragilidad y el peso del barro</strong> encarecen la obra estructural en un <strong style="color:#8a4e4e;">30%</strong>.',
-                    'val.sol.title': 'La Solución',
-                    'val.sol.desc': '100% de los entrevistados mostraron <strong style="color:var(--white);">alta intención de compra</strong> al conocer el Sistema K-LOCK frente a vendavales.',
-                    'val.quote': '"El sistema de anclaje de KASTON resuelve el mayor miedo de mis clientes en zonas de vientos fuertes y granizo."',
                     'comp.label': '¿Por qué KASTON?',
                     'comp.title': 'Análisis <span class="gold">Competitivo</span>',
                     'comp.th.criteria': 'Criterio',
@@ -2653,13 +2724,16 @@
                     'svc.card1.label': 'Tiles Only (Supply)',
                     'svc.card1.note': 'We supply the KASTON tiles; you install them with our manual.',
                     'svc.card2.label': 'All-Inclusive (Installed)',
-                    'svc.card2.note': 'We provide the tiles and the complete installation of your roof.',
+                    'svc.card1.price': '$85,000',
+                    'svc.card2.price': '$124,500',
+                    'svc.card2.from': 'From',
+                    'svc.card2.note': 'We provide the tiles and the complete installation of your roof. The final price depends on your site zone: work it out in the quoter.',
                     'svc.feat1.title': 'Site requirements',
                     'svc.feat1.desc': 'Your structure must arrive finished and with the asphalt membrane already installed. KASTON does not build structure or install the membrane: we start the installation from there.',
                     'svc.feat2.title': 'You choose how to install',
                     'svc.feat2.desc': 'With "Tiles only" you install yourself following the manual; with "All-inclusive" we do it. KASTON is responsible for the quality of its tiles and its installation.',
                     'sp.label': 'Materials Engineering',
-                    'sp.title': 'Master <span class="gold">Technical Sheet</span><br><span style="font-size:0.6em; color:var(--muted);">(KASTON 8MM SYSTEM)</span>',
+                    'sp.title': 'Our product\'s technical sheet <span class="gold">within your reach</span><br><span style="font-size:0.6em; color:var(--muted);">(KASTON 8MM SYSTEM)</span>',
                     'sp.units': 'Units / m²',
                     'sp.thick': 'Shield Thickness',
                     'sp.unitweight': 'Weight per Unit',
@@ -2684,7 +2758,6 @@
                     'int.l3': '<strong style="color:var(--gold);">Intervention:</strong> Repair the asphalt membrane to ensure waterproofing.',
                     'int.l4': '<strong style="color:var(--gold);">Closing:</strong> Lower the mesh and rejoin the edges to the rest of the structure.',
                     'int.l5': '<strong style="color:var(--gold);">Reinstallation:</strong> Place the original tiles ensuring the mechanical anchoring.',
-                    'comp.cite': '— Architect, Medellín',
                     'comp.title2': '<span class="gold">Technical Superiority</span> Analysis',
                     'footer.ig': 'Explore more of KASTON on Instagram',
                     'footer.priv': 'Privacy Policy',
@@ -2761,6 +2834,7 @@
                     'colors.s1': 'Signature color. Our hallmark.',
                     'colors.s2': 'Natural warmth.',
                     'colors.s3': 'Modern architecture.',
+                    'colors.note': 'Reference view. The final tone may vary with daylight and your screen.',
                     'colors.s4': 'Natural integration.',
                     'specs.label': 'Specifications',
                     'specs.title': 'Technical <span class="gold">Data Sheet</span>',
@@ -2786,13 +2860,6 @@
                     'quote.step4.num': 'STEP 4',
                     'quote.step4.title': 'Get your quote',
                     'quote.step4.desc': 'Download the PDF and, if you want, book your technical visit by WhatsApp or email. Create an account only if you want to save your project.',
-                    'val.label': 'Market Validation',
-                    'val.title': 'Voice of the <span class="gold">Customer</span>',
-                    'val.pain.title': 'The Pain',
-                    'val.pain.desc': '8 out of 10 architects agree that <strong style="color:var(--white);">fragility and weight of clay</strong> increase structural costs by <strong style="color:#8a4e4e;">30%</strong>.',
-                    'val.sol.title': 'The Solution',
-                    'val.sol.desc': '100% of respondents showed <strong style="color:var(--white);">high purchase intent</strong> after learning about the K-LOCK System against strong winds.',
-                    'val.quote': '"KASTON\'s anchoring system solves my clients\' biggest fear in areas with strong winds and hail."',
                     'comp.label': 'Why KASTON?',
                     'comp.title': 'Competitive <span class="gold">Analysis</span>',
                     'comp.th.criteria': 'Criteria',
@@ -3108,6 +3175,59 @@
             } else {
                 setStep(3);
             }
+        })();
+    </script>
+
+    <!-- COLORES: vista previa que cambia con la muestra elegida -->
+    <script>
+        (function () {
+            var preview = document.getElementById('colorPreview');
+            var tag = document.getElementById('colorPreviewTag');
+            if (!preview) return;
+
+            var swatches = Array.prototype.slice.call(document.querySelectorAll('.swatch[data-color]'));
+            if (!swatches.length) return;
+
+            function syncTag(sw) {
+                var name = sw.querySelector('h4');
+                if (tag && name) tag.textContent = name.textContent.trim();
+            }
+
+            function select(sw) {
+                preview.setAttribute('data-active', sw.getAttribute('data-color'));
+                swatches.forEach(function (s) {
+                    var on = s === sw;
+                    s.classList.toggle('active', on);
+                    s.setAttribute('aria-pressed', on ? 'true' : 'false');
+                });
+                syncTag(sw);
+            }
+
+            swatches.forEach(function (sw) {
+                sw.addEventListener('click', function () { select(sw); });
+                sw.addEventListener('mouseenter', function () { select(sw); });
+                sw.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        select(sw);
+                    }
+                });
+            });
+
+            // Mantener la etiqueta al día si se cambia de idioma
+            if ('MutationObserver' in window) {
+                var mo = new MutationObserver(function () {
+                    var active = document.querySelector('.swatch[data-color].active');
+                    if (active) syncTag(active);
+                });
+                swatches.forEach(function (sw) {
+                    var h4 = sw.querySelector('h4');
+                    if (h4) mo.observe(h4, { childList: true, characterData: true, subtree: true });
+                });
+            }
+
+            var initial = document.querySelector('.swatch[data-color].active') || swatches[0];
+            syncTag(initial);
         })();
     </script>
 </body>
