@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KASTON — Cotizador Técnico</title>
+    <title>KASTON | Cotizador Técnico</title>
 
     <!-- Dependencias Externas CND para ejecutar React localmente sin servidor -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -208,7 +208,7 @@
              Hasta 25 km:  85.000 + 54.335,41 × 1,25 = $152.919  →  $153.000
              25 a 60 km:   85.000 + 64.335,41 × 1,25 = $165.419  →  $165.500
 
-           OJO — dos costos que TODAVÍA NO están incluidos: el traslapo de la
+           OJO: dos costos que TODAVÍA NO están incluidos: el traslapo de la
            malla (sube el $6.345,41 si hay solape entre láminas) y el caballete.
            Si entran, hay que recalcular estos precios hacia arriba.
         ───────────────────────────────────────────────────────────────── */
@@ -451,7 +451,7 @@
             const pendienteLabel = pendiente === null || pendiente === undefined
                 ? t.pitchUnknown
                 : `${pendiente}%`;
-            const colorLabel = KASTON_COLORS.find(c => c.id === selectedColor)?.nameEs || '—';
+            const colorLabel = KASTON_COLORS.find(c => c.id === selectedColor)?.nameEs || 'Sin definir';
             const matLabel = MATERIAL_CONSTANTS[material]?.label || material;
 
             /* ── SECCIÓN 1: CONFIGURACIÓN ── */
@@ -459,7 +459,7 @@
             row(t.pdfRoofArea, `${area} ${unit}  (≈ ${areaM2.toFixed(1)} m²)`);
             row(t.pdfConstrType, constructionType);
             if (flow === 'A') row(t.pdfP1TradMat, matLabel);
-            row(t.pdfRoofTypeLabel, activeRoof ? (activeRoof.name) : '—');
+            row(t.pdfRoofTypeLabel, activeRoof ? (activeRoof.name) : 'Sin definir');
             row(t.pdfPendienteLabel, pendienteLabel);
             
             // Render color with a hex block if available
@@ -772,7 +772,7 @@
         }
 
         /* =============================================
-           PHONE INPUT — Prefijo internacional + número
+           PHONE INPUT: Prefijo internacional + número
            ============================================= */
         function PhoneInput({ value, onChange, language, required }) {
             const detect = (v) => {
@@ -807,7 +807,7 @@
         }
 
         /* =============================================
-           COLOR PICKER — Paleta mineral KASTON
+           COLOR PICKER: Paleta mineral KASTON
            ============================================= */
         function ColorPicker({ selectedColor, onSelectColor, language }) {
             const t = T[language] || T['es'];
@@ -837,7 +837,7 @@
         }
 
         /* =============================================
-           ROOF CONFIGURATOR — Aguas + Pendiente
+           ROOF CONFIGURATOR: Aguas + Pendiente
            ============================================= */
         function RoofConfigurator({ selectedType, onSelectType, pendiente, onPendienteChange, language }) {
             const t = T[language] || T['es'];
@@ -900,7 +900,7 @@
                     </div>
 
 
-                    {/* ── Pendiente — OBLIGATORIO ────────────────────── */}
+                    {/* ── Pendiente, OBLIGATORIO ────────────────────── */}
                     {activeRoof?.id !== 'otro' && <div className="border-t border-white/10 pt-5">
                         <div className="flex items-center gap-3 mb-4">
                             <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofPitchTitle}</h3>
@@ -1041,7 +1041,7 @@
                         clientRole:  meta.role        || t.pdfClientUnreg,
                         withObservation: false, includeZincWaiver,
                     }, logoDataUrl);
-                    doc.save(`Cotización Kaston — ${clientName}.pdf`);
+                    doc.save(`Cotización Kaston - ${clientName}.pdf`);
                 } catch (err) {
                     console.error("Error regenerando PDF: ", err);
                     alert(t.pdfGenError);
@@ -1526,6 +1526,12 @@
             const [manualOpen, setManualOpen] = useState(false);
             const [geoStatus, setGeoStatus] = useState('idle'); // idle | asking | denied | error | unsupported
             const [mapaRoto, setMapaRoto] = useState(false);
+            // Búsqueda por dirección / barrio / código postal
+            const [query, setQuery] = useState('');
+            const [buscando, setBuscando] = useState(false);
+            const [resultados, setResultados] = useState(null);
+            const [errorBusqueda, setErrorBusqueda] = useState(null); // 'vacio' | 'fallo' | null
+            const ultimaBusqueda = useRef(0);
             const divRef = useRef(null);
             const mapRef = useRef(null);
             const markerRef = useRef(null);
@@ -1603,6 +1609,50 @@
                 }
             }, [coords]);
 
+            /* Geocodificación con Nominatim (OpenStreetMap): sin API key y gratis.
+               Su política pide máximo 1 consulta por segundo y nada de autocompletar
+               tecla por tecla, por eso es un botón de buscar y no una búsqueda en vivo. */
+            const buscarDireccion = async () => {
+                const q = query.trim();
+                if (q.length < 3 || buscando) return;
+                const ahora = Date.now();
+                if (ahora - ultimaBusqueda.current < 1100) return; // no pasarse del límite de Nominatim
+                ultimaBusqueda.current = ahora;
+
+                setBuscando(true);
+                setErrorBusqueda(null);
+                setResultados(null);
+                try {
+                    const url = 'https://nominatim.openstreetmap.org/search'
+                        + '?format=jsonv2&countrycodes=co&limit=6&addressdetails=1&q=' + encodeURIComponent(q);
+                    const res = await fetch(url, { headers: { 'Accept-Language': language === 'en' ? 'en' : 'es' } });
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const data = await res.json();
+                    if (!Array.isArray(data) || data.length === 0) {
+                        setErrorBusqueda('vacio');
+                    } else if (data.length === 1) {
+                        fijarDesdeResultado(data[0]);
+                    } else {
+                        setResultados(data);
+                    }
+                } catch (err) {
+                    console.error('No se pudo buscar la dirección:', err);
+                    setErrorBusqueda('fallo');
+                } finally {
+                    setBuscando(false);
+                }
+            };
+
+            const fijarDesdeResultado = (r) => {
+                const lat = parseFloat(r.lat), lng = parseFloat(r.lon);
+                if (isNaN(lat) || isNaN(lng)) { setErrorBusqueda('fallo'); return; }
+                setResultados(null);
+                setErrorBusqueda(null);
+                setQuery(r.display_name || query);
+                onPickRef.current(lat, lng, 'direccion');
+                if (mapRef.current) mapRef.current.setView([lat, lng], 14);
+            };
+
             const usarGPS = () => {
                 if (!navigator.geolocation) { setGeoStatus('unsupported'); return; }
                 setGeoStatus('asking');
@@ -1630,6 +1680,45 @@
                     </div>
 
                     <p className="text-xs text-white/70 leading-relaxed">{mapaRoto ? t.geoWhyNoMap : t.geoWhy}</p>
+
+                    {/* Buscar por dirección, barrio o código postal */}
+                    {!mapaRoto && (
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[10px] text-white/40 uppercase tracking-widest">{t.geoSearchLabel}</label>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                                <input
+                                    type="text"
+                                    value={query}
+                                    onChange={(e) => { setQuery(e.target.value); setErrorBusqueda(null); }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); buscarDireccion(); } }}
+                                    placeholder={t.geoSearchPlaceholder}
+                                    className="flex-1 min-w-0 bg-black/40 border border-white/15 focus:border-bronze focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 transition-colors"
+                                />
+                                <button onClick={buscarDireccion} disabled={buscando || query.trim().length < 3}
+                                    className={`flex-shrink-0 px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all ${buscando || query.trim().length < 3 ? 'opacity-40 cursor-not-allowed bg-white/5 border border-white/10 text-white/40' : 'bg-bronze border border-bronze text-graphite hover:bg-white cursor-pointer'}`}>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    {buscando ? t.geoSearching : t.geoSearchBtn}
+                                </button>
+                            </div>
+
+                            {errorBusqueda === 'vacio' && <p className="text-xs text-amber-400/90 leading-relaxed">{t.geoSearchEmpty}</p>}
+                            {errorBusqueda === 'fallo' && <p className="text-xs text-amber-400/90 leading-relaxed">{t.geoSearchFail}</p>}
+
+                            {resultados && resultados.length > 0 && (
+                                <div className="flex flex-col gap-1.5 border border-white/10 rounded-xl p-2 bg-black/30">
+                                    <div className="text-[10px] text-white/40 uppercase tracking-widest px-2 pt-1">{t.geoSearchResults}</div>
+                                    {resultados.map((r, i) => (
+                                        <button key={r.place_id || i} onClick={() => fijarDesdeResultado(r)}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg border border-transparent hover:border-bronze/50 hover:bg-bronze/10 transition-all cursor-pointer">
+                                            <span className="text-xs text-white/80 leading-snug block">{r.display_name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            <p className="text-[10px] text-white/30">{t.geoSearchHint}</p>
+                        </div>
+                    )}
 
                     {!mapaRoto && (
                         <>
@@ -1663,6 +1752,7 @@
                                 <div className="text-[11px] text-white/45">{t.geoDistance} {km} km {t.geoFromPlant}</div>
                             )}
                             {source === 'manual' && <div className="text-[11px] text-white/45">{t.geoManualUsed}</div>}
+                            {source === 'direccion' && <div className="text-[11px] text-white/45">{t.geoAddressUsed}</div>}
                             <p className="text-xs text-white/60 leading-relaxed mt-1">{esLejana ? t.geoLejanaNote : t.geoZoneNote}</p>
                         </div>
                     )}
@@ -1708,7 +1798,7 @@
             const [pendiente, setPendiente] = useState(editingProject ? (editingProject.pendiente !== undefined ? editingProject.pendiente : null) : undefined);
             const [selectedColor, setSelectedColor] = useState(editingProject ? (editingProject.selectedColor || null) : null);
 
-            /* Ubicación de la obra — solo se usa en la modalidad "todo costo",
+            /* Ubicación de la obra: solo se usa en la modalidad "todo costo",
                porque ahí el precio cambia según lo que cobre el instalador por la distancia. */
             const [obraCoords, setObraCoords] = useState(editingProject ? (editingProject.obraCoords || null) : null);
             const [geoKm, setGeoKm] = useState(editingProject ? (editingProject.geoKm ?? null) : null);
@@ -1810,7 +1900,7 @@
                         clientRole:  meta.role        || t.pdfClientUnreg,
                         withObservation, includeZincWaiver: false,
                     }, logoDataUrl);
-                    doc.save(`Cotización Kaston — ${clientName}.pdf`);
+                    doc.save(`Cotización Kaston - ${clientName}.pdf`);
                     setIsPdfDownloaded(true);
                 } catch (err) {
                     console.error("Error durante el proceso:", err);
@@ -2092,7 +2182,7 @@
                         </div>
                     </div>
 
-                    {/* Inversión estimada — en "todo costo" depende de la zona resuelta arriba */}
+                    {/* Inversión estimada: en "todo costo" depende de la zona resuelta arriba */}
                     {zonaFueraDeCobertura ? (
                         <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-white/20 bg-white/5 relative overflow-hidden mt-2 gap-4">
                             <h3 className="text-xl tracking-tight text-white uppercase font-semibold text-center">{t.zoneOutTitle}</h3>
@@ -2619,7 +2709,7 @@
                 });
                 window.google.accounts.id.prompt((notification) => {
                     if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        // One Tap no disponible — mostrar botón oficial de Google
+                        // One Tap no disponible, mostrar botón oficial de Google
                         setLoading(false);
                         setShowGoogleBtn(true);
                         setTimeout(() => {
@@ -2810,7 +2900,7 @@
                                     ))}
                                 </div>
 
-                                {/* Step 1 — Identidad */}
+                                {/* Step 1: Identidad */}
                                 {step === 1 && (
                                     <div className="flex flex-col gap-4">
                                         <div>
@@ -2869,7 +2959,7 @@
                                     </div>
                                 )}
 
-                                {/* Step 2 — Foto */}
+                                {/* Step 2: Foto */}
                                 {step === 2 && (
                                     <div className="flex flex-col items-center gap-6">
                                         <p className="text-white/40 text-sm text-center">{isEs ? 'Sube una foto clara de tu rostro para identificación corporativa.' : 'Upload a clear face photo for corporate identification.'}</p>
@@ -2906,7 +2996,7 @@
                                     </div>
                                 )}
 
-                                {/* Step 3 — Acceso */}
+                                {/* Step 3: Acceso */}
                                 {step === 3 && (
                                     <div className="flex flex-col gap-4">
                                         {/* Acceso rápido con OAuth en el paso de credenciales */}
@@ -2984,9 +3074,9 @@
                 welcomeTag: "Cotizador Técnico KASTON",
                 welcomeTitle: "¡Hola! Te damos la bienvenida al Cotizador Técnico de KASTON.",
                 welcomeBody: "Queremos que el proceso de cotizar tu proyecto sea lo más sencillo, transparente y rápido posible. Diseñamos esta herramienta para que funcione como nuestro primer filtro de ahorro de tiempo: tú nos compartes lo que ya conoces de tu espacio y nosotros avanzamos de inmediato. Así, cuando programemos tu visita técnica presencial, iremos directo al grano para concluir los detalles finales de tu instalación sin hacerte perder tiempo en papeleos previos.",
-                welcomeAccept: "Lo acepto — entrar al cotizador",
-                welcomeDecline: "No acepto — regresar al sitio",
-                formIncompleteHint: "Completa el área de tu proyecto —y, en todo costo, marca tu obra en el mapa— para habilitar la descarga del PDF.",
+                welcomeAccept: "Lo acepto, entrar al cotizador",
+                welcomeDecline: "No acepto, regresar al sitio",
+                formIncompleteHint: "Completa el área de tu proyecto y, en todo costo, marca tu obra en el mapa, para habilitar la descarga del PDF.",
                 routeA: "Solo tejas",
                 routeASub: "$85.000 / m² · suministro",
                 routeADesc: "Te suministramos las tejas KASTON y tú te encargas de instalarlas con la ayuda de nuestro manual, que te explica el paso a paso.",
@@ -3015,14 +3105,23 @@
                 geoDenied: "No nos diste permiso para ver tu ubicación. Puedes marcar tu obra tocando el mapa, o activar el permiso en tu navegador e intentar de nuevo.",
                 geoError: "No pudimos leer tu ubicación. Marca tu obra tocando el mapa o intenta de nuevo.",
                 geoUnsupported: "Tu navegador no permite compartir la ubicación. Marca tu obra tocando el mapa.",
-                geoManualLink: "Prefiero elegir mi zona a mano",
+                geoManualLink: "No encuentro mi obra · elegir la zona a mano",
+                geoSearchLabel: "Busca tu obra por dirección",
+                geoSearchPlaceholder: "Dirección, barrio, municipio o código postal",
+                geoSearchBtn: "Buscar",
+                geoSearching: "Buscando…",
+                geoSearchResults: "¿Cuál es tu obra?",
+                geoSearchEmpty: "No encontramos ese lugar. Intenta agregando el municipio (por ejemplo: \"Calle 30 #45-12, Envigado\") o marca el punto directo en el mapa.",
+                geoSearchFail: "No pudimos buscar en este momento. Marca tu obra tocando el mapa.",
+                geoSearchHint: "También puedes tocar el mapa directamente o arrastrar el pin para ajustarlo.",
+                geoAddressUsed: "Ubicación encontrada por la dirección que escribiste",
                 geoManualTitle: "Elige tu zona",
                 geoManualUsed: "Zona elegida por ti, sin marcar el mapa",
                 geoChange: "Cambiar",
                 geoDistance: "A",
                 geoZoneNote: "El precio de abajo ya incluye lo que cobra el instalador por llegar hasta tu zona. El transporte de las tejas hasta la obra se cobra aparte.",
                 geoLejanaNote: "Tu obra queda fuera de nuestras zonas con precio automático. Escríbenos y te armamos la cotización con el valor real del desplazamiento.",
-                geoPrivacy: "Solo usamos el punto que marcas para calcular la distancia a nuestra planta. No lo guardamos en nuestros servidores ni lo compartimos con nadie.",
+                geoPrivacy: "Solo usamos el punto que marcas para calcular la distancia a nuestra planta: no lo guardamos en nuestros servidores. Si buscas por dirección, el texto que escribes se consulta en OpenStreetMap para ubicarlo en el mapa.",
                 zoneMetro: "Área metropolitana · hasta 25 km",
                 zoneAfueras: "Afueras · entre 25 y 60 km",
                 zoneLejana: "Fuera de nuestras zonas con precio automático",
@@ -3033,7 +3132,7 @@
                 zoneOutTitle: "Tu obra necesita cotización personalizada",
                 zoneOutBody: "Estás fuera de las zonas donde podemos calcular el precio automáticamente. Escríbenos y en poco tiempo te pasamos el valor exacto para tu obra, con el desplazamiento del instalador incluido.",
                 zoneOutWhatsapp: "¡Hola! Quiero cotizar mi techo en modalidad todo costo, pero mi obra queda fuera del área metropolitana y del Oriente. ¿Me ayudan con el precio?",
-                zoneOutMailSubject: "Cotización todo costo — obra fuera de cobertura",
+                zoneOutMailSubject: "Cotización todo costo: obra fuera de cobertura",
                 pdfZoneLabel: "Zona de instalación:",
                 manualNote: "Con tu compra recibirás un manual de instalación detallado paso a paso.",
                 supplyPriceNote: "En esta modalidad el precio es el mismo estés donde estés: $85.000/m². No cambia por tu ubicación porque el transporte no va incluido, se cobra aparte según a dónde haya que llevar las tejas.",
@@ -3235,7 +3334,7 @@
                 pitchKnown: "Conozco la pendiente",
                 pitchUnknown: "No lo sé, me gustaría asesorarme y conocerla",
                 pitchUnit: "% Pendiente",
-                pitchRange: "Mínimo 15% — Máximo 100%",
+                pitchRange: "Mínimo 15%, máximo 100%",
                 pitchMinTitle: "Pendiente Mínima",
                 pitchMinDesc: "El mínimo es de 15% para la fluidez del agua",
                 pitchMinError: "La pendiente mínima es 15% para garantizar la escorrentía del agua.",
@@ -3246,7 +3345,7 @@
                 roofTypeReq: "Selecciona el tipo de techo para continuar",
                 roofTypeChosen: "Elegiste:",
                 roofTypeRequired: "Debes seleccionar el tipo de techo (aguas) antes de guardar el proyecto.",
-                specialRoofTitle: "Diseño Personalizado — Asesoría Sin Costo",
+                specialRoofTitle: "Diseño Personalizado: Asesoría Sin Costo",
                 specialRoofAdvisory: "¡Tu techo suena único! Para estructuras con diseños arquitectónicos especiales, preferimos darte una asesoría completamente personalizada. Déjanos tus datos al finalizar y un ingeniero de nuestro equipo te contactará directamente para evaluar tu estructura mediante una visita técnica sin costo.",
                 colorLabel: "Color de Teja Deseado",
                 pdfRoofTypeLabel: "Tipo de Techo:",
@@ -3287,9 +3386,9 @@
                 welcomeTag: "KASTON Technical Quoter",
                 welcomeTitle: "Hello! Welcome to KASTON's Technical Quoter.",
                 welcomeBody: "We want the process of quoting your project to be as simple, transparent, and fast as possible. We designed this tool as our first time-saving filter: you share what you already know about your space and we move forward immediately. When we schedule your in-person technical visit, we'll go straight to the point to finalize installation details without wasting your time on paperwork.",
-                welcomeAccept: "I accept — enter the quoter",
-                welcomeDecline: "I don't accept — go back to site",
-                formIncompleteHint: "Complete your project area —and, for all-inclusive, mark your site on the map— to enable the PDF download.",
+                welcomeAccept: "I accept, enter the quoter",
+                welcomeDecline: "I don't accept, go back to site",
+                formIncompleteHint: "Complete your project area and, for all-inclusive, mark your site on the map, to enable the PDF download.",
                 routeA: "Tiles only",
                 routeASub: "$85,000 / m² · supply",
                 routeADesc: "We supply the KASTON tiles and you install them with the help of our step-by-step manual.",
@@ -3318,14 +3417,23 @@
                 geoDenied: "You didn't allow us to see your location. You can mark your site by tapping the map, or enable the permission in your browser and try again.",
                 geoError: "We couldn't read your location. Mark your site by tapping the map or try again.",
                 geoUnsupported: "Your browser doesn't support sharing your location. Mark your site by tapping the map.",
-                geoManualLink: "I'd rather pick my zone manually",
+                geoManualLink: "I can't find my site · pick the zone manually",
+                geoSearchLabel: "Find your site by address",
+                geoSearchPlaceholder: "Address, neighborhood, town or postal code",
+                geoSearchBtn: "Search",
+                geoSearching: "Searching…",
+                geoSearchResults: "Which one is your site?",
+                geoSearchEmpty: "We couldn't find that place. Try adding the town (for example: \"Calle 30 #45-12, Envigado\") or mark the spot directly on the map.",
+                geoSearchFail: "We couldn't search right now. Mark your site by tapping the map.",
+                geoSearchHint: "You can also tap the map directly or drag the pin to fine-tune it.",
+                geoAddressUsed: "Location found from the address you typed",
                 geoManualTitle: "Pick your zone",
                 geoManualUsed: "Zone picked by you, without marking the map",
                 geoChange: "Change",
                 geoDistance: "At",
                 geoZoneNote: "The price below already includes what the installer charges to reach your zone. Shipping the tiles to the site is charged separately.",
                 geoLejanaNote: "Your site is outside our automatic-pricing zones. Message us and we'll quote it with the real travel cost.",
-                geoPrivacy: "We only use the point you mark to measure the distance to our plant. We don't store it on our servers or share it with anyone.",
+                geoPrivacy: "We only use the point you mark to measure the distance to our plant. We don't store it on our servers. If you search by address, the text you type is looked up on OpenStreetMap to place it on the map.",
                 zoneMetro: "Metropolitan area · up to 25 km",
                 zoneAfueras: "Outskirts · 25 to 60 km",
                 zoneLejana: "Outside our automatic-pricing zones",
@@ -3336,10 +3444,10 @@
                 zoneOutTitle: "Your site needs a custom quote",
                 zoneOutBody: "You're outside the zones where we can price automatically. Message us and we'll send you the exact figure for your site, installer travel included.",
                 zoneOutWhatsapp: "Hi! I want an all-inclusive quote for my roof, but my site is outside the metropolitan area and Eastern Antioquia. Can you help me with the price?",
-                zoneOutMailSubject: "All-inclusive quote — site outside coverage",
+                zoneOutMailSubject: "All-inclusive quote: site outside coverage",
                 pdfZoneLabel: "Installation zone:",
                 manualNote: "With your purchase you'll receive a detailed step-by-step installation manual.",
-                supplyPriceNote: "In this option the price is the same wherever you are: $85,000/m². It doesn't change with your location because shipping isn't included — it's charged separately based on where the tiles need to go.",
+                supplyPriceNote: "In this option the price is the same wherever you are: $85,000/m². It doesn't change with your location because shipping isn't included; it's charged separately based on where the tiles need to go.",
                 specialTitle: "Special architectural design",
                 specialBody: "Your roof sounds unique! For special designs we prefer personalized advice. Leave your details and an engineer will contact you for a free technical visit.",
                 tilesNeeded: "Tiles needed",
@@ -3536,9 +3644,9 @@
                 mandatory: "Required",
                 optional: "Optional",
                 pitchKnown: "I know the pitch",
-                pitchUnknown: "I don't know — I'd like advice on this",
+                pitchUnknown: "I don't know, I'd like advice on this",
                 pitchUnit: "% Pitch",
-                pitchRange: "Min 15% — Max 100%",
+                pitchRange: "Min 15%, max 100%",
                 pitchMinTitle: "Minimum Pitch",
                 pitchMinDesc: "Minimum 15% pitch is required for proper water runoff",
                 pitchMinError: "Minimum pitch is 15% to ensure water drainage.",
@@ -3549,14 +3657,14 @@
                 roofTypeReq: "Select a roof type to continue",
                 roofTypeChosen: "You chose:",
                 roofTypeRequired: "You must select a roof type before saving the project.",
-                specialRoofTitle: "Custom Design — Free Technical Consultation",
+                specialRoofTitle: "Custom Design: Free Technical Consultation",
                 specialRoofAdvisory: "Your roof sounds unique! For structures with special architectural designs, we prefer to give you a fully personalized consultation. Leave your details at the end and one of our engineers will contact you directly to evaluate your structure through a no-cost technical site visit.",
                 colorLabel: "Desired Tile Color",
                 pdfRoofTypeLabel: "Roof Type:",
                 pdfPendienteLabel: "Pitch:",
                 pdfColorLabel: "Selected Color:",
                 pdfConstrType: "Construction Type:",
-                colorTooltipTitle: "Color Variation — Recovered Polymer",
+                colorTooltipTitle: "Color Variation: Recovered Polymer",
                 colorTooltipDesc: "When manufacturing with recovered polymer (high-strength recycled plastics), the final real tone will be as close as possible to the render shown, but may present natural variations based on the material mix in each production batch. This does not affect the product's technical properties.",
                 awaitConfirm: "Registration successful! Please check your inbox to confirm your account before logging in.",
                 selectImg: "Select image",
@@ -3609,7 +3717,7 @@
                     };
                 };
 
-                // 1. onAuthStateChange primero — captura el SIGNED_IN del redirect OAuth
+                // 1. onAuthStateChange primero, captura el SIGNED_IN del redirect OAuth
                 const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
                     setSession(session);
                     setAuthChecked(true);
@@ -3617,7 +3725,7 @@
                     if (session) setExtraData(prev => normalizeExtra(session, prev));
                 });
 
-                // 2. getSession sin timeout — deja que Supabase procese el código OAuth de la URL
+                // 2. getSession sin timeout, deja que Supabase procese el código OAuth de la URL
                 supabase.auth.getSession()
                     .then(({ data: { session } }) => {
                         setSession(session);
