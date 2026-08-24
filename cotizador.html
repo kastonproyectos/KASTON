@@ -15,6 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Leaflet: mapa para que el cliente marque dónde queda su obra (tiles de CARTO/OpenStreetMap, sin API key) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
         tailwind.config = {
@@ -182,6 +185,85 @@
         const KASTON_UNITS_PER_M2 = 42; // Fijo 42 uds por m2
         const KASTON_UNITS_PER_FT2 = 3.90; // 42 / 10.7639
 
+        /* ─────────────────────────────────────────────────────────────
+           PRECIOS POR m²  ·  actualizado agosto 2026
+           ─────────────────────────────────────────────────────────────
+           SOLO TEJA: precio único, no depende de la ubicación.
+             Costo: teja 42 × $1.073 = $45.066 + costal $210 = $45.276/m²
+             Venta: $85.000/m²  →  margen ~47%
+
+           TODO COSTO: se arma sumando, no aplicando un markup al costo.
+           La teja entra al PRECIO DE VENTA de $85.000 (no a costo): si el
+           cliente que solo compra teja paga ese margen, el de todo costo
+           también. Encima va la instalación con su propio margen.
+
+             teja, a precio de venta ..... $85.000,00   (ya trae su margen y el costal)
+             insumos de instalación ......  $9.335,41   (malla $6.345,41 + alambre $2.500
+                                                         + grapas $300 + silicona $190;
+                                                         el costal NO se repite acá)
+             instalador ..... $45.000 hasta 25 km · $55.000 de 25 a 60 km
+             ────────────────────────────────────────────────────────────
+             + 25% de margen sobre (insumos + instalador)
+
+             Hasta 25 km:  85.000 + 54.335,41 × 1,25 = $152.919  →  $153.000
+             25 a 60 km:   85.000 + 64.335,41 × 1,25 = $165.419  →  $165.500
+
+           OJO — dos costos que TODAVÍA NO están incluidos: el traslapo de la
+           malla (sube el $6.345,41 si hay solape entre láminas) y el caballete.
+           Si entran, hay que recalcular estos precios hacia arriba.
+        ───────────────────────────────────────────────────────────────── */
+        const PRECIO_SOLO_TEJA_M2 = 85000;
+
+        // Origen para medir la distancia: planta de producción KASTON, Itagüí (Antioquia).
+        // Si la planta se muda, cambiar estas coordenadas y todo lo demás se ajusta solo.
+        const KASTON_ORIGEN = { lat: 6.1719, lng: -75.6114 };
+
+        // Las zonas se evalúan en orden: gana la primera cuyo maxKm alcance.
+        const ZONAS_TODO_COSTO = [
+            {
+                id: 'metro',
+                maxKm: 25,
+                instalador: 45000,
+                costoM2: 99611.41,   // lo que REALMENTE pagas: teja $45.066 + insumos $9.545,41 + instalador
+                precioM2: 153000     // 85.000 + (9.335,41 + 45.000) × 1,25  →  te quedan $53.389/m²
+            },
+            {
+                id: 'afueras',
+                maxKm: 60,
+                instalador: 55000,
+                costoM2: 109611.41,  // lo que REALMENTE pagas: teja $45.066 + insumos $9.545,41 + instalador
+                precioM2: 165500     // 85.000 + (9.335,41 + 55.000) × 1,25  →  te quedan $55.889/m²
+            },
+            {
+                id: 'lejana',
+                maxKm: Infinity,
+                instalador: null,
+                costoM2: null,
+                precioM2: null       // sin precio automático: pasa a un asesor
+            }
+        ];
+
+        // Fuera de este radio ya no cotizamos solos: lo ve un asesor.
+        const RADIO_AFUERAS_KM = 60;
+
+        // Distancia en línea recta (Haversine) entre la planta y la obra, en km.
+        const distanciaDesdePlanta = (lat, lng) => {
+            const R = 6371;
+            const rad = d => d * Math.PI / 180;
+            const dLat = rad(lat - KASTON_ORIGEN.lat);
+            const dLng = rad(lng - KASTON_ORIGEN.lng);
+            const a = Math.sin(dLat / 2) ** 2 +
+                      Math.cos(rad(KASTON_ORIGEN.lat)) * Math.cos(rad(lat)) * Math.sin(dLng / 2) ** 2;
+            return 2 * R * Math.asin(Math.sqrt(a));
+        };
+
+        const zonaPorId = id => ZONAS_TODO_COSTO.find(z => z.id === id) || null;
+
+        const zonaPorPunto = (lat, lng) => {
+            const km = distanciaDesdePlanta(lat, lng);
+            return ZONAS_TODO_COSTO.find(z => km <= z.maxKm) || ZONAS_TODO_COSTO[ZONAS_TODO_COSTO.length - 1];
+        };
+
         const MATERIAL_CONSTANTS = {
             clay: { label: 'Teja de Barro', weight: 44.5, color: '#bd533b' },
             cement: { label: 'Teja de Fibrocemento', weight: 13.0, color: '#8da399' },
@@ -276,7 +358,8 @@
                 flow, area, unit, areaM2, material, currency, metrics, modality,
                 roofType, pendiente, selectedColor, constructionType,
                 clientName, clientPhone, clientDoc, clientRole,
-                withObservation, includeZincWaiver, t, isSpecialDesign, roofPngUrl, selectedColorHex
+                withObservation, includeZincWaiver, t, isSpecialDesign, roofPngUrl, selectedColorHex,
+                zone, geoKm
             } = data;
 
             const C = {
@@ -459,7 +542,20 @@
                 doc.setFontSize(7.5);
                 doc.setTextColor(...C.dim);
                 doc.text(invLabel, col1 + 4, y);
-                y += 7;
+                y += 4.5;
+                const tarifaM2 = modality === 'full' ? metrics.tarifaTodoCosto : PRECIO_SOLO_TEJA_M2;
+                if (tarifaM2) {
+                    const tarifaConv = currency === 'COP' ? tarifaM2 : tarifaM2 * (exchangeRates[currency] || 1);
+                    doc.text(`${sym} ${formatCurrency(tarifaConv, currency)} / m2`, col1 + 4, y);
+                    y += 4.5;
+                }
+                // La zona solo aparece en todo costo: es lo que explica la tarifa del instalador.
+                if (modality === 'full' && zone) {
+                    const zonaLbl = zone.id === 'metro' ? t.zoneMetro : (zone.id === 'afueras' ? t.zoneAfueras : t.zoneLejana);
+                    doc.text(`${t.pdfZoneLabel} ${zonaLbl}${geoKm !== null && geoKm !== undefined ? ` (~${geoKm} km)` : ''}`, col1 + 4, y);
+                    y += 4.5;
+                }
+                y += 2.5;
                 row(t.pdfUpcycledTitle, `${metrics.plasticUpcycled.toFixed(1)} kg`);
                 row(t.pdfCO2RedTitle,   `${metrics.co2Reduced.toFixed(1)} kg`);
                 divider();
@@ -520,7 +616,7 @@
             }).replace(/,/g, '.');
         };
 
-        const calculateMetrics = (m2, materialType = 'clay', currency = 'COP', rates = exchangeRates) => {
+        const calculateMetrics = (m2, materialType = 'clay', currency = 'COP', rates = exchangeRates, zone = null) => {
             const units = m2 * KASTON_UNITS_PER_M2; // Sin margen de desperdicio 3%
             const selectedMaterial = MATERIAL_CONSTANTS[materialType] || MATERIAL_CONSTANTS.clay;
             const traditionalWeight = m2 * selectedMaterial.weight;
@@ -528,15 +624,14 @@
             const weightSavedKg = traditionalWeight - kastonWeight;
             const weightSavedTons = weightSavedKg / 1000;
 
-            const T_Kaston_m2 = 85000;
-            const TEJA_kaston_todo_Costo = 106623;
+            // La teja sola tiene precio único; el todo costo depende de la zona de la obra.
+            const tarifaTodoCosto = zone && zone.precioM2 ? zone.precioM2 : null;
 
-            let costOnlyTejaCOP = m2 * T_Kaston_m2;
-            let costTodoCostoCOP = m2 * TEJA_kaston_todo_Costo;
-
+            let costOnlyTejaCOP = m2 * PRECIO_SOLO_TEJA_M2;
             let rate = rates[currency] || 1;
             let finalCostOnlyTeja = costOnlyTejaCOP * rate;
-            let finalCostTodoCosto = costTodoCostoCOP * rate;
+            // null = zona sin precio automático (más de 60 km): la cotiza un asesor.
+            let finalCostTodoCosto = tarifaTodoCosto === null ? null : m2 * tarifaTodoCosto * rate;
 
             const plasticUpcycled = m2 * 12.6;
             const co2Reduced = m2 * 18.5;
@@ -545,7 +640,8 @@
                 units: Math.ceil(units),
                 weightSavedTons: Number(weightSavedTons.toFixed(2)),
                 finalCost: Number(finalCostOnlyTeja.toFixed(2)),
-                finalCostTodoCosto: Number(finalCostTodoCosto.toFixed(2)),
+                finalCostTodoCosto: finalCostTodoCosto === null ? null : Number(finalCostTodoCosto.toFixed(2)),
+                tarifaTodoCosto,
                 plasticUpcycled: Number(plasticUpcycled.toFixed(1)),
                 co2Reduced: Number(co2Reduced.toFixed(1))
             };
@@ -762,13 +858,20 @@
                             <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 relative">
-                            {ROOF_TYPES.map(rt => (
+                            {ROOF_TYPES.map(rt => {
+                                const elegido = selectedType === rt.id;
+                                // Con una elegida, las demás se apagan para que la escogida cante sola.
+                                const apagada = Boolean(selectedType) && !elegido;
+                                return (
                                 <button key={rt.id}
                                     onClick={() => onSelectType(rt.id)}
                                     className={`relative flex flex-col justify-between h-full text-center items-center p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer gap-2
-                                        ${selectedType === rt.id
-                                            ? 'border-[#4E5154] bg-[#4E5154]/20 shadow-md shadow-black/40'
-                                            : 'border-white/10 bg-white/5 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20'}`}>
+                                        ${elegido
+                                            ? 'border-bronze bg-bronze/15 scale-[1.03] shadow-[0_0_22px_rgba(193,138,104,0.3)]'
+                                            : `border-white/10 bg-white/5 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20 ${apagada ? 'opacity-40 hover:opacity-100' : ''}`}`}>
+                                    {elegido && (
+                                        <span className="absolute top-1 left-1 z-10 w-5 h-5 rounded-full bg-bronze text-graphite flex items-center justify-center text-[11px] font-black shadow-md">&#10003;</span>
+                                    )}
                                     <div className="absolute top-1 right-1 z-10" onClick={(e) => e.stopPropagation()}>
                                         <InfoTooltip title={language === 'en' ? rt.nameEn : rt.name} description={language === 'en' ? rt.descEn : rt.description} />
                                     </div>
@@ -781,16 +884,17 @@
                                             </div>
                                         )}
                                     </div>
-                                    <span className={`text-[10px] mt-auto font-bold tracking-wide text-center leading-tight w-full ${selectedType === rt.id ? 'text-white' : 'text-white/60'}`}>
+                                    <span className={`text-[10px] mt-auto font-bold tracking-wide text-center leading-tight w-full ${elegido ? 'text-bronze' : 'text-white/60'}`}>
                                         {language === 'en' ? rt.nameEn : rt.name}
                                     </span>
                                 </button>
-                            ))}
+                                );
+                            })}
                         </div>
                         <div className="mt-3 min-h-[16px]">
                             {!selectedType
                                 ? <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.roofTypeReq}</p>
-                                : <p className="text-[10px] text-bronze/60 uppercase tracking-widest">{language === 'en' ? activeRoof?.nameEn : activeRoof?.name}</p>
+                                : <p className="text-[10px] text-bronze uppercase tracking-widest font-bold">&#10003; {t.roofTypeChosen} {language === 'en' ? activeRoof?.nameEn : activeRoof?.name}</p>
                             }
                         </div>
                     </div>
@@ -1412,6 +1516,180 @@
             );
         }
 
+        /* Mapa para que el cliente marque dónde queda su obra. De ahí sale la distancia
+           a la planta y, con ella, la zona y lo que cobra el instalador.
+           Tres formas de fijarla, de más a menos precisa: tocar el mapa, usar el GPS
+           del dispositivo (solo centra y suelta el pin, el cliente puede corregirlo),
+           o elegir la zona a mano si el mapa no carga. Nunca se bloquea la cotización. */
+        function UbicacionObra({ language, zone, km, source, coords, onPick, onManual, onReset }) {
+            const t = T[language] || T['es'];
+            const [manualOpen, setManualOpen] = useState(false);
+            const [geoStatus, setGeoStatus] = useState('idle'); // idle | asking | denied | error | unsupported
+            const [mapaRoto, setMapaRoto] = useState(false);
+            const divRef = useRef(null);
+            const mapRef = useRef(null);
+            const markerRef = useRef(null);
+            const onPickRef = useRef(onPick);
+            onPickRef.current = onPick;
+
+            const zonaNombre = { metro: t.zoneMetro, afueras: t.zoneAfueras, lejana: t.zoneLejana };
+
+            const pinObra = () => window.L.divIcon({
+                className: '',
+                html: '<div style="width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#C18A68;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.6)"></div>',
+                iconSize: [26, 26], iconAnchor: [13, 26]
+            });
+
+            // Monta el mapa una sola vez.
+            useEffect(() => {
+                if (!window.L) { setMapaRoto(true); return; }
+                if (!divRef.current || mapRef.current) return;
+                const L = window.L;
+                try {
+                    const map = L.map(divRef.current, { scrollWheelZoom: false, attributionControl: true })
+                                 .setView([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], 9);
+
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; OpenStreetMap &copy; CARTO',
+                        subdomains: 'abcd', maxZoom: 19
+                    }).addTo(map);
+
+                    // Anillos: hasta 25 km es área metropolitana; hasta 60 km, afueras.
+                    L.circle([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], {
+                        radius: RADIO_AFUERAS_KM * 1000, color: '#C18A68', weight: 1,
+                        dashArray: '6 6', fillColor: '#C18A68', fillOpacity: 0.04, interactive: false
+                    }).addTo(map);
+                    L.circle([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], {
+                        radius: ZONAS_TODO_COSTO[0].maxKm * 1000, color: '#C18A68', weight: 1.5,
+                        fillColor: '#C18A68', fillOpacity: 0.16, interactive: false
+                    }).addTo(map);
+
+                    L.marker([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], {
+                        icon: L.divIcon({
+                            className: '',
+                            html: '<div style="width:22px;height:22px;border-radius:4px;background:#0D0D0D;border:2px solid #C18A68;color:#C18A68;font:700 11px/18px Arial;text-align:center">K</div>',
+                            iconSize: [22, 22], iconAnchor: [11, 11]
+                        })
+                    }).addTo(map).bindTooltip(t.geoPlant);
+
+                    map.on('click', e => onPickRef.current(e.latlng.lat, e.latlng.lng, 'mapa'));
+                    mapRef.current = map;
+                    setTimeout(() => map.invalidateSize(), 120);
+                } catch (err) {
+                    console.error('No se pudo montar el mapa:', err);
+                    setMapaRoto(true);
+                }
+                return () => {
+                    if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; markerRef.current = null; }
+                };
+            }, []);
+
+            // Mantiene el pin sincronizado con las coordenadas elegidas.
+            useEffect(() => {
+                const map = mapRef.current;
+                if (!map || !window.L) return;
+                if (!coords) {
+                    if (markerRef.current) { map.removeLayer(markerRef.current); markerRef.current = null; }
+                    return;
+                }
+                if (!markerRef.current) {
+                    markerRef.current = window.L.marker([coords.lat, coords.lng], { draggable: true, icon: pinObra() }).addTo(map);
+                    markerRef.current.on('dragend', ev => {
+                        const pos = ev.target.getLatLng();
+                        onPickRef.current(pos.lat, pos.lng, 'mapa');
+                    });
+                } else {
+                    markerRef.current.setLatLng([coords.lat, coords.lng]);
+                }
+            }, [coords]);
+
+            const usarGPS = () => {
+                if (!navigator.geolocation) { setGeoStatus('unsupported'); return; }
+                setGeoStatus('asking');
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        const { latitude: lat, longitude: lng } = pos.coords;
+                        setGeoStatus('idle');
+                        onPickRef.current(lat, lng, 'gps');
+                        if (mapRef.current) mapRef.current.setView([lat, lng], 13);
+                    },
+                    err => setGeoStatus(err && err.code === 1 ? 'denied' : 'error'),
+                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 }
+                );
+            };
+
+            const esLejana = Boolean(zone) && !zone.precioM2;
+
+            return (
+                <div className={`glass-panel rounded-2xl p-6 flex flex-col gap-4 mt-2 border ${zone ? (esLejana ? 'border-white/15 bg-white/5' : 'border-bronze/30 bg-bronze/5') : 'border-2 border-bronze/40 bg-bronze/5'}`}>
+                    <div className="flex items-center justify-between gap-3 border-b border-bronze/20 pb-3">
+                        <div className="text-[10px] text-bronze uppercase tracking-[0.15em] font-bold">{t.geoTitle}</div>
+                        {zone && (
+                            <button onClick={() => { onReset(); setManualOpen(false); }} className="text-[10px] text-white/40 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer">{t.geoChange}</button>
+                        )}
+                    </div>
+
+                    <p className="text-xs text-white/70 leading-relaxed">{mapaRoto ? t.geoWhyNoMap : t.geoWhy}</p>
+
+                    {!mapaRoto && (
+                        <>
+                            <div ref={divRef}
+                                 className="w-full rounded-xl overflow-hidden border border-white/10"
+                                 style={{ height: '320px', background: '#0D0D0D', zIndex: 0 }} />
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-white/40 uppercase tracking-widest">
+                                <span className="flex items-center gap-1.5"><span style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(193,138,104,.45)', border: '1px solid #C18A68', display: 'inline-block' }}></span>{t.zoneMetro}</span>
+                                <span className="flex items-center gap-1.5"><span style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(193,138,104,.12)', border: '1px dashed #C18A68', display: 'inline-block' }}></span>{t.zoneAfueras}</span>
+                            </div>
+                        </>
+                    )}
+
+                    {geoStatus === 'denied' && <p className="text-xs text-amber-400/90 leading-relaxed">{t.geoDenied}</p>}
+                    {geoStatus === 'error' && <p className="text-xs text-amber-400/90 leading-relaxed">{t.geoError}</p>}
+                    {geoStatus === 'unsupported' && <p className="text-xs text-amber-400/90 leading-relaxed">{t.geoUnsupported}</p>}
+
+                    {!mapaRoto && (
+                        <button onClick={usarGPS} disabled={geoStatus === 'asking'}
+                            className={`w-full justify-center transition-all duration-300 border px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center gap-3 ${geoStatus === 'asking' ? 'opacity-50 cursor-wait bg-black text-white/40 border-white/10' : 'bg-white/5 border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite cursor-pointer'}`}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            {geoStatus === 'asking' ? t.geoAsking : t.geoUseLocation}
+                        </button>
+                    )}
+
+                    {/* Resultado */}
+                    {zone && (
+                        <div className={`rounded-xl p-4 flex flex-col gap-1.5 border ${esLejana ? 'border-white/15 bg-white/5' : 'border-bronze/30 bg-bronze/10'}`}>
+                            <div className="text-sm text-white font-bold">{zonaNombre[zone.id]}</div>
+                            {km !== null && km !== undefined && (
+                                <div className="text-[11px] text-white/45">{t.geoDistance} {km} km {t.geoFromPlant}</div>
+                            )}
+                            {source === 'manual' && <div className="text-[11px] text-white/45">{t.geoManualUsed}</div>}
+                            <p className="text-xs text-white/60 leading-relaxed mt-1">{esLejana ? t.geoLejanaNote : t.geoZoneNote}</p>
+                        </div>
+                    )}
+
+                    {/* Respaldo manual: siempre disponible */}
+                    {!manualOpen ? (
+                        <button onClick={() => setManualOpen(true)} className="text-[11px] text-white/40 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer text-center">
+                            {t.geoManualLink}
+                        </button>
+                    ) : (
+                        <div className="flex flex-col gap-2 border-t border-white/10 pt-4">
+                            <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">{t.geoManualTitle}</div>
+                            {ZONAS_TODO_COSTO.map(z => (
+                                <button key={z.id} onClick={() => { onManual(z.id); setManualOpen(false); }}
+                                    className={`w-full text-left px-4 py-3 rounded-xl border transition-all cursor-pointer ${zone && zone.id === z.id && source === 'manual' ? 'border-bronze bg-bronze/15' : 'border-white/10 bg-white/5 hover:border-bronze/50 hover:bg-bronze/10'}`}>
+                                    <div className="text-xs text-white font-bold">{zonaNombre[z.id]}</div>
+                                    <div className="text-[10px] text-white/40 mt-0.5">{t['zoneHint_' + z.id]}</div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    <p className="text-[10px] text-white/30 leading-relaxed">{t.geoPrivacy}</p>
+                </div>
+            );
+        }
+
         function CalculatorTab({ defaults, onSaveProject, editingProject, defaultFlow, session, setCurrentTab, setTriageFlow, rates, language }) {
             const t = T[language] || T['es'];
             // defaultFlow ahora transporta la MODALIDAD elegida en la pantalla de inicio: 'supply' (solo tejas) o 'full' (todo costo)
@@ -1429,6 +1707,39 @@
             const [roofType, setRoofType] = useState(editingProject ? (editingProject.roofType || null) : null);
             const [pendiente, setPendiente] = useState(editingProject ? (editingProject.pendiente !== undefined ? editingProject.pendiente : null) : undefined);
             const [selectedColor, setSelectedColor] = useState(editingProject ? (editingProject.selectedColor || null) : null);
+
+            /* Ubicación de la obra — solo se usa en la modalidad "todo costo",
+               porque ahí el precio cambia según lo que cobre el instalador por la distancia. */
+            const [obraCoords, setObraCoords] = useState(editingProject ? (editingProject.obraCoords || null) : null);
+            const [geoKm, setGeoKm] = useState(editingProject ? (editingProject.geoKm ?? null) : null);
+            const [zoneId, setZoneId] = useState(editingProject ? (editingProject.zoneId || null) : null);
+            const [zoneSource, setZoneSource] = useState(editingProject ? (editingProject.zoneSource || null) : null); // 'mapa' | 'gps' | 'manual'
+
+            const zone = modality === 'full' ? zonaPorId(zoneId) : null;
+
+            // El cliente marcó un punto (tocando el mapa, arrastrando el pin o vía GPS).
+            const fijarUbicacion = (lat, lng, src) => {
+                const km = distanciaDesdePlanta(lat, lng);
+                setObraCoords({ lat, lng });
+                setGeoKm(Number(km.toFixed(1)));
+                setZoneId(zonaPorPunto(lat, lng).id);
+                setZoneSource(src || 'mapa');
+            };
+
+            // Respaldo: eligió la zona a mano, sin punto en el mapa.
+            const elegirZonaManual = (id) => {
+                setZoneId(id);
+                setZoneSource('manual');
+                setObraCoords(null);
+                setGeoKm(null);
+            };
+
+            const resetZona = () => {
+                setZoneId(null);
+                setZoneSource(null);
+                setObraCoords(null);
+                setGeoKm(null);
+            };
 
             useEffect(() => {
                 setUnit(defaults.unit);
@@ -1451,7 +1762,7 @@
             };
 
             const areaM2 = unit === 'ft2' ? inputValue / 10.7639 : inputValue;
-            const metrics = useMemo(() => calculateMetrics(areaM2, material, currency, rates), [areaM2, material, currency, rates]);
+            const metrics = useMemo(() => calculateMetrics(areaM2, material, currency, rates, zone), [areaM2, material, currency, rates, zone]);
 
             const sliderMin = unit === 'ft2' ? 10.76 : 1;
             const sliderMax = unit === 'ft2' ? 16145.85 : 1500;
@@ -1460,14 +1771,21 @@
             const activeRoofObj = ROOF_TYPES.find(r => r.id === roofType);
             const isSpecialDesign = activeRoofObj?.id === 'otro';
 
-            // Nuevo flujo: modalidad (de inicio) + tipo de construcción + tipo de techo + pendiente válida + área
+            // En "todo costo" no hay precio hasta saber la zona, y las zonas de más de
+            // 60 km no tienen tarifa automática: esas las cotiza un asesor.
+            const zonaLista = modality !== 'full' || Boolean(zone && zone.precioM2);
+            const zonaFueraDeCobertura = modality === 'full' && Boolean(zone) && !zone.precioM2;
+
+            // Nuevo flujo: modalidad (de inicio) + tipo de construcción + tipo de techo + pendiente válida + área + zona
             const isFormComplete = Boolean(
-                modality && areaM2 > 0 && constructionType && roofType &&
+                modality && areaM2 > 0 && constructionType && roofType && zonaLista &&
                 (isSpecialDesign || (pendiente !== undefined && (pendiente === null || (typeof pendiente === 'number' && pendiente >= 15))))
             );
 
             const handlePDF = async (options = {}) => {
                 if (!isSpecialDesign && !modality) return;
+                // Sin zona resuelta no hay precio de todo costo que imprimir.
+                if (!isSpecialDesign && modality === 'full' && !(zone && zone.precioM2)) return;
                 const withObservation = options && options.withObservation === true;
                 setIsSaving(true);
                 try {
@@ -1483,6 +1801,7 @@
                     buildPremiumPDF(doc, {
                         t, flow: flowActive, area: inputValue, unit, areaM2,
                         material, currency, metrics, modality,
+                        zone, geoKm,
                         roofType, pendiente, selectedColor,
                         constructionType, isSpecialDesign, roofPngUrl, selectedColorHex,
                         clientName,
@@ -1521,6 +1840,10 @@
                     unidad: unit,
                     inversion_tejas: modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost,
                     modality: modality,
+                    zoneId: zoneId,
+                    zoneSource: zoneSource,
+                    geoKm: geoKm,
+                    obraCoords: obraCoords,
                     divisa: currency,
                     plastico_kg: metrics.plasticUpcycled,
                     co2_kg: metrics.co2Reduced,
@@ -1528,7 +1851,7 @@
                     hasOwnStructure
                 });
 
-                alert(t.transportNoticeAlert);
+                alert(modality === 'full' ? t.transportNoticeAlertFull : t.transportNoticeAlert);
             };
 
             const handleZincYes = () => {
@@ -1711,8 +2034,25 @@
                     ) : (
                         <div className="glass-panel rounded-2xl p-6 border border-bronze/30 bg-bronze/5 flex items-start gap-3 mt-2">
                             <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p className="text-bronze text-xs leading-relaxed">{t.manualNote}</p>
+                            <div className="flex flex-col gap-2">
+                                <p className="text-bronze text-xs leading-relaxed">{t.manualNote}</p>
+                                <p className="text-white/50 text-xs leading-relaxed">{t.supplyPriceNote}</p>
+                            </div>
                         </div>
+                    )}
+
+                    {/* Ubicación de la obra: define la zona y, con ella, la tarifa del instalador */}
+                    {modality === 'full' && (
+                        <UbicacionObra
+                            language={language}
+                            km={geoKm}
+                            zone={zone}
+                            source={zoneSource}
+                            coords={obraCoords}
+                            onPick={fijarUbicacion}
+                            onManual={elegirZonaManual}
+                            onReset={resetZona}
+                        />
                     )}
 
                     {/* Métricas del proyecto (ambas modalidades) */}
@@ -1752,7 +2092,31 @@
                         </div>
                     </div>
 
-                    {/* Inversión estimada */}
+                    {/* Inversión estimada — en "todo costo" depende de la zona resuelta arriba */}
+                    {zonaFueraDeCobertura ? (
+                        <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-white/20 bg-white/5 relative overflow-hidden mt-2 gap-4">
+                            <h3 className="text-xl tracking-tight text-white uppercase font-semibold text-center">{t.zoneOutTitle}</h3>
+                            <p className="text-xs text-white/60 leading-relaxed text-center max-w-md">{t.zoneOutBody}</p>
+                            <div className="flex flex-col sm:flex-row gap-2 w-full max-w-md">
+                                <a href={`https://wa.me/573188978552?text=${encodeURIComponent(t.zoneOutWhatsapp)}`}
+                                   target="_blank" rel="noopener noreferrer"
+                                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest bg-green-900/40 border border-green-700/50 text-green-400 hover:bg-green-600 hover:text-white hover:border-green-500 transition-all no-underline">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    WhatsApp
+                                </a>
+                                <a href={`mailto:kaston.proyectos@gmail.com?subject=${encodeURIComponent(t.zoneOutMailSubject)}`}
+                                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest bg-bronze/10 border border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite transition-all no-underline">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    {t.emailBtn}
+                                </a>
+                            </div>
+                        </div>
+                    ) : (modality === 'full' && !zone) ? (
+                        <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-white/20 bg-white/5 mt-2 gap-2">
+                            <h3 className="text-xl tracking-tight text-white/70 uppercase font-semibold text-center">{t.estInvest}</h3>
+                            <p className="text-xs text-white/40 leading-relaxed text-center max-w-md">{t.priceNeedsZone}</p>
+                        </div>
+                    ) : (
                     <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-bronze bg-gradient-to-r from-bronze/5 to-transparent relative overflow-hidden mt-2">
                         <h3 className="text-2xl tracking-tight text-white mb-1 uppercase font-semibold text-center">{t.estInvest}</h3>
                         <p className="text-sm text-white/50 tracking-wider mb-4 text-center">{modality === 'full' ? t.allInc : t.onlyTile}</p>
@@ -1761,8 +2125,14 @@
                             <span className="text-bronze text-5xl font-black tabular-nums tracking-tighter drop-shadow-[0_0_20px_rgba(193,138,104,0.4)]">{formatCurrency(modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost, currency)}</span>
                             <span className="text-bronze/50 text-xs uppercase tracking-widest ml-1">{currency}</span>
                         </div>
+                        <p className="text-[11px] text-white/40 tracking-wide mt-2 text-center">
+                            {currency === 'COP'
+                                ? `$${formatCurrency(modality === 'full' ? metrics.tarifaTodoCosto : PRECIO_SOLO_TEJA_M2, 'COP')} / m\u00b2`
+                                : `${currency === 'EUR' ? '\u20ac' : '$'}${formatCurrency((modality === 'full' ? metrics.tarifaTodoCosto : PRECIO_SOLO_TEJA_M2) * (rates[currency] || 1), currency)} / m\u00b2`}
+                        </p>
                         <p className="text-[10px] text-white/30 uppercase tracking-widest mt-3 text-center">{t.pdfVisitNote}</p>
                     </div>
+                    )}
                     </>
                     )}
 
@@ -2616,12 +2986,12 @@
                 welcomeBody: "Queremos que el proceso de cotizar tu proyecto sea lo más sencillo, transparente y rápido posible. Diseñamos esta herramienta para que funcione como nuestro primer filtro de ahorro de tiempo: tú nos compartes lo que ya conoces de tu espacio y nosotros avanzamos de inmediato. Así, cuando programemos tu visita técnica presencial, iremos directo al grano para concluir los detalles finales de tu instalación sin hacerte perder tiempo en papeleos previos.",
                 welcomeAccept: "Lo acepto — entrar al cotizador",
                 welcomeDecline: "No acepto — regresar al sitio",
-                formIncompleteHint: "Ingresa el área de tu proyecto para habilitar la descarga del PDF.",
+                formIncompleteHint: "Completa el área de tu proyecto —y, en todo costo, marca tu obra en el mapa— para habilitar la descarga del PDF.",
                 routeA: "Solo tejas",
                 routeASub: "$85.000 / m² · suministro",
                 routeADesc: "Te suministramos las tejas KASTON y tú te encargas de instalarlas con la ayuda de nuestro manual, que te explica el paso a paso.",
                 routeB: "Todo costo",
-                routeBSub: "$106.623 / m² · instalación",
+                routeBSub: "Desde $153.000 / m² · instalación",
                 routeBDesc: "Nosotros nos encargamos de todo: te brindamos la teja y la instalación completa de tu techo. No tienes que conseguir materiales ni preocuparte por la instalación.",
                 routeC: "Proyecto especial o a gran escala",
                 routeCSub: "Asesoría personalizada",
@@ -2632,7 +3002,41 @@
                 reqObraTitle: "Requisitos de obra",
                 reqObra1: "Tu estructura debe soportar 12.6 kg/m².",
                 reqObra2: "Debes entregar la estructura con manto asfáltico ya instalado. KASTON no instala estructura ni manto.",
+
+                /* ── Ubicación de la obra y zonas de instalación ── */
+                geoTitle: "Ubicación de tu obra",
+                geoWhy: "Toca el mapa para marcar dónde queda tu obra. El precio del todo costo cambia según qué tan lejos esté de nuestra planta, porque el instalador cobra distinto por la distancia. Puedes arrastrar el pin para ajustarlo.",
+                geoWhyNoMap: "No pudimos cargar el mapa. Elige tu zona a mano aquí abajo y sigue con tu cotización sin problema.",
+                geoPlant: "Planta KASTON · Itagüí",
+                geoFromPlant: "de nuestra planta",
+                geoUseLocation: "Usar mi ubicación actual",
+                geoAsking: "Buscando tu ubicación…",
+                geoRetry: "Intentar de nuevo",
+                geoDenied: "No nos diste permiso para ver tu ubicación. Puedes marcar tu obra tocando el mapa, o activar el permiso en tu navegador e intentar de nuevo.",
+                geoError: "No pudimos leer tu ubicación. Marca tu obra tocando el mapa o intenta de nuevo.",
+                geoUnsupported: "Tu navegador no permite compartir la ubicación. Marca tu obra tocando el mapa.",
+                geoManualLink: "Prefiero elegir mi zona a mano",
+                geoManualTitle: "Elige tu zona",
+                geoManualUsed: "Zona elegida por ti, sin marcar el mapa",
+                geoChange: "Cambiar",
+                geoDistance: "A",
+                geoZoneNote: "El precio de abajo ya incluye lo que cobra el instalador por llegar hasta tu zona. El transporte de las tejas hasta la obra se cobra aparte.",
+                geoLejanaNote: "Tu obra queda fuera de nuestras zonas con precio automático. Escríbenos y te armamos la cotización con el valor real del desplazamiento.",
+                geoPrivacy: "Solo usamos el punto que marcas para calcular la distancia a nuestra planta. No lo guardamos en nuestros servidores ni lo compartimos con nadie.",
+                zoneMetro: "Área metropolitana · hasta 25 km",
+                zoneAfueras: "Afueras · entre 25 y 60 km",
+                zoneLejana: "Fuera de nuestras zonas con precio automático",
+                zoneHint_metro: "Hasta 25 km desde nuestra planta en Itagüí",
+                zoneHint_afueras: "Entre 25 y 60 km desde nuestra planta",
+                zoneHint_lejana: "A más de 60 km desde nuestra planta",
+                priceNeedsZone: "Marca la ubicación de tu obra en el mapa de arriba para ver tu precio.",
+                zoneOutTitle: "Tu obra necesita cotización personalizada",
+                zoneOutBody: "Estás fuera de las zonas donde podemos calcular el precio automáticamente. Escríbenos y en poco tiempo te pasamos el valor exacto para tu obra, con el desplazamiento del instalador incluido.",
+                zoneOutWhatsapp: "¡Hola! Quiero cotizar mi techo en modalidad todo costo, pero mi obra queda fuera del área metropolitana y del Oriente. ¿Me ayudan con el precio?",
+                zoneOutMailSubject: "Cotización todo costo — obra fuera de cobertura",
+                pdfZoneLabel: "Zona de instalación:",
                 manualNote: "Con tu compra recibirás un manual de instalación detallado paso a paso.",
+                supplyPriceNote: "En esta modalidad el precio es el mismo estés donde estés: $85.000/m². No cambia por tu ubicación porque el transporte no va incluido, se cobra aparte según a dónde haya que llevar las tejas.",
                 specialTitle: "Diseño arquitectónico especial",
                 specialBody: "¡Tu techo suena único! Para estructuras con diseños especiales preferimos una asesoría personalizada. Déjanos tus datos al finalizar y un ingeniero te contactará para una visita técnica sin costo.",
                 tilesNeeded: "Tejas necesarias",
@@ -2760,6 +3164,7 @@
                 saveProjAlert: "Debe descargar el reporte en PDF antes de guardar el proyecto.",
                 loginToSave: "Debe iniciar sesión para guardar proyectos.",
                 transportNoticeAlert: "Recuerda: el transporte no está incluido en esta cotización. Cuando te comuniques con nosotros por WhatsApp o correo electrónico, indícanos tu ubicación para poder calcular su costo.",
+                transportNoticeAlertFull: "Recuerda: el transporte de las tejas hasta tu obra no está incluido en esta cotización. El precio que viste cubre las tejas, los materiales y el instalador; el transporte lo calculamos aparte cuando te comuniques con nosotros.",
                 zincAlertTitle: "REQUERIMIENTO TÉCNICO",
                 zincAlertBody1: "Vemos que usted escogió la opción de láminas de zinc. Conociendo los estándares habituales de instalación de este material, lo más probable es que su estructura actual no posea la capacidad de carga requerida para el blindaje KASTON. Para su requerimiento de",
                 zincAlertBody2: "calcularíamos",
@@ -2839,6 +3244,7 @@
                 pitchSelectReqAlert: "Debes indicar la pendiente del techo antes de guardar el proyecto.",
                 pitchShedWarn: "El cobertizo requiere mínimo 15% de pendiente. Se coordinará en la asesoría.",
                 roofTypeReq: "Selecciona el tipo de techo para continuar",
+                roofTypeChosen: "Elegiste:",
                 roofTypeRequired: "Debes seleccionar el tipo de techo (aguas) antes de guardar el proyecto.",
                 specialRoofTitle: "Diseño Personalizado — Asesoría Sin Costo",
                 specialRoofAdvisory: "¡Tu techo suena único! Para estructuras con diseños arquitectónicos especiales, preferimos darte una asesoría completamente personalizada. Déjanos tus datos al finalizar y un ingeniero de nuestro equipo te contactará directamente para evaluar tu estructura mediante una visita técnica sin costo.",
@@ -2883,12 +3289,12 @@
                 welcomeBody: "We want the process of quoting your project to be as simple, transparent, and fast as possible. We designed this tool as our first time-saving filter: you share what you already know about your space and we move forward immediately. When we schedule your in-person technical visit, we'll go straight to the point to finalize installation details without wasting your time on paperwork.",
                 welcomeAccept: "I accept — enter the quoter",
                 welcomeDecline: "I don't accept — go back to site",
-                formIncompleteHint: "Enter your project area to enable the PDF download.",
+                formIncompleteHint: "Complete your project area —and, for all-inclusive, mark your site on the map— to enable the PDF download.",
                 routeA: "Tiles only",
                 routeASub: "$85,000 / m² · supply",
                 routeADesc: "We supply the KASTON tiles and you install them with the help of our step-by-step manual.",
                 routeB: "All-inclusive",
-                routeBSub: "$106,623 / m² · installation",
+                routeBSub: "From $153,000 / m² · installation",
                 routeBDesc: "We take care of everything: we provide the tiles and the complete installation of your roof. You don't have to source materials or worry about the installation.",
                 routeC: "Special or large-scale project",
                 routeCSub: "Personalized advice",
@@ -2899,7 +3305,41 @@
                 reqObraTitle: "Site requirements",
                 reqObra1: "Your structure must support 12.6 kg/m².",
                 reqObra2: "You must hand over the structure with the asphalt membrane already installed. KASTON does not install structure or membrane.",
+
+                /* ── Site location and installation zones ── */
+                geoTitle: "Your site location",
+                geoWhy: "Tap the map to mark where your site is. The all-inclusive price changes with how far it is from our plant, because the installer charges differently by distance. You can drag the pin to fine-tune it.",
+                geoWhyNoMap: "We couldn't load the map. Pick your zone manually below and carry on with your quote.",
+                geoPlant: "KASTON plant · Itagüí",
+                geoFromPlant: "from our plant",
+                geoUseLocation: "Use my current location",
+                geoAsking: "Finding your location…",
+                geoRetry: "Try again",
+                geoDenied: "You didn't allow us to see your location. You can mark your site by tapping the map, or enable the permission in your browser and try again.",
+                geoError: "We couldn't read your location. Mark your site by tapping the map or try again.",
+                geoUnsupported: "Your browser doesn't support sharing your location. Mark your site by tapping the map.",
+                geoManualLink: "I'd rather pick my zone manually",
+                geoManualTitle: "Pick your zone",
+                geoManualUsed: "Zone picked by you, without marking the map",
+                geoChange: "Change",
+                geoDistance: "At",
+                geoZoneNote: "The price below already includes what the installer charges to reach your zone. Shipping the tiles to the site is charged separately.",
+                geoLejanaNote: "Your site is outside our automatic-pricing zones. Message us and we'll quote it with the real travel cost.",
+                geoPrivacy: "We only use the point you mark to measure the distance to our plant. We don't store it on our servers or share it with anyone.",
+                zoneMetro: "Metropolitan area · up to 25 km",
+                zoneAfueras: "Outskirts · 25 to 60 km",
+                zoneLejana: "Outside our automatic-pricing zones",
+                zoneHint_metro: "Up to 25 km from our plant in Itagüí",
+                zoneHint_afueras: "Between 25 and 60 km from our plant",
+                zoneHint_lejana: "More than 60 km from our plant",
+                priceNeedsZone: "Mark your site location on the map above to see your price.",
+                zoneOutTitle: "Your site needs a custom quote",
+                zoneOutBody: "You're outside the zones where we can price automatically. Message us and we'll send you the exact figure for your site, installer travel included.",
+                zoneOutWhatsapp: "Hi! I want an all-inclusive quote for my roof, but my site is outside the metropolitan area and Eastern Antioquia. Can you help me with the price?",
+                zoneOutMailSubject: "All-inclusive quote — site outside coverage",
+                pdfZoneLabel: "Installation zone:",
                 manualNote: "With your purchase you'll receive a detailed step-by-step installation manual.",
+                supplyPriceNote: "In this option the price is the same wherever you are: $85,000/m². It doesn't change with your location because shipping isn't included — it's charged separately based on where the tiles need to go.",
                 specialTitle: "Special architectural design",
                 specialBody: "Your roof sounds unique! For special designs we prefer personalized advice. Leave your details and an engineer will contact you for a free technical visit.",
                 tilesNeeded: "Tiles needed",
@@ -3027,6 +3467,7 @@
                 saveProjAlert: "You must download the PDF report before saving the project.",
                 loginToSave: "You must log in to save projects.",
                 transportNoticeAlert: "Please note: transport is not included in this quote. When you contact us via WhatsApp or email, please provide your location so we can calculate its cost.",
+                transportNoticeAlertFull: "Please note: shipping the tiles to your site is not included in this quote. The price you saw covers the tiles, the materials and the installer; we work out shipping separately when you get in touch.",
                 zincAlertTitle: "TECHNICAL REQUIREMENT",
                 zincAlertBody1: "We see you chose the zinc sheet option. Knowing the standard installation of this material, it is highly likely that your current structure lacks the load-bearing capacity required for KASTON shielding. For your requirement of",
                 zincAlertBody2: "we calculate",
@@ -3106,6 +3547,7 @@
                 pitchSelectReqAlert: "You must indicate the roof pitch before saving the project.",
                 pitchShedWarn: "Shed roof requires at least 15% pitch. Will be discussed during consultation.",
                 roofTypeReq: "Select a roof type to continue",
+                roofTypeChosen: "You chose:",
                 roofTypeRequired: "You must select a roof type before saving the project.",
                 specialRoofTitle: "Custom Design — Free Technical Consultation",
                 specialRoofAdvisory: "Your roof sounds unique! For structures with special architectural designs, we prefer to give you a fully personalized consultation. Leave your details at the end and one of our engineers will contact you directly to evaluate your structure through a no-cost technical site visit.",
