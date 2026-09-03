@@ -15,9 +15,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Leaflet: mapa para que el cliente marque dónde queda su obra (tiles de CARTO/OpenStreetMap, sin API key) -->
+    <!-- Leaflet: mapa para que el cliente marque dónde queda su obra (tiles de Esri, sin API key) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        /* Oscurece solo las baldosas del mapa para que combinen con el negro KASTON.
+           Los anillos y el pin viven en otro pane, asi que no se ven afectados. */
+        .leaflet-tile-pane { filter: brightness(.45) contrast(1.05); }
+    </style>
 
     <script>
         tailwind.config = {
@@ -1551,9 +1556,13 @@
                     const map = L.map(divRef.current, { scrollWheelZoom: false, attributionControl: true })
                                  .setView([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], 9);
 
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                        attribution: '&copy; OpenStreetMap &copy; CARTO',
-                        subdomains: 'abcd', maxZoom: 19
+                    // Base oscura de Esri: no exige API key. Reference trae los nombres encima.
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '&copy; Esri, HERE, Garmin, &copy; OpenStreetMap',
+                        maxZoom: 19, maxNativeZoom: 16
+                    }).addTo(map);
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+                        maxZoom: 19, maxNativeZoom: 16
                     }).addTo(map);
 
                     // Anillos: hasta 25 km es área metropolitana; hasta 60 km, afueras.
