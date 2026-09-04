@@ -2538,8 +2538,10 @@
                             // no era de esta cuenta o ya no existe, y hay que decirlo.
                             const borradas = await apiProyectos({ action: 'delete', id });
                             if (!borradas || borradas.length === 0) {
+                                // No estaba en la base: es una copia local vieja. Se avisa,
+                                // pero se quita igual de la lista; si no, el proyecto fantasma
+                                // se queda pegado para siempre sin forma de sacarlo.
                                 alert(T[language]?.deleteNotFound || T['es'].deleteNotFound);
-                                return;
                             }
                         } catch (err) {
                             console.error('Error eliminando proyecto:', err);
@@ -2643,7 +2645,9 @@
 
             // Sincronizar proyectos a localStorage cuando cambian (solo si hay sesión activa)
             useEffect(() => {
-                if (session && projects.length > 0) {
+                // Tambien cuando queda en cero: si no, borrar el ultimo proyecto dejaba la
+                // copia local intacta y volvia a aparecer en la siguiente visita.
+                if (session) {
                     try { localStorage.setItem('kaston_projects_cache', JSON.stringify(projects)); } catch (e) {}
                 }
             }, [projects, session]);
