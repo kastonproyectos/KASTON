@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>KASTON | Diagnóstico</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; padding:1.5rem; background:#0a0a0a; color:#fff; font:14px/1.5 -apple-system,Inter,Arial,sans-serif; }
+  h1 { font-size:1.1rem; color:#C18A68; text-transform:uppercase; letter-spacing:.15em; margin:0 0 1.25rem; }
+  .p { border:1px solid #222; border-left-width:4px; border-radius:8px; padding:.75rem 1rem; margin-bottom:.6rem; background:#111; }
+  .ok { border-left-color:#4ade80; } .mal { border-left-color:#f87171; } .esp { border-left-color:#666; }
+  .t { font-weight:700; margin-bottom:.15rem; }
+  .d { color:#9aa; font-family:ui-monospace,Menlo,monospace; font-size:12px; word-break:break-all; white-space:pre-wrap; }
+  .fin { margin-top:1.25rem; color:#C18A68; font-weight:700; }
+</style>
+</head>
+<body>
+<h1>Diagnóstico del cotizador</h1>
+<div id="salida"></div>
+<div class="fin" id="fin"></div>
+<script>
+// Pagina de diagnostico: SOLO lee, no crea ni borra nada.
+// Existe porque el fallo solo aparece en Safari y no se puede reproducir desde fuera.
+const SUPA_URL = "https://naxvanbiwgwfraxqtsof.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heHZhbmJpd2d3ZnJheHF0c29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxODUxNDQsImV4cCI6MjA5MTc2MTE0NH0.jMoSNrVwKHBuPxTDxsqsysuV0I7c0t6DNk-7bFbTwvw";
+const salida = document.getElementById('salida');
+
+function linea(titulo, estado, detalle) {
+  const d = document.createElement('div');
+  d.className = 'p ' + estado;
+  d.innerHTML = '<div class="t">' + titulo + '</div><div class="d"></div>';
+  d.querySelector('.d').textContent = detalle;
+  salida.appendChild(d);
+}
+
+function tokenGuardado() {
+  try {
+    for (const k of Object.keys(localStorage)) {
+      if (/^sb-.+-auth-token$/.test(k)) {
+        const v = JSON.parse(localStorage.getItem(k));
+        if (v && v.access_token) return v.access_token;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function prueba(titulo, fn) {
+  const t0 = performance.now();
+  try {
+    const r = await fn();
+    linea(titulo, r.ok === false ? 'mal' : 'ok', Math.round(performance.now()-t0) + ' ms — ' + r.texto);
+  } catch (e) {
+    linea(titulo, 'mal', Math.round(performance.now()-t0) + ' ms — FALLO: ' + (e.message || e));
+  }
+}
+
+(async () => {
+  linea('1. Dónde estoy', 'esp', 'origen: ' + location.origin + '\nhost: ' + location.host);
+
+  const tok = tokenGuardado();
+  linea('2. Sesión guardada', tok ? 'ok' : 'mal',
+    tok ? ('token presente, ' + tok.length + ' caracteres') : 'NO hay token en este navegador (¿sin iniciar sesión?)');
+
+  await prueba('3. GET a /api/projects (debe decir 405)', async () => {
+    const r = await fetch('/api/projects');
+    return { texto: 'estado ' + r.status + ' — ' + (await r.text()).slice(0,120) };
+  });
+
+  await prueba('4. POST a /api/projects SIN sesión (debe decir 401)', async () => {
+    const r = await fetch('/api/projects', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'list'}) });
+    return { texto: 'estado ' + r.status + ' — ' + (await r.text()).slice(0,120) };
+  });
+
+  await prueba('5. POST a /api/projects CON tu sesión (listar)', async () => {
+    if (!tok) return { texto: 'saltada, no hay sesión' };
+    const r = await fetch('/api/projects', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + tok},
+      body: JSON.stringify({action:'list'})
+    });
+    const t = await r.text();
+    let n = '';
+    try { const j = JSON.parse(t); if (Array.isArray(j)) n = ' — ' + j.length + ' proyecto(s) en la base'; } catch(e){}
+    return { texto: 'estado ' + r.status + n + '\n' + t.slice(0,200) };
+  });
+
+  await prueba('6. OPTIONS a /api/save-project (el que sí funcionaba)', async () => {
+    const r = await fetch('/api/save-project', { method:'OPTIONS' });
+    return { texto: 'estado ' + r.status };
+  });
+
+  await prueba('7. Llamada directa a Supabase (la que Safari suele cortar)', async () => {
+    const r = await fetch(SUPA_URL + '/auth/v1/settings', { headers:{ apikey: SUPA_KEY } });
+    return { texto: 'estado ' + r.status };
+  });
+
+  await prueba('8. ¿El dominio redirige?', async () => {
+    const otro = location.host.startsWith('www.')
+      ? location.protocol + '//' + location.host.slice(4) + '/api/projects'
+      : location.protocol + '//www.' + location.host + '/api/projects';
+    const r = await fetch(otro, { method:'GET', redirect:'manual' });
+    return { texto: otro + '\ntipo: ' + r.type + ' — estado ' + r.status };
+  });
+
+  document.getElementById('fin').textContent = 'Listo. Manda una captura de toda esta pantalla.';
+})();
+</script>
+</body>
+</html>
