@@ -35,16 +35,23 @@ function linea(titulo, estado, detalle) {
   salida.appendChild(d);
 }
 
+function clavesSesion() {
+  try { return Object.keys(localStorage).filter(k => /^sb-/.test(k)); } catch (e) { return []; }
+}
 function tokenGuardado() {
   try {
-    for (const k of Object.keys(localStorage)) {
-      if (/^sb-.+-auth-token$/.test(k)) {
-        const v = JSON.parse(localStorage.getItem(k));
-        if (v && v.access_token) return v.access_token;
-      }
-    }
-  } catch (e) {}
-  return null;
+    const claves = Object.keys(localStorage).filter(k => /^sb-.+-auth-token(\.\d+)?$/.test(k));
+    const partidas = claves.filter(k => /\.\d+$/.test(k))
+      .sort((a,b) => parseInt(a.split('.').pop(),10) - parseInt(b.split('.').pop(),10));
+    const entera = claves.find(k => !/\.\d+$/.test(k));
+    let crudo = partidas.length
+      ? partidas.map(k => localStorage.getItem(k) || '').join('')
+      : (entera ? localStorage.getItem(entera) : null);
+    if (!crudo) return null;
+    if (crudo.startsWith('base64-')) crudo = atob(crudo.slice(7));
+    const v = JSON.parse(crudo);
+    return (v && v.access_token) || null;
+  } catch (e) { return null; }
 }
 
 async function prueba(titulo, fn) {
@@ -62,7 +69,8 @@ async function prueba(titulo, fn) {
 
   const tok = tokenGuardado();
   linea('2. Sesión guardada', tok ? 'ok' : 'mal',
-    tok ? ('token presente, ' + tok.length + ' caracteres') : 'NO hay token en este navegador (¿sin iniciar sesión?)');
+    (tok ? ('token presente, ' + tok.length + ' caracteres') : 'NO hay token en este navegador (¿sin iniciar sesión?)')
+    + '\nclaves: ' + (clavesSesion().join(', ') || 'ninguna'));
 
   await prueba('3. GET a /api/projects (debe decir 405)', async () => {
     const r = await fetch('/api/projects');
@@ -78,8 +86,8 @@ async function prueba(titulo, fn) {
     if (!tok) return { texto: 'saltada, no hay sesión' };
     const r = await fetch('/api/projects', {
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + tok},
-      body: JSON.stringify({action:'list'})
+      headers:{'Content-Type':'text/plain;charset=UTF-8'},
+      body: JSON.stringify({action:'list', token: tok})
     });
     const t = await r.text();
     let n = '';

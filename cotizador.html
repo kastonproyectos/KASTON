@@ -990,16 +990,23 @@
         // Safari bloquea las llamadas del navegador directo a supabase.co
         // ("TypeError: Load failed"), asi que no se habla con la base desde aqui.
         // Lee el token directo del almacenamiento, sin salir a la red.
+        // Supabase parte la sesion en varias claves (.0, .1, ...) cuando es grande,
+        // y a veces la guarda en base64; hay que cubrir las dos formas o el token
+        // "no aparece" aunque el cliente si tenga la sesion abierta.
         function tokenGuardado() {
             try {
-                for (const k of Object.keys(localStorage)) {
-                    if (/^sb-.+-auth-token$/.test(k)) {
-                        const v = JSON.parse(localStorage.getItem(k));
-                        if (v && v.access_token) return v.access_token;
-                    }
-                }
-            } catch (e) {}
-            return null;
+                const claves = Object.keys(localStorage).filter(k => /^sb-.+-auth-token(\.\d+)?$/.test(k));
+                const partidas = claves.filter(k => /\.\d+$/.test(k))
+                    .sort((a, b) => parseInt(a.split('.').pop(), 10) - parseInt(b.split('.').pop(), 10));
+                const entera = claves.find(k => !/\.\d+$/.test(k));
+                let crudo = partidas.length
+                    ? partidas.map(k => localStorage.getItem(k) || '').join('')
+                    : (entera ? localStorage.getItem(entera) : null);
+                if (!crudo) return null;
+                if (crudo.startsWith('base64-')) crudo = atob(crudo.slice(7));
+                const v = JSON.parse(crudo);
+                return (v && v.access_token) || null;
+            } catch (e) { return null; }
         }
 
         async function apiProyectos(payload) {
@@ -1020,10 +1027,15 @@
 
             let resp;
             try {
+                // El token va en el mensaje, no en una cabecera, y el tipo de contenido
+                // es text/plain a proposito: asi la peticion es "simple" para el navegador
+                // (sin consulta previa de permisos) y sobrevive la redireccion del dominio
+                // a www. Safari descarta las peticiones con cabecera de autorizacion
+                // cuando las redirigen a otro dominio; Chrome no, y por eso no se veia.
                 resp = await fetch('/api/projects', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                    body: JSON.stringify({ ...payload, token })
                 });
             } catch (e) {
                 // Etiquetado a proposito: distingue no haber alcanzado el servidor
