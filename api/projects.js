@@ -46,6 +46,14 @@ export default async function handler(req, res) {
         url = `${base}?id=eq.${encodeURIComponent(id)}`;
         method = 'PATCH';
         body = JSON.stringify(fields);
+    } else if (action === 'clear-avatar') {
+        // Saca la foto en base64 de los metadatos del usuario. Ahi dentro viaja
+        // en el token de sesion y lo engorda hasta que Cloudflare rechaza las
+        // peticiones que lo llevan. Va por aqui y no desde el navegador porque
+        // el token grande solo sobrevive dentro del cuerpo del mensaje.
+        url = `${SUPA_URL}/auth/v1/user`;
+        method = 'PUT';
+        body = JSON.stringify({ data: { avatar_url: null } });
     } else {
         return res.status(400).json({ error: 'Accion no valida' });
     }
