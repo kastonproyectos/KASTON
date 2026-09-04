@@ -989,17 +989,47 @@
         // Todo lo de proyectos pasa por /api/projects, en el mismo origen.
         // Safari bloquea las llamadas del navegador directo a supabase.co
         // ("TypeError: Load failed"), asi que no se habla con la base desde aqui.
+        // Lee el token directo del almacenamiento, sin salir a la red.
+        function tokenGuardado() {
+            try {
+                for (const k of Object.keys(localStorage)) {
+                    if (/^sb-.+-auth-token$/.test(k)) {
+                        const v = JSON.parse(localStorage.getItem(k));
+                        if (v && v.access_token) return v.access_token;
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+
         async function apiProyectos(payload) {
             if (!supabase) throw new Error('El servicio de cuentas no está disponible.');
-            const { data: authData } = await supabase.auth.getSession();
-            const token = authData?.session?.access_token;
+
+            // getSession puede salir a la red a renovar el token, y esa llamada va
+            // directo a supabase.co: justo la que Safari corta. Si falla, seguimos
+            // con el token ya guardado en vez de tumbar toda la operacion.
+            let token = null;
+            try {
+                const { data: authData } = await supabase.auth.getSession();
+                token = authData?.session?.access_token || null;
+            } catch (e) {
+                console.warn('No se pudo renovar la sesión, se usa la guardada:', e);
+            }
+            if (!token) token = tokenGuardado();
             if (!token) throw new Error('No hay sesión activa. Inicia sesión de nuevo.');
 
-            const resp = await fetch('/api/projects', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(payload)
-            });
+            let resp;
+            try {
+                resp = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                // Etiquetado a proposito: distingue no haber alcanzado el servidor
+                // propio de que el servidor haya respondido con un error.
+                throw new Error('no se pudo contactar al servidor: ' + (e.message || e));
+            }
             const texto = await resp.text();
             let cuerpo = null;
             try { cuerpo = texto ? JSON.parse(texto) : null; } catch (e) {}
