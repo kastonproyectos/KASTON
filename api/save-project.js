@@ -18,12 +18,15 @@ export default async function handler(req, res) {
                 'apikey': SUPA_KEY,
                 'Authorization': authHeader,
                 'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
+                // representation y no minimal: el cliente necesita el id que asigno la base
+                // para poder borrar o editar el proyecto sin recargar la pagina.
+                'Prefer': 'return=representation'
             },
             body: JSON.stringify(req.body)
         });
 
         const text = await supaRes.text();
+        if (text) res.setHeader('Content-Type', 'application/json');
         return res.status(supaRes.status).send(text || 'ok');
     } catch (e) {
         return res.status(500).json({ error: e.message });

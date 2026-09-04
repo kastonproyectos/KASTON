@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>KASTON | Iniciando sesión…</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { color-scheme: dark; }
+        body {
+            margin: 0; min-height: 100vh; background: #0a0a0a; color: #fff;
+            font-family: Inter, Arial, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 1.5rem; text-align: center; padding: 2rem;
+        }
+        .spinner {
+            width: 3.5rem; height: 3.5rem; border-radius: 50%;
+            border: 4px solid #C18A68; border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        p { color: #C18A68; text-transform: uppercase; letter-spacing: .2em; font-size: .8rem; font-weight: 700; margin: 0; }
+        .err { color: #f87171; letter-spacing: normal; text-transform: none; font-size: .9rem; max-width: 32rem; line-height: 1.5; }
+        a { color: #C18A68; font-size: .85rem; }
+    </style>
+</head>
+<body>
+    <div class="spinner" id="spinner"></div>
+    <p id="msg">Iniciando sesión…</p>
+    <script>
+        // Página de retorno del login con Google. Vive aparte del cotizador para que el
+        // popup cargue en milisegundos en vez de arrancar React, Babel y Leaflet otra vez.
+        const SUPABASE_URL = "https://naxvanbiwgwfraxqtsof.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heHZhbmJpd2d3ZnJheHF0c29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxODUxNDQsImV4cCI6MjA5MTc2MTE0NH0.jMoSNrVwKHBuPxTDxsqsysuV0I7c0t6DNk-7bFbTwvw";
+
+        // MISMA config de storage que cotizador.html: el code_verifier de PKCE lo escribió
+        // el cotizador en localStorage y esta página tiene que poder leerlo.
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true,
+                flowType: 'pkce'
+            }
+        });
+
+        const esPopup = !!window.opener && window.opener !== window;
+        const volverAlCotizador = (params) => {
+            window.location.replace('/cotizador.html' + (params || ''));
+        };
+
+        const fallar = (detalle) => {
+            document.getElementById('spinner').style.display = 'none';
+            const msg = document.getElementById('msg');
+            msg.className = 'err';
+            msg.textContent = 'No se pudo completar el inicio de sesión: ' + detalle;
+            const a = document.createElement('a');
+            a.href = '/cotizador.html';
+            a.textContent = 'Volver al cotizador';
+            document.body.appendChild(a);
+            if (esPopup) {
+                try { window.opener.postMessage({ type: 'kaston-auth', ok: false, error: detalle }, window.location.origin); } catch (e) {}
+            }
+        };
+
+        (async () => {
+            // Google puede devolver el error en la query o en el fragmento.
+            const q = new URLSearchParams(window.location.search);
+            const h = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+            const errUrl = q.get('error_description') || q.get('error') || h.get('error_description') || h.get('error');
+            if (errUrl) { fallar(errUrl); return; }
+
+            try {
+                // detectSessionInUrl ya intercambia el code; esperamos a que termine.
+                const { data, error } = await sb.auth.getSession();
+                if (error) throw error;
+                if (!data.session) throw new Error('Google no devolvió una sesión válida.');
+
+                if (esPopup) {
+                    try { window.opener.postMessage({ type: 'kaston-auth', ok: true }, window.location.origin); } catch (e) {}
+                    window.close();
+                    // Si el navegador no deja cerrar el popup, al menos que muestre el cotizador.
+                    setTimeout(() => volverAlCotizador(), 400);
+                } else {
+                    volverAlCotizador();
+                }
+            } catch (err) {
+                fallar(err.message || String(err));
+            }
+        })();
+    </script>
+</body>
+</html>
