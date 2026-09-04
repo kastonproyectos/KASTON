@@ -2425,8 +2425,11 @@
                             .eq('user_id', session?.user?.id)
                             .select();
                         if (error) {
-                            console.error('Error eliminando proyecto:', error.message);
-                            alert(T[language]?.deleteError || T['es'].deleteError);
+                            // El detalle tecnico va en el aviso a proposito: un "intenta de nuevo"
+                            // a secas no deja diagnosticar nada cuando el cliente reporta la falla.
+                            console.error('Error eliminando proyecto:', error);
+                            const detalle = error.message || error.hint || error.code || '';
+                            alert((T[language]?.deleteError || T['es'].deleteError) + (detalle ? '\n\n(' + detalle + ')' : ''));
                             return;
                         }
                         if (!data || data.length === 0) {
