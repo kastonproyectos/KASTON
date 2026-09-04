@@ -1057,6 +1057,31 @@
             return cuerpo;
         }
 
+        // La foto de perfil vive en el navegador y NUNCA en los metadatos del usuario.
+        // Metida ahi viaja dentro del token de sesion: una foto de 30 KB deja el token
+        // tan grande que Cloudflare rechaza toda peticion que lo lleve encima con
+        // "400 Request Header Or Cookie Too Large", y se cae guardar, editar y borrar.
+        const claveFoto = (uid) => 'kaston_avatar_' + (uid || 'anon');
+        function guardarFotoLocal(uid, dataUrl) {
+            try { if (dataUrl) localStorage.setItem(claveFoto(uid), dataUrl); } catch (e) {}
+        }
+        function leerFotoLocal(uid) {
+            try { return localStorage.getItem(claveFoto(uid)); } catch (e) { return null; }
+        }
+        // Una foto en base64 heredada de la version anterior se pasa al navegador y se
+        // borra del usuario, para que el token vuelva a su tamano normal.
+        async function repararFotoEnToken(session) {
+            const m = session?.user?.user_metadata || {};
+            if (!m.avatar_url || !String(m.avatar_url).startsWith('data:')) return;
+            guardarFotoLocal(session.user.id, m.avatar_url);
+            try {
+                await apiProyectos({ action: 'clear-avatar' });
+                await supabase.auth.refreshSession();
+            } catch (e) {
+                console.warn('No se pudo sacar la foto del token:', e);
+            }
+        }
+
         function ServiceBanner({ language }) {
             const t = T[language] || T['es'];
             return (
@@ -1310,7 +1335,12 @@
                 const m = session?.user?.user_metadata || {};
                 // Google envía 'name' y 'picture'; Apple envía 'name' solo en el primer login
                 if (field === 'full_name')  return m.full_name  || m.name    || extraData?.[field] || def;
-                if (field === 'avatar_url') return m.avatar_url || m.picture || extraData?.[field] || def;
+                if (field === 'avatar_url') {
+                    const local = leerFotoLocal(session?.user?.id);
+                    // Se ignora un avatar_url en base64 heredado: ya no se usa.
+                    const remoto = (m.avatar_url && !String(m.avatar_url).startsWith('data:')) ? m.avatar_url : null;
+                    return local || remoto || m.picture || extraData?.[field] || def;
+                }
                 return m[field] || extraData?.[field] || def;
             };
 
@@ -1372,7 +1402,7 @@
                 try {
                     const metadata = { phone };
                     if (profilePhotoFile) {
-                        metadata.avatar_url = profilePhotoFile;
+                        guardarFotoLocal(session?.user?.id, profilePhotoFile);
                     }
                     const userUpdate = { data: metadata };
                     if (passValidated && newPassword) userUpdate.password = newPassword;
@@ -2901,7 +2931,7 @@
                     if (error) throw error;
                     if (data.session) {
                         if (profilePhoto) {
-                            await supabase.auth.updateUser({ data: { avatar_url: profilePhoto } });
+                            guardarFotoLocal(data.session?.user?.id || data.user?.id, profilePhoto);
                         }
                         onAuth(data.session, { fullName, phone, photoPreview, role, idType, idNumber });
                     } else {
@@ -3836,7 +3866,9 @@
                         role:       m.role                    || prev?.role       || 'Propietario',
                         id_type:    m.id_type                 || prev?.id_type    || '',
                         id_number:  m.id_number               || prev?.id_number  || '',
-                        avatar_url: m.avatar_url || m.picture || prev?.avatar_url || '',
+                        avatar_url: leerFotoLocal(session?.user?.id)
+                                    || ((m.avatar_url && !String(m.avatar_url).startsWith('data:')) ? m.avatar_url : '')
+                                    || m.picture || prev?.avatar_url || '',
                         provider:   session?.user?.app_metadata?.provider || 'email'
                     };
                 };
@@ -3846,14 +3878,20 @@
                     setSession(session);
                     setAuthChecked(true);
                     setLoading(false);
-                    if (session) setExtraData(prev => normalizeExtra(session, prev));
+                    if (session) {
+                        setExtraData(prev => normalizeExtra(session, prev));
+                        repararFotoEnToken(session);
+                    }
                 });
 
                 // 2. getSession sin timeout, deja que Supabase procese el código OAuth de la URL
                 supabase.auth.getSession()
                     .then(({ data: { session } }) => {
                         setSession(session);
-                        if (session) setExtraData(prev => normalizeExtra(session, prev));
+                        if (session) {
+                            setExtraData(prev => normalizeExtra(session, prev));
+                            repararFotoEnToken(session);
+                        }
                     })
                     .catch(err => console.error('Auth init error:', err))
                     .finally(() => { setLoading(false); setAuthChecked(true); });
