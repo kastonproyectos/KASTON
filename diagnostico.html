@@ -65,7 +65,11 @@ async function prueba(titulo, fn) {
 }
 
 (async () => {
+  const galletas = document.cookie || '';
   linea('1. Dónde estoy', 'esp', 'origen: ' + location.origin + '\nhost: ' + location.host);
+  // Cloudflare tumba la peticion con 400 si las cookies del dominio se pasan de tamano.
+  linea('1b. Peso de las cookies', galletas.length > 4000 ? 'mal' : 'ok',
+    galletas.length + ' caracteres' + (galletas.length > 4000 ? '  <-- DEMASIADO GRANDE' : ''));
 
   const tok = tokenGuardado();
   linea('2. Sesión guardada', tok ? 'ok' : 'mal',

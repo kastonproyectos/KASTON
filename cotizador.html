@@ -1034,6 +1034,12 @@
                 // cuando las redirigen a otro dominio; Chrome no, y por eso no se veia.
                 resp = await fetch('/api/projects', {
                     method: 'POST',
+                    // credentials omit: sin esto el navegador adjunta todas las cookies
+                    // del dominio y Cloudflare rechaza la peticion entera con
+                    // "400 Request Header Or Cookie Too Large" antes de que llegue
+                    // al servidor. Aqui las cookies no pintan nada: el token va en
+                    // el cuerpo del mensaje.
+                    credentials: 'omit',
                     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
                     body: JSON.stringify({ ...payload, token })
                 });
@@ -2450,6 +2456,9 @@
                         const token = authData?.session?.access_token;
                         const resp = await fetch('/api/save-project', {
                             method: 'POST',
+                            // Mismo motivo que en /api/projects: sin las cookies del
+                            // dominio, que hacen que Cloudflare rechace la peticion.
+                            credentials: 'omit',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${token}`
