@@ -1056,8 +1056,8 @@
                 // token del usuario es enorme (foto de perfil incrustada en la sesion).
                 // Devuelve una pagina HTML, no JSON, y sin traducirla el aviso queda ilegible.
                 if (/Request Header Or Cookie Too Large/i.test(texto || '')) {
-                    throw new Error('Tu sesión quedó demasiado grande por la foto de perfil guardada. '
-                        + 'Cierra sesión y vuelve a entrar; si sigue igual, hay que limpiar la foto desde la base de datos.');
+                    throw new Error('Supabase rechazó la petición por tamaño. '
+                        + 'Sesión: ' + (token ? token.length : 0) + ' caracteres.');
                 }
                 throw new Error((cuerpo && (cuerpo.message || cuerpo.error)) || texto || ('HTTP ' + resp.status));
             }

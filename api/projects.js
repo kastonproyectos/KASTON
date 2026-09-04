@@ -29,6 +29,16 @@ export default async function handler(req, res) {
 
     const authHeader = token ? `Bearer ${token}` : req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ error: 'No authorization header' });
+
+    // Supabase esta detras de Cloudflare, que rechaza las cabeceras grandes con una
+    // pagina HTML de "400 Request Header Or Cookie Too Large". Se mide aqui para
+    // decirlo con un numero en vez de reenviar una peticion que ya se sabe condenada.
+    if (authHeader.length > 7000) {
+        return res.status(413).json({
+            error: 'La sesión pesa ' + authHeader.length + ' caracteres y Supabase rechaza cabeceras de ese tamaño.',
+            tamano: authHeader.length
+        });
+    }
     const base = `${SUPA_URL}/rest/v1/projects`;
 
     let url, method, body;
