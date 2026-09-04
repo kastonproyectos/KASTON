@@ -14,7 +14,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Leaflet: mapa para que el cliente marque dónde queda su obra (tiles de Esri, sin API key) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -976,10 +975,13 @@
         const supabase = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
             ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                 auth: {
-                    storage: window.sessionStorage,
+                    // localStorage y no sessionStorage: el popup de Google escribe la sesion
+                    // ahi y la ventana principal la lee. sessionStorage no se comparte.
+                    storage: window.localStorage,
                     autoRefreshToken: true,
                     persistSession: true,
-                    detectSessionInUrl: false
+                    detectSessionInUrl: true,
+                    flowType: 'pkce'
                 }
               })
             : null;
@@ -2387,6 +2389,18 @@
                         if (!resp.ok) {
                             const txt = await resp.text();
                             alert('⚠️ Error al guardar: ' + txt);
+                        } else {
+                            // Adoptar el id que asigno la base: si se queda el uuid local,
+                            // borrar o editar este proyecto no encuentra nada hasta recargar.
+                            try {
+                                const filas = await resp.json();
+                                const fila = Array.isArray(filas) ? filas[0] : filas;
+                                if (fila && fila.id) {
+                                    setProjects(prev => prev.map(p => p.id === fullProj.id ? { ...p, id: fila.id } : p));
+                                }
+                            } catch (e) {
+                                console.error('No se pudo leer el id del proyecto guardado:', e);
+                            }
                         }
                     }
                 }
@@ -2403,9 +2417,20 @@
             const handleDeleteProject = async (id) => {
                 if (window.confirm(T[language]?.deleteConfirm || T['es'].deleteConfirm)) {
                     if (supabase) {
-                        const { error } = await supabase.from('projects').delete().eq('id', id).eq('user_id', session?.user?.id);
+                        // .select() devuelve las filas borradas: sin el, un delete que no
+                        // encuentra nada responde sin error y el proyecto reaparece al recargar.
+                        const { data, error } = await supabase.from('projects')
+                            .delete()
+                            .eq('id', id)
+                            .eq('user_id', session?.user?.id)
+                            .select();
                         if (error) {
-                            alert(T[language]?.deleteError || 'Error al eliminar el proyecto. Intenta de nuevo.');
+                            console.error('Error eliminando proyecto:', error.message);
+                            alert(T[language]?.deleteError || T['es'].deleteError);
+                            return;
+                        }
+                        if (!data || data.length === 0) {
+                            alert(T[language]?.deleteNotFound || T['es'].deleteNotFound);
                             return;
                         }
                     }
@@ -2469,7 +2494,10 @@
                                 const loaded = data.map(p => {
                                     // Preferir project_data (JSON completo)
                                     if (p.project_data) {
-                                        try { return JSON.parse(p.project_data); } catch {}
+                                        // El id manda siempre la fila, no el JSON: project_data guarda el
+                                        // uuid que genero el navegador al cotizar, que no es el de la tabla.
+                                        // Sin este id real, borrar y editar filtran por una fila inexistente.
+                                        try { return { ...JSON.parse(p.project_data), id: p.id }; } catch {}
                                     }
                                     // Reconstruir desde columnas individuales
                                     const storedVal = p.selected_color || '';
@@ -2626,7 +2654,7 @@
             );
         }
 
-        function OAuthButtons({ loading, onOAuth, isEs, showGoogleBtn }) {
+        function OAuthButtons({ loading, onOAuth, isEs }) {
             return (
                 <div className="flex flex-col gap-2">
                     <button type="button" onClick={() => onOAuth('google')} disabled={loading}
@@ -2639,9 +2667,6 @@
                         </svg>
                         {isEs ? 'Continuar con Google' : 'Continue with Google'}
                     </button>
-                    {showGoogleBtn && (
-                        <div id="google-rendered-btn" className="w-full flex justify-center" />
-                    )}
                 </div>
             );
         }
@@ -2677,60 +2702,77 @@
 
             const switchMode = (m) => { setMode(m); setStep(1); setError(null); setConfirmMsg(null); };
 
-            const GOOGLE_CLIENT_ID = '90020836207-82o12lfhkluhgbs4nh0rusv4b402j0gt.apps.googleusercontent.com';
+            // Login con Google por el OAuth de Supabase, no por One Tap: One Tap exige que el
+            // cliente ya tenga sesion de Google abierta en ese navegador y, si no la tiene,
+            // muere con "Provider's accounts list is empty" sin ofrecer donde escribir el correo.
+            // Se abre en popup para no recargar el cotizador y perder la cotizacion en curso;
+            // si el navegador bloquea el popup, cae al redirect de toda la vida.
+            const popupRef = useRef(null);
 
-            const [showGoogleBtn, setShowGoogleBtn] = useState(false);
+            // El popup avisa por postMessage cuando termina; la sesion ya quedo en localStorage.
+            useEffect(() => {
+                const onMessage = async (e) => {
+                    if (e.origin !== window.location.origin) return;
+                    if (!e.data || e.data.type !== 'kaston-auth') return;
+                    if (!e.data.ok) {
+                        setLoading(false);
+                        setError(e.data.error || (isEs ? 'No se pudo iniciar sesión con Google.' : 'Google sign-in failed.'));
+                        return;
+                    }
+                    try {
+                        const { data } = await supabase.auth.getSession();
+                        if (data?.session) onAuth(data.session, {});
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                window.addEventListener('message', onMessage);
+                return () => window.removeEventListener('message', onMessage);
+            }, [onAuth, isEs]);
 
-            const onGoogleCredential = async (response) => {
-                if (!response.credential) return;
-                setLoading(true);
-                setShowGoogleBtn(false);
-                try {
-                    const { data, error } = await supabase.auth.signInWithIdToken({
-                        provider: 'google',
-                        token: response.credential,
-                    });
-                    if (error) throw error;
-                    onAuth(data.session, {});
-                } catch (err) {
-                    setError(err.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            const handleOAuth = (provider) => {
-                if (provider !== 'google' || !window.google?.accounts?.id) {
-                    setError(isEs ? 'Google no está disponible aún, intenta en unos segundos.' : 'Google not ready yet, try in a moment.');
+            const handleOAuth = async (provider) => {
+                if (!supabase) {
+                    setError(isEs ? 'El servicio de cuentas no está disponible.' : 'Account service unavailable.');
                     return;
                 }
                 setError(null);
                 setLoading(true);
-                window.google.accounts.id.initialize({
-                    client_id: GOOGLE_CLIENT_ID,
-                    callback: onGoogleCredential,
-                    use_fedcm_for_prompt: false,
-                    auto_select: false,
-                });
-                window.google.accounts.id.prompt((notification) => {
-                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        // One Tap no disponible, mostrar botón oficial de Google
-                        setLoading(false);
-                        setShowGoogleBtn(true);
-                        setTimeout(() => {
-                            const container = document.getElementById('google-rendered-btn');
-                            if (container) {
-                                window.google.accounts.id.renderButton(container, {
-                                    theme: 'outline',
-                                    size: 'large',
-                                    width: Math.min(container.offsetWidth || 380, 380),
-                                    text: 'signin_with',
-                                    logo_alignment: 'center',
-                                });
-                            }
-                        }, 100);
+                try {
+                    const { data, error } = await supabase.auth.signInWithOAuth({
+                        provider,
+                        options: {
+                            redirectTo: window.location.origin + '/auth-callback.html',
+                            skipBrowserRedirect: true,
+                            queryParams: { prompt: 'select_account' }
+                        }
+                    });
+                    if (error) throw error;
+                    if (!data?.url) throw new Error(isEs ? 'Google no devolvió una URL de acceso.' : 'Google returned no sign-in URL.');
+
+                    const w = Math.min(500, window.screen.width - 20);
+                    const h = Math.min(650, window.screen.height - 60);
+                    const left = window.screenX + Math.max(0, (window.outerWidth - w) / 2);
+                    const top = window.screenY + Math.max(0, (window.outerHeight - h) / 2);
+                    popupRef.current = window.open(data.url, 'kaston-google-login',
+                        `width=${w},height=${h},left=${left},top=${top},menubar=no,toolbar=no`);
+
+                    if (!popupRef.current || popupRef.current.closed) {
+                        // Popup bloqueado: redirect en la misma pestaña.
+                        window.location.href = data.url;
+                        return;
                     }
-                });
+
+                    // Si el cliente cierra el popup sin terminar, no dejar la pantalla trabada.
+                    const iv = setInterval(() => {
+                        if (popupRef.current && popupRef.current.closed) {
+                            clearInterval(iv);
+                            setLoading(false);
+                        }
+                    }, 600);
+                } catch (err) {
+                    setLoading(false);
+                    setError(err.message || String(err));
+                }
             };
 
             const handlePhotoChange = (e) => {
@@ -2857,7 +2899,7 @@
                         {/* ── LOGIN ── */}
                         {mode === 'login' && (
                             <div className="flex flex-col gap-4">
-                                <OAuthButtons loading={loading} onOAuth={handleOAuth} isEs={isEs} showGoogleBtn={showGoogleBtn} />
+                                <OAuthButtons loading={loading} onOAuth={handleOAuth} isEs={isEs} />
                                 <div className="flex items-center gap-3">
                                     <div className="flex-1 h-px bg-white/10" />
                                     <span className="text-[10px] text-white/25 uppercase tracking-widest">{isEs ? 'o con correo' : 'or with email'}</span>
@@ -3005,7 +3047,7 @@
                                 {step === 3 && (
                                     <div className="flex flex-col gap-4">
                                         {/* Acceso rápido con OAuth en el paso de credenciales */}
-                                        <OAuthButtons loading={loading} onOAuth={handleOAuth} isEs={isEs} showGoogleBtn={showGoogleBtn} />
+                                        <OAuthButtons loading={loading} onOAuth={handleOAuth} isEs={isEs} />
                                         <div className="flex items-center gap-3">
                                             <div className="flex-1 h-px bg-white/10" />
                                             <span className="text-[10px] text-white/25 uppercase tracking-widest">{isEs ? 'o crea con correo' : 'or create with email'}</span>
@@ -3196,6 +3238,8 @@
                 passMismatch: "Las nuevas contraseñas no coinciden.",
                 chgSaved: "Cambios guardados exitosamente.",
                 deleteConfirm: "¿Estás seguro de que deseas eliminar este proyecto?",
+                deleteError: "No se pudo eliminar el proyecto. Intenta de nuevo.",
+                deleteNotFound: "Ese proyecto ya no está en tu cuenta. Recarga la página para ver la lista al día.",
                 regSuccess: "Registro exitoso. Revisa tu bandeja de entrada si la confirmación por correo está activada.",
                 fullNPlace: "Juan Pérez",
                 telPlace: "+57 300 000 0000",
@@ -3508,6 +3552,8 @@
                 passMismatch: "The new passwords do not match.",
                 chgSaved: "Changes saved successfully.",
                 deleteConfirm: "Are you sure you want to delete this project?",
+                deleteError: "The project could not be deleted. Please try again.",
+                deleteNotFound: "That project is no longer in your account. Reload the page to see the current list.",
                 regSuccess: "Registration successful. Check your inbox if email confirmation is enabled.",
                 fullNPlace: "John Doe",
                 telPlace: "+1 555 000 0000",
