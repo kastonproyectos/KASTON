@@ -17,10 +17,18 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.status(401).json({ error: 'No authorization header' });
+    // El cliente manda el token dentro del cuerpo, no en la cabecera: asi la
+    // peticion es "simple" para el navegador y sobrevive la redireccion a www,
+    // que Safari no perdona cuando hay cabecera de autorizacion. Se acepta
+    // igual por cabecera para no romper a quien tenga la version anterior.
+    let datos = req.body;
+    if (typeof datos === 'string') {
+        try { datos = JSON.parse(datos); } catch (e) { datos = {}; }
+    }
+    const { action, id, fields, token } = datos || {};
 
-    const { action, id, fields } = req.body || {};
+    const authHeader = token ? `Bearer ${token}` : req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'No authorization header' });
     const base = `${SUPA_URL}/rest/v1/projects`;
 
     let url, method, body;
