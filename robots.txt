@@ -1,0 +1,13 @@
+# kastonproyectos.com
+
+User-agent: *
+Allow: /
+
+# Paginas internas: se pueden abrir con el enlace, pero no se indexan.
+Disallow: /kaston-pitch-deck
+Disallow: /kaston-pitch-deck-en
+Disallow: /diagnostico
+Disallow: /auth-callback
+Disallow: /mapa-proceso
+
+Sitemap: https://www.kastonproyectos.com/sitemap.xml
