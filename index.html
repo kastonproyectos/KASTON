@@ -1367,6 +1367,55 @@
             border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
+        /* Mapa del sitio */
+        .footer-map {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            text-align: left;
+            max-width: 860px;
+            margin: 36px auto 0;
+            padding-top: 34px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .footer-col h4 {
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+            opacity: 0.85;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 9px;
+        }
+
+        .footer-col a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.86rem;
+            transition: color 0.25s;
+        }
+
+        .footer-col a:hover {
+            color: var(--gold);
+        }
+
+        @media (max-width: 768px) {
+            .footer-map {
+                grid-template-columns: 1fr;
+                gap: 26px;
+                text-align: center;
+            }
+        }
+
         .footer p {
             font-size: 0.8rem;
             color: var(--muted);
@@ -1553,11 +1602,11 @@
         <div class="container">
             <a href="#hero" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#problema" data-i18n="nav.problema">Problema</a></li>
-                <li><a href="#solucion" data-i18n="nav.solucion">Solución</a></li>
-                <li><a href="#k-lock">K-Lock</a></li>
+                <li><a href="#solucion" data-i18n="nav.solucion">La teja</a></li>
+                <li><a href="#k-lock" data-i18n="nav.instalacion">Cómo se instala</a></li>
                 <li><a href="#colores" data-i18n="nav.colores">Colores</a></li>
-                <li><a href="#cotizacion" data-i18n="nav.cotizacion">Cotización</a></li>
+                <li><a href="#cotizacion" data-i18n="nav.precios">Precios</a></li>
+                <li><a href="/empresa" data-i18n="nav.empresa">Empresa</a></li>
                 <li><a href="#cta" class="nav-cta" data-i18n="nav.cta">Cotiza Ahora</a></li>
             </ul>
             <div class="nav-right">
@@ -1595,7 +1644,7 @@
                     años.</strong>
             </p>
             <div class="hero-cta-group fade-in fade-in-d3">
-                <a href="cotizador.html" class="btn btn-gold" data-i18n="hero.cta1">Cotiza Tu Proyecto</a>
+                <a href="/cotizador" class="btn btn-gold" data-i18n="hero.cta1">Cotiza Tu Proyecto</a>
                 <a href="#solucion" class="btn btn-outline" data-i18n="hero.cta2">Conoce Más</a>
             </div>
             <div class="hero-stats fade-in fade-in-d4">
@@ -1659,7 +1708,7 @@
 
         <div class="reveal-br fade-in fade-in-d2">
             <p data-i18n="reveal.br">Blindaje Total. En serio.</p>
-            <a href="cotizador.html" class="btn btn-gold" data-i18n="nav.cta">Cotiza Ahora</a>
+            <a href="/cotizador" class="btn btn-gold" data-i18n="nav.cta">Cotiza Ahora</a>
         </div>
     </section>
 
@@ -2374,7 +2423,7 @@
             </div>
 
             <div class="fade-in fade-in-d2" style="text-align:center; margin-top: 64px; margin-bottom: 24px;">
-                <a href="cotizador.html" class="btn btn-gold"
+                <a href="/cotizador" class="btn btn-gold"
                     style="font-size:1.1rem; padding:20px 56px; font-weight:700; display:inline-block;"
                     data-i18n="cta.btn">INICIAR COTIZACIÓN TÉCNICA</a>
             </div>
@@ -2481,7 +2530,7 @@
             <p class="tagline fade-in fade-in-d1" data-i18n="cta.tagline">COTIZA TU PROYECTO HOY Y OLVÍDATE DE CAMBIAR
                 EL TECHO POR 500 AÑOS</p>
             <div class="fade-in fade-in-d2">
-                <a href="cotizador.html" class="btn btn-gold" style="font-size:1rem; padding:18px 48px;"
+                <a href="/cotizador" class="btn btn-gold" style="font-size:1rem; padding:18px 48px;"
                     data-i18n="cta.btn">Cotiza Ahora</a>
             </div>
         </div>
@@ -2499,11 +2548,40 @@
             <div class="footer-brand" style="margin-top:24px;">KASTON</div>
             <p data-i18n="footer.tagline">Innovación para siempre. Cubiertas de polímero recuperado.</p>
             <p style="margin-top:16px;" data-i18n="footer.copy">&copy; 2026 KASTON. Todos los derechos reservados.</p>
-            <p style="margin-top:12px;">
-                <a href="privacidad.html" style="color:var(--muted); text-decoration:none; transition:color 0.25s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'" data-i18n="footer.priv">Política de Privacidad</a>
-                <span style="color:var(--muted); margin:0 10px;">·</span>
-                <a href="terminos.html" style="color:var(--muted); text-decoration:none; transition:color 0.25s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'" data-i18n="footer.terms">Términos y Condiciones</a>
-            </p>
+            <div class="footer-map">
+                <div class="footer-col">
+                    <h4 data-i18n="footer.col.prod">Producto</h4>
+                    <ul>
+                        <li><a href="#problema" data-i18n="nav.problema">Problema</a></li>
+                        <li><a href="#solucion" data-i18n="nav.solucion">Solución</a></li>
+                        <li><a href="#k-lock" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                        <li><a href="#colores" data-i18n="nav.colores">Colores</a></li>
+                        <li><a href="#especificaciones" data-i18n="footer.specs">Ficha técnica</a></li>
+                        <li><a href="#comparativa" data-i18n="footer.comp">Comparativa</a></li>
+                        <li><a href="/cotizador" data-i18n="nav.cotizacion">Cotización</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="footer.col.emp">Empresa</h4>
+                    <ul>
+                        <li><a href="/empresa#origen" data-i18n="emp.n1">Origen</a></li>
+                        <li><a href="/empresa#manifiesto" data-i18n="emp.n2">Manifiesto</a></li>
+                        <li><a href="/empresa#proposito" data-i18n="emp.n3">Misión, visión y valores</a></li>
+                        <li><a href="/empresa#impacto" data-i18n="emp.n5">Qué rescatamos</a></li>
+                        <li><a href="/empresa#datos" data-i18n="emp.n6">Datos oficiales</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="footer.col.legal">Legal y contacto</h4>
+                    <ul>
+                        <li><a href="/privacidad" data-i18n="footer.priv">Política de Privacidad</a></li>
+                        <li><a href="/terminos" data-i18n="footer.terms">Términos y Condiciones</a></li>
+                        <li><a href="/empresa#legal" data-i18n="emp.legal.hab.t">Tratamiento de datos</a></li>
+                        <li><a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a></li>
+                        <li><a href="https://wa.me/573188978552" target="_blank" rel="noopener noreferrer">+57 318 897 8552</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -2586,12 +2664,26 @@
                     'comp.title2': 'Análisis de <span class="gold">Superioridad Técnica</span>',
                     'footer.ig': 'Síguenos en Instagram',
                     'footer.priv': 'Política de Privacidad',
+                    'footer.specs': 'Ficha técnica',
+                    'footer.comp': 'Comparativa',
+                    'footer.col.prod': 'Producto',
+                    'footer.col.emp': 'Empresa',
+                    'footer.col.legal': 'Legal y contacto',
+                    'emp.n1': 'Origen',
+                    'emp.n2': 'Manifiesto',
+                    'emp.n3': 'Misión, visión y valores',
+                    'emp.n5': 'Qué rescatamos',
+                    'emp.n6': 'Datos oficiales',
+                    'emp.legal.hab.t': 'Tratamiento de datos',
                     'footer.terms': 'Términos y Condiciones',
                     'sp.composition': '<strong>Composición:</strong> Matriz termoplástica bifásica.<br><br><strong>Protección UV Activa:</strong> El grosor masivo de 8mm garantiza que el 96% del núcleo interno permanezca estructuralmente invulnerable a la radiación solar por décadas, limitando la degradación mecánica solo a las micras superficiales.',
                     'nav.problema': 'Problema',
-                    'nav.solucion': 'Solución',
+                    'nav.solucion': 'La teja',
+                    'nav.instalacion': 'Cómo se instala',
+                    'nav.precios': 'Precios',
                     'nav.colores': 'Colores',
                     'nav.cotizacion': 'Cotización',
+                    'nav.empresa': 'Empresa',
                     'nav.cta': 'INICIAR COTIZACIÓN TÉCNICA',
                     'hero.subtitle': 'INNOVACIÓN PARA SIEMPRE',
                     'hero.tagline': 'La primera cubierta de polímero recuperado diseñada para durar <strong style="color:var(--gold);">500 años.</strong>',
@@ -2775,9 +2867,12 @@
                     'footer.terms': 'Terms & Conditions',
                     'sp.composition': '<strong>Composition:</strong> Two-phase thermoplastic matrix.<br><br><strong>Active UV Protection:</strong> The massive 8mm thickness ensures that 96% of the inner core remains structurally invulnerable to solar radiation for decades, limiting mechanical degradation to just the surface microns.',
                     'nav.problema': 'Problem',
-                    'nav.solucion': 'Solution',
+                    'nav.solucion': 'The tile',
+                    'nav.instalacion': 'How it installs',
+                    'nav.precios': 'Pricing',
                     'nav.colores': 'Colors',
                     'nav.cotizacion': 'Quote',
+                    'nav.empresa': 'Company',
                     'nav.cta': 'START TECHNICAL QUOTE',
                     'hero.subtitle': 'INNOVATION FOREVER',
                     'hero.tagline': 'The first recovered polymer roofing tile designed to last <strong style="color:var(--gold);">500 years.</strong>',
@@ -2915,7 +3010,18 @@
                     'cta.tagline': 'QUOTE YOUR PROJECT TODAY AND FORGET ABOUT REPLACING YOUR ROOF FOR 500 YEARS',
                     'cta.btn': 'Get a Quote',
                     'footer.tagline': 'Innovation forever. Recovered polymer roofing.',
-                    'footer.copy': '&copy; 2026 KASTON. All rights reserved.'
+                    'footer.copy': '&copy; 2026 KASTON. All rights reserved.',
+                    'footer.specs': 'Spec sheet',
+                    'footer.comp': 'Comparison',
+                    'footer.col.prod': 'Product',
+                    'footer.col.emp': 'Company',
+                    'footer.col.legal': 'Legal and contact',
+                    'emp.n1': 'Origin',
+                    'emp.n2': 'Manifesto',
+                    'emp.n3': 'Mission, vision and values',
+                    'emp.n5': 'What we rescue',
+                    'emp.n6': 'Official records',
+                    'emp.legal.hab.t': 'Data handling'
                 }
             };
 

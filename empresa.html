@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASTON | La Empresa | Origen, Propósito y Datos Oficiales</title>
+    <meta name="description"
+        content="Quién está detrás de KASTON: una fábrica en Itagüí con 35 años, un techo de 17 años en Las Palmas, y los datos oficiales, el propósito y las políticas de la empresa.">
+    <meta property="og:title" content="KASTON | La Empresa">
+    <meta property="og:description" content="Una fábrica en Itagüí, un apellido y un techo de 17 años. Todo lo que hay detrás de la teja.">
+    <meta property="og:image" content="real-roof-2.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="KASTON | La Empresa">
+    <meta name="twitter:description" content="Una fábrica en Itagüí, un apellido y un techo de 17 años.">
+    <meta name="twitter:image" content="real-roof-2.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* =============================================
+           CUSTOM PROPERTIES (idénticas a index.html)
+           ============================================= */
+        :root {
+            --bg: #000000;
+            --gold: #C18A68;
+            --gold-dark: #8a6f4e;
+            --white: #FFFFFF;
+            --light: #F4F4F4;
+            --muted: #bcbcbc;
+            --surface: #111111;
+            --surface-light: #1a1a1a;
+            --green: #4A5B38;
+            --font-heading: 'Oswald', 'Now', 'Gotham', sans-serif;
+            --font-body: 'Inter', 'Now', 'Gotham', sans-serif;
+            --nav-height: 110px;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: calc(var(--nav-height) + 20px);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.15;
+        }
+
+        .gold { color: var(--gold); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+            width: 100%;
+        }
+
+        /* =============================================
+           NAVBAR
+           ============================================= */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--nav-height);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            transition: background 0.35s var(--ease), box-shadow 0.35s var(--ease);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 1px 0 rgba(193, 138, 104, 0.15);
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo-img { height: 46px; width: auto; display: block; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.25s;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active { color: var(--gold); }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0; right: 0;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 1px;
+        }
+
+        .nav-cta {
+            font-family: var(--font-heading) !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 2px !important;
+            text-transform: uppercase;
+            background: var(--gold) !important;
+            color: var(--bg) !important;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600 !important;
+            transition: background 0.25s, transform 0.25s !important;
+        }
+
+        .nav-cta:hover { background: var(--gold-dark) !important; transform: translateY(-1px); }
+        .nav-cta::after { display: none !important; }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(193, 138, 104, 0.25);
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .lang-toggle button {
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            padding: 7px 12px;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .lang-toggle button.active { background: var(--gold); color: var(--bg); }
+        .lang-toggle button:hover:not(.active) { color: var(--white); background: rgba(255, 255, 255, 0.06); }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            width: 24px; height: 2px;
+            background: var(--white);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        .btn {
+            display: inline-block;
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            transition: all 0.3s var(--ease);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-gold { background: var(--gold); color: var(--bg); }
+        .btn-gold:hover { background: #d49b76; transform: translateY(-2px); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* =============================================
+           CABECERA DE PÁGINA
+           ============================================= */
+        .page-head {
+            padding: calc(var(--nav-height) + 90px) 0 70px;
+            border-bottom: 1px solid rgba(193, 138, 104, 0.14);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-head::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 0%, rgba(193, 138, 104, 0.10), transparent 62%);
+            pointer-events: none;
+        }
+
+        .page-head .container { position: relative; z-index: 2; }
+
+        .eyebrow {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+            opacity: 0.85;
+        }
+
+        .page-head h1 {
+            font-size: clamp(2.6rem, 6vw, 4.6rem);
+            margin-bottom: 22px;
+        }
+
+        .page-head p {
+            max-width: 640px;
+            color: var(--light);
+            font-size: 1.08rem;
+        }
+
+        /* =============================================
+           LAYOUT: ÍNDICE + APARTADOS
+           ============================================= */
+        .layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 70px;
+            align-items: start;
+            padding: 70px 0 40px;
+        }
+
+        .toc {
+            position: sticky;
+            top: calc(var(--nav-height) + 30px);
+        }
+
+        .toc-title {
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            opacity: 0.8;
+        }
+
+        .toc ol { list-style: none; counter-reset: toc; }
+
+        .toc li { counter-increment: toc; }
+
+        .toc a {
+            display: flex;
+            gap: 12px;
+            align-items: baseline;
+            padding: 9px 0 9px 14px;
+            border-left: 2px solid rgba(255, 255, 255, 0.10);
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            transition: color 0.25s, border-color 0.25s;
+        }
+
+        .toc a::before {
+            content: '0' counter(toc);
+            font-family: var(--font-heading);
+            font-size: 0.68rem;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.28);
+            transition: color 0.25s;
+        }
+
+        .toc a:hover { color: var(--white); border-left-color: rgba(193, 138, 104, 0.5); }
+
+        .toc a.active {
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .toc a.active::before { color: var(--gold); }
+
+        /* =============================================
+           APARTADOS
+           ============================================= */
+        .apartado {
+            padding: 58px 0 70px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        /* Los apartados solo arrancan ocultos si hay JS para revelarlos.
+           Sin JS (o con el script caido) la pagina se lee completa. */
+        .js .apartado {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+        }
+
+        .js .apartado.visible { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .js .apartado { opacity: 1; transform: none; transition: none; }
+        }
+        .apartado:first-child { padding-top: 0; }
+        .apartado:last-child { border-bottom: none; }
+
+        .ap-num {
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .apartado h2 {
+            font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+            margin-bottom: 10px;
+        }
+
+        .ap-divider {
+            width: 56px;
+            height: 3px;
+            background: var(--gold);
+            margin: 20px 0 28px;
+            border-radius: 2px;
+        }
+
+        .apartado p {
+            color: var(--light);
+            margin-bottom: 18px;
+            max-width: 700px;
+        }
+
+        .apartado p strong { color: var(--white); font-weight: 600; }
+
+        /* Origen: foto + texto */
+        .origen-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 44px;
+            align-items: center;
+        }
+
+        .origen-foto {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(193, 138, 104, 0.22);
+            aspect-ratio: 4 / 3;
+        }
+
+        .origen-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .foto-pie {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 12px;
+            font-style: normal;
+        }
+
+        /* Manifiesto en cobre */
+        .manifiesto {
+            background: var(--gold);
+            color: var(--bg);
+            border-radius: 14px;
+            padding: 60px 52px;
+            margin: 6px 0 8px;
+        }
+
+        .manifiesto .ap-num, .manifiesto h2 { color: var(--bg); opacity: 1; }
+        .manifiesto .ap-divider { background: var(--bg); opacity: 0.35; }
+
+        .manifiesto blockquote {
+            font-family: var(--font-heading);
+            font-size: clamp(1.35rem, 2.9vw, 2.1rem);
+            line-height: 1.3;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
+            max-width: 780px;
+        }
+
+        .manifiesto .firma {
+            margin-top: 26px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-family: var(--font-heading);
+            opacity: 0.75;
+        }
+
+        /* Tarjetas */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.16);
+            border-radius: 12px;
+            padding: 28px 26px;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .card:hover { border-color: rgba(193, 138, 104, 0.45); transform: translateY(-3px); }
+
+        .card h3 {
+            font-size: 1.02rem;
+            color: var(--gold);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .card p { color: var(--muted); font-size: 0.94rem; margin: 0; }
+
+        /* Valores numerados */
+        .valores { display: grid; gap: 2px; margin-top: 8px; }
+
+        .valor {
+            display: grid;
+            grid-template-columns: 62px 1fr;
+            gap: 20px;
+            align-items: start;
+            padding: 22px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .valor:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+
+        .valor-num {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: rgba(193, 138, 104, 0.55);
+            line-height: 1;
+            padding-top: 2px;
+        }
+
+        .valor h3 { font-size: 1.02rem; margin-bottom: 6px; letter-spacing: 1.5px; }
+        .valor p { color: var(--muted); font-size: 0.94rem; margin: 0; }
+
+        /* Enemigo */
+        .enemigo-box {
+            border-left: 3px solid var(--gold);
+            background: linear-gradient(90deg, rgba(193, 138, 104, 0.09), transparent 70%);
+            padding: 30px 34px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+        }
+
+        .enemigo-box .frase {
+            font-family: var(--font-heading);
+            font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        /* Cifras */
+        .cifras {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin: 26px 0 8px;
+        }
+
+        .cifra {
+            background: var(--surface);
+            border: 1px solid rgba(74, 91, 56, 0.45);
+            border-radius: 12px;
+            padding: 26px 22px;
+        }
+
+        .cifra .n {
+            font-family: var(--font-heading);
+            font-size: 2.1rem;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .cifra .l { font-size: 0.85rem; color: var(--muted); }
+
+        /* Tabla de datos oficiales */
+        .datos { border-top: 1px solid rgba(255, 255, 255, 0.10); margin-top: 8px; }
+
+        .dato {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            gap: 24px;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            align-items: baseline;
+        }
+
+        .dato dt {
+            font-family: var(--font-heading);
+            font-size: 0.76rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            opacity: 0.85;
+        }
+
+        .dato dd { color: var(--light); font-size: 0.98rem; }
+
+        .dato dd a { color: var(--light); text-decoration: none; border-bottom: 1px solid rgba(193, 138, 104, 0.45); transition: color 0.25s; }
+        .dato dd a:hover { color: var(--gold); }
+
+        /* Legal */
+        .legal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 12px;
+        }
+
+        .legal-card {
+            display: block;
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.16);
+            border-radius: 12px;
+            padding: 28px 26px;
+            text-decoration: none;
+            transition: border-color 0.3s, transform 0.3s, background 0.3s;
+        }
+
+        .legal-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+            background: var(--surface-light);
+        }
+
+        .legal-card h3 { font-size: 0.98rem; color: var(--gold); margin-bottom: 10px; letter-spacing: 1.5px; }
+        .legal-card p { color: var(--muted); font-size: 0.92rem; margin: 0; }
+
+        .legal-card .ir {
+            display: inline-block;
+            margin-top: 14px;
+            font-family: var(--font-heading);
+            font-size: 0.74rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        /* CTA final */
+        .cta-empresa {
+            text-align: center;
+            padding: 90px 0 100px;
+            border-top: 1px solid rgba(193, 138, 104, 0.14);
+        }
+
+        .cta-empresa h2 { font-size: clamp(1.7rem, 3.6vw, 2.6rem); margin-bottom: 18px; }
+        .cta-empresa p { color: var(--muted); max-width: 520px; margin: 0 auto 34px; }
+
+        .cta-botones { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+        /* =============================================
+           FOOTER (mapa del sitio)
+           ============================================= */
+        .footer {
+            background: var(--surface);
+            border-top: 1px solid rgba(193, 138, 104, 0.15);
+            padding: 64px 0 34px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+            padding-bottom: 44px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .footer-brand {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            letter-spacing: 5px;
+            color: var(--white);
+            margin-bottom: 14px;
+        }
+
+        .footer-col h4 {
+            font-size: 0.74rem;
+            letter-spacing: 2.5px;
+            color: var(--gold);
+            margin-bottom: 16px;
+            opacity: 0.85;
+        }
+
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 10px; }
+
+        .footer-col a, .footer p {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.25s;
+        }
+
+        .footer-col a:hover { color: var(--gold); }
+
+        .footer-bottom {
+            padding-top: 26px;
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .footer-bottom p { font-size: 0.84rem; color: var(--muted); }
+
+        .footer-ig {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.25s;
+        }
+
+        .footer-ig:hover { color: var(--gold); }
+
+        /* =============================================
+           RESPONSIVE
+           ============================================= */
+        @media (max-width: 1000px) {
+            .layout { grid-template-columns: 1fr; gap: 0; padding-top: 44px; }
+
+            .toc {
+                position: static;
+                margin-bottom: 46px;
+                padding-bottom: 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .toc ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 2px; }
+            .origen-grid { grid-template-columns: 1fr; gap: 30px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+        }
+
+        @media (max-width: 768px) {
+            :root { --nav-height: 84px; }
+
+            .container { padding: 0 22px; }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: var(--nav-height);
+                left: 0; right: 0;
+                background: rgba(0, 0, 0, 0.96);
+                backdrop-filter: blur(16px);
+                flex-direction: column;
+                padding: 20px 32px 28px;
+                gap: 16px;
+                border-bottom: 1px solid rgba(193, 138, 104, 0.15);
+            }
+
+            .nav-links.open { display: flex; }
+            .hamburger { display: flex; }
+            .nav-logo-img { height: 38px; }
+
+            .page-head { padding: calc(var(--nav-height) + 56px) 0 50px; }
+            .manifiesto { padding: 40px 26px; }
+            .dato { grid-template-columns: 1fr; gap: 6px; }
+            .valor { grid-template-columns: 40px 1fr; gap: 14px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+        }
+    </style>
+</head>
+
+<body>
+    <script>document.documentElement.className += ' js';</script>
+
+    <!-- ================================================
+     NAVBAR
+     ================================================ -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#solucion" data-i18n="nav.solucion">La teja</a></li>
+                <li><a href="/#k-lock" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                <li><a href="/#colores" data-i18n="nav.colores">Colores</a></li>
+                <li><a href="/#cotizacion" data-i18n="nav.precios">Precios</a></li>
+                <li><a href="/empresa" class="active" data-i18n="nav.empresa">Empresa</a></li>
+                <li><a href="/cotizador" class="nav-cta" data-i18n="nav.cta">Cotiza Ahora</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="lang-toggle" id="langToggle">
+                    <button class="active" data-lang="es">ES</button>
+                    <button data-lang="en">EN</button>
+                </div>
+                <button class="hamburger" id="hamburger" aria-label="Menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================================================
+     CABECERA
+     ================================================ -->
+    <header class="page-head">
+        <div class="container">
+            <div class="eyebrow" data-i18n="emp.eyebrow">La empresa</div>
+            <h1 data-i18n-html="emp.title">Quién está <span class="gold">detrás</span><br>de la teja</h1>
+            <p data-i18n="emp.intro">Una fábrica en Itagüí con treinta y cinco años de oficio, un apellido que responde
+                y un techo que lleva diecisiete años puesto. Aquí está todo lo que no cabe en la ficha técnica,
+                incluidas nuestras políticas y nuestros datos oficiales.</p>
+        </div>
+    </header>
+
+    <!-- ================================================
+     ÍNDICE + APARTADOS
+     ================================================ -->
+    <div class="container">
+        <div class="layout">
+
+            <!-- Índice lateral -->
+            <aside class="toc">
+                <div class="toc-title" data-i18n="emp.toc">Apartados</div>
+                <ol>
+                    <li><a href="#origen" data-i18n="emp.n1">Origen</a></li>
+                    <li><a href="#manifiesto" data-i18n="emp.n2">Manifiesto</a></li>
+                    <li><a href="#proposito" data-i18n="emp.n3">Misión, visión y valores</a></li>
+                    <li><a href="#enemigo" data-i18n="emp.n4">Contra qué peleamos</a></li>
+                    <li><a href="#impacto" data-i18n="emp.n5">Qué rescatamos</a></li>
+                    <li><a href="#datos" data-i18n="emp.n6">Datos oficiales</a></li>
+                    <li><a href="#legal" data-i18n="emp.n7">Legal y datos personales</a></li>
+                </ol>
+            </aside>
+
+            <main>
+
+                <!-- 01 ORIGEN -->
+                <section class="apartado" id="origen">
+                    <div class="ap-num">01</div>
+                    <h2 data-i18n-html="emp.origen.title">El origen: una casa en <span class="gold">Las Palmas</span></h2>
+                    <div class="ap-divider"></div>
+                    <div class="origen-grid">
+                        <div>
+                            <p data-i18n-html="emp.origen.p1"><strong>Juan David Ospina</strong> lleva más de treinta años
+                                en su fábrica de Itagüí, Cauchos Amazonas, haciendo suelas de zapato y bandas para marcas
+                                colombianas. Sabe de polímeros porque los trabaja todos los días desde antes de que el
+                                reciclaje fuera un argumento de venta.</p>
+                            <p data-i18n-html="emp.origen.p2">Hace diecisiete años fabricó unas tejas de polímero recuperado
+                                para su propia casa en Las Palmas, Medellín. No para venderlas. Para techar su casa. Ese
+                                techo aguantó granizadas, vendavales y un temblor <strong>sin una sola teja rota</strong>.</p>
+                            <p data-i18n-html="emp.origen.p3">Su hija, <strong>Juanita Ospina</strong>, creció debajo de ese
+                                techo. En 2022 decidió retomar el proyecto que su papá había dejado en pausa, y lo convirtió
+                                en KASTON. Por eso no vendemos una promesa: vendemos algo que ya lleva diecisiete años
+                                puesto, y la fábrica que lo hace sigue siendo la misma.</p>
+                            <p data-i18n-html="emp.origen.p4"><strong>KASTON fabrica, no revende.</strong> Cada teja sale de
+                                esa planta en Itagüí.</p>
+                        </div>
+                        <div>
+                            <div class="origen-foto">
+                                <img src="real-roof-2.jpg" alt="Techo KASTON instalado en Las Palmas, Medellín" loading="lazy">
+                            </div>
+                            <div class="foto-pie" data-i18n="emp.origen.pie">La primera instalación del sistema, en Las
+                                Palmas, Medellín. Diecisiete años a la intemperie.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 02 MANIFIESTO -->
+                <section class="apartado" id="manifiesto">
+                    <div class="manifiesto">
+                        <div class="ap-num">02</div>
+                        <h2 data-i18n="emp.mani.title">Manifiesto</h2>
+                        <div class="ap-divider"></div>
+                        <blockquote data-i18n="emp.mani.quote">De las tejas para arriba está el exterior. De tu techo para
+                            abajo está tu familia. KASTON es lo que hay en medio.</blockquote>
+                        <div class="firma" data-i18n="emp.mani.firma">Juanita Ospina, fundadora</div>
+                    </div>
+                </section>
+
+                <!-- 03 MISIÓN, VISIÓN Y VALORES -->
+                <section class="apartado" id="proposito">
+                    <div class="ap-num">03</div>
+                    <h2 data-i18n="emp.prop.title">Misión, visión y valores</h2>
+                    <div class="ap-divider"></div>
+
+                    <div class="cards">
+                        <div class="card">
+                            <h3 data-i18n="emp.prop.mision.t">Misión</h3>
+                            <p data-i18n="emp.prop.mision.d">Fabricar cubiertas que no haya que volver a cambiar.
+                                Convertimos polímero recuperado del sector industrial en tejas que protegen una casa
+                                durante generaciones, hechas en nuestra propia planta y respaldadas metro a metro.</p>
+                        </div>
+                        <div class="card">
+                            <h3 data-i18n="emp.prop.vision.t">Visión</h3>
+                            <p data-i18n="emp.prop.vision.d">Que en 2030 cambiar el techo cada quince años sea cosa del
+                                pasado en Colombia, y que la cubierta de polímero recuperado sea el estándar en Medellín,
+                                en el país y en la región andina.</p>
+                        </div>
+                    </div>
+
+                    <div class="valores" style="margin-top:34px;">
+                        <div class="valor">
+                            <div class="valor-num">01</div>
+                            <div>
+                                <h3 data-i18n="emp.val1.t">Se prueba, no se promete</h3>
+                                <p data-i18n="emp.val1.d">Diecisiete años bajo el mismo techo antes de vender el primer
+                                    metro. Todo dato que publicamos se puede verificar.</p>
+                            </div>
+                        </div>
+                        <div class="valor">
+                            <div class="valor-num">02</div>
+                            <div>
+                                <h3 data-i18n="emp.val2.t">Fabricamos, no revendemos</h3>
+                                <p data-i18n="emp.val2.d">La planta es nuestra y está en Itagüí. Si algo sale mal, no hay a
+                                    quién echarle la culpa.</p>
+                            </div>
+                        </div>
+                        <div class="valor">
+                            <div class="valor-num">03</div>
+                            <div>
+                                <h3 data-i18n="emp.val3.t">Lo que se rescata, se transforma</h3>
+                                <p data-i18n="emp.val3.d">Trabajamos con polímero recuperado del sector industrial. No es
+                                    un adorno del discurso: es de lo que está hecha la teja.</p>
+                            </div>
+                        </div>
+                        <div class="valor">
+                            <div class="valor-num">04</div>
+                            <div>
+                                <h3 data-i18n="emp.val4.t">Respondemos por el metro instalado</h3>
+                                <p data-i18n="emp.val4.d">Decimos qué incluye el precio y qué no. Sin sorpresas al final
+                                    de la obra.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 04 ENEMIGO -->
+                <section class="apartado" id="enemigo">
+                    <div class="ap-num">04</div>
+                    <h2 data-i18n="emp.enem.title">Contra qué peleamos</h2>
+                    <div class="ap-divider"></div>
+                    <div class="enemigo-box">
+                        <div class="frase" data-i18n="emp.enem.frase">El techo con fecha de caducidad.</div>
+                    </div>
+                    <p data-i18n-html="emp.enem.p1">La industria de la construcción normalizó algo absurdo: que la parte de
+                        la casa que protege a todas las demás sea la que primero se daña. El barro dura entre veinte y
+                        cuarenta años. El zinc, entre quince y treinta. Y cada reemplazo cuesta plata, obra y semanas de
+                        incomodidad.</p>
+                    <p data-i18n-html="emp.enem.p2">No peleamos contra ninguna empresa. Peleamos contra la idea de que un
+                        techo es un consumible. Por eso hablamos de tres cosas y siempre de una a la vez:
+                        <strong>escudo</strong> (lo que protege), <strong>herencia</strong> (el último techo que compras,
+                        el que heredan tus hijos) y <strong>rescate</strong> (de dónde sale el material).</p>
+                </section>
+
+                <!-- 05 IMPACTO -->
+                <section class="apartado" id="impacto">
+                    <div class="ap-num">05</div>
+                    <h2 data-i18n="emp.imp.title">Qué rescatamos</h2>
+                    <div class="ap-divider"></div>
+                    <p data-i18n-html="emp.imp.p1">Cada metro cuadrado de cubierta KASTON son <strong>12,6 kg de polímero
+                        recuperado del sector industrial</strong> que dejan de ser residuo y pasan a ser techo. En una casa
+                        de 150 m², eso son cerca de <strong>1,9 toneladas</strong>.</p>
+                    <div class="cifras">
+                        <div class="cifra">
+                            <div class="n">12,6 kg</div>
+                            <div class="l" data-i18n="emp.imp.c1">Polímero recuperado por m²</div>
+                        </div>
+                        <div class="cifra">
+                            <div class="n">500</div>
+                            <div class="l" data-i18n="emp.imp.c2">Años de vida química del material</div>
+                        </div>
+                        <div class="cifra">
+                            <div class="n">100%</div>
+                            <div class="l" data-i18n="emp.imp.c3">Reciclable al final de su ciclo</div>
+                        </div>
+                        <div class="cifra">
+                            <div class="n">0%</div>
+                            <div class="l" data-i18n="emp.imp.c4">Absorción de agua</div>
+                        </div>
+                    </div>
+                    <p style="margin-top:26px;" data-i18n-html="emp.imp.p2">Además, nuestro proceso trabaja a temperaturas
+                        mucho más bajas que un horno de teja de barro, que supera los 900 °C. Y cuando dentro de siglos
+                        alguien desmonte ese techo, no va a tener un escombro: va a tener materia prima.</p>
+                    <p data-i18n-html="emp.imp.p3">Lo que sí decimos siempre: trabajamos con <strong>polímero recuperado del
+                        sector industrial</strong>. La fórmula y el proceso son nuestros y no se publican.</p>
+                </section>
+
+                <!-- 06 DATOS OFICIALES -->
+                <section class="apartado" id="datos">
+                    <div class="ap-num">06</div>
+                    <h2 data-i18n="emp.datos.title">Datos oficiales</h2>
+                    <div class="ap-divider"></div>
+                    <p data-i18n="emp.datos.intro">Para constructoras, proveedores y cualquiera que necesite saber con
+                        quién está tratando antes de comprar.</p>
+                    <dl class="datos">
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.marca">Marca</dt>
+                            <dd>KASTON</dd>
+                        </div>
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.responsable">Responsable</dt>
+                            <dd data-i18n="emp.datos.responsable.d">Juanita Ospina, fundadora</dd>
+                        </div>
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.fabricacion">Fabricación</dt>
+                            <dd data-i18n="emp.datos.fabricacion.d">Producción propia en Cauchos Amazonas SAS, Itagüí.
+                                KASTON fabrica, no revende.</dd>
+                        </div>
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.planta">Planta de producción</dt>
+                            <dd>Carrera 46 #50-75, Los Naranjos, Itagüí, Antioquia, Colombia</dd>
+                        </div>
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.correo">Correo</dt>
+                            <dd><a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a></dd>
+                        </div>
+                        <div class="dato">
+                            <dt>WhatsApp</dt>
+                            <dd><a href="https://wa.me/573188978552" target="_blank" rel="noopener noreferrer">+57 318 897 8552</a></dd>
+                        </div>
+                        <div class="dato">
+                            <dt>Instagram</dt>
+                            <dd><a href="https://www.instagram.com/kaston.proyectos" target="_blank" rel="noopener noreferrer">@kaston.proyectos</a></dd>
+                        </div>
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.equipo">Equipo</dt>
+                            <dd data-i18n="emp.datos.equipo.d">Juanita Ospina (fundadora, producto y mercado) · Juan David
+                                Ospina (fabricación) · Eliana Cano (comercial). Negocio familiar.</dd>
+                        </div>
+                        <div class="dato">
+                            <dt data-i18n="emp.datos.facturacion">Facturación</dt>
+                            <dd data-i18n-html="emp.datos.facturacion.d">¿Necesitas RUT o documentos tributarios para
+                                registrarnos como proveedor? Escríbenos a
+                                <a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a> y te los
+                                enviamos.</dd>
+                        </div>
+                    </dl>
+                </section>
+
+                <!-- 07 LEGAL -->
+                <section class="apartado" id="legal">
+                    <div class="ap-num">07</div>
+                    <h2 data-i18n="emp.legal.title">Legal y datos personales</h2>
+                    <div class="ap-divider"></div>
+                    <p data-i18n="emp.legal.intro">Nada de esto vive escondido en letra chica. Si nos das tus datos para
+                        una cotización, tienes derecho a saber qué hacemos con ellos y a pedir que los borremos cuando
+                        quieras.</p>
+                    <div class="legal-grid">
+                        <a class="legal-card" href="/privacidad">
+                            <h3 data-i18n="footer.priv">Política de Privacidad</h3>
+                            <p data-i18n="emp.legal.priv.d">Qué datos guardamos cuando cotizas o creas una cuenta, para qué
+                                los usamos y cómo pedir que los eliminemos.</p>
+                            <span class="ir" data-i18n="emp.legal.leer">Leer</span>
+                        </a>
+                        <a class="legal-card" href="/terminos">
+                            <h3 data-i18n="footer.terms">Términos y Condiciones</h3>
+                            <p data-i18n="emp.legal.terms.d">Las reglas de uso del sitio y del cotizador, y el alcance de
+                                lo que una cotización significa.</p>
+                            <span class="ir" data-i18n="emp.legal.leer">Leer</span>
+                        </a>
+                        <a class="legal-card" href="mailto:kaston.proyectos@gmail.com?subject=Tratamiento%20de%20datos%20personales">
+                            <h3 data-i18n="emp.legal.hab.t">Tratamiento de datos</h3>
+                            <p data-i18n="emp.legal.hab.d">¿Quieres consultar, corregir o eliminar tus datos personales?
+                                Escríbenos y lo resolvemos.</p>
+                            <span class="ir" data-i18n="emp.legal.escribir">Escribir</span>
+                        </a>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ================================================
+     CTA
+     ================================================ -->
+    <section class="cta-empresa">
+        <div class="container">
+            <h2 data-i18n-html="emp.cta.title">¿Hablamos de <span class="gold">tu techo</span>?</h2>
+            <p data-i18n="emp.cta.sub">Calcula tu proyecto en dos minutos, o escríbenos y lo miramos contigo.</p>
+            <div class="cta-botones">
+                <a href="/cotizador" class="btn btn-gold" data-i18n="nav.cta">Cotiza Ahora</a>
+                <a href="https://wa.me/573188978552" target="_blank" rel="noopener noreferrer" class="btn btn-outline"
+                    data-i18n="emp.cta.wa">Escríbenos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+     FOOTER
+     ================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">KASTON</div>
+                    <p data-i18n="footer.tagline">Innovación para siempre. Cubiertas de polímero recuperado.</p>
+                    <p style="margin-top:14px;">Carrera 46 #50-75, Los Naranjos<br>Itagüí, Antioquia, Colombia</p>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="footer.col.prod">Producto</h4>
+                    <ul>
+                        <li><a href="/#problema" data-i18n="nav.problema">Problema</a></li>
+                        <li><a href="/#solucion" data-i18n="nav.solucion">Solución</a></li>
+                        <li><a href="/#k-lock" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                        <li><a href="/#colores" data-i18n="nav.colores">Colores</a></li>
+                        <li><a href="/#especificaciones" data-i18n="footer.specs">Ficha técnica</a></li>
+                        <li><a href="/#comparativa" data-i18n="footer.comp">Comparativa</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="footer.col.emp">Empresa</h4>
+                    <ul>
+                        <li><a href="/empresa#origen" data-i18n="emp.n1">Origen</a></li>
+                        <li><a href="/empresa#proposito" data-i18n="emp.n3">Misión, visión y valores</a></li>
+                        <li><a href="/empresa#impacto" data-i18n="emp.n5">Qué rescatamos</a></li>
+                        <li><a href="/empresa#datos" data-i18n="emp.n6">Datos oficiales</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 data-i18n="footer.col.legal">Legal y contacto</h4>
+                    <ul>
+                        <li><a href="/privacidad" data-i18n="footer.priv">Política de Privacidad</a></li>
+                        <li><a href="/terminos" data-i18n="footer.terms">Términos y Condiciones</a></li>
+                        <li><a href="/empresa#legal" data-i18n="emp.legal.hab.t">Tratamiento de datos</a></li>
+                        <li><a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a></li>
+                        <li><a href="https://wa.me/573188978552" target="_blank" rel="noopener noreferrer">+57 318 897 8552</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-i18n-html="footer.copy">&copy; 2026 KASTON. Todos los derechos reservados.</p>
+                <a href="https://www.instagram.com/kaston.proyectos" target="_blank" rel="noopener noreferrer" class="footer-ig">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.17.053 1.805.249 2.227.413.56.218.96.478 1.38.898.42.42.68.82.898 1.38.164.422.36 1.057.413 2.227.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.053 1.17-.249 1.805-.413 2.227a3.72 3.72 0 0 1-.898 1.38c-.42.42-.82.68-1.38.898-.422.164-1.057.36-2.227.413-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.053-1.805-.249-2.227-.413a3.72 3.72 0 0 1-1.38-.898 3.72 3.72 0 0 1-.898-1.38c-.164-.422-.36-1.057-.413-2.227-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.053-1.17.249-1.805.413-2.227.218-.56.478-.96.898-1.38.42-.42.82-.68 1.38-.898.422-.164 1.057-.36 2.227-.413 1.266-.058 1.646-.07 4.85-.07M12 0C8.741 0 8.332.014 7.052.072 5.775.131 4.903.333 4.14.63a5.88 5.88 0 0 0-2.126 1.384A5.88 5.88 0 0 0 .63 4.14C.333 4.903.131 5.775.072 7.052.014 8.332 0 8.741 0 12s.014 3.668.072 4.948c.059 1.277.261 2.149.558 2.912a5.88 5.88 0 0 0 1.384 2.126A5.88 5.88 0 0 0 4.14 23.37c.763.297 1.635.499 2.912.558C8.332 23.986 8.741 24 12 24s3.668-.014 4.948-.072c1.277-.059 2.149-.261 2.912-.558a5.88 5.88 0 0 0 2.126-1.384 5.88 5.88 0 0 0 1.384-2.126c.297-.763.499-1.635.558-2.912C23.986 15.668 24 15.259 24 12s-.014-3.668-.072-4.948c-.059-1.277-.261-2.149-.558-2.912a5.88 5.88 0 0 0-1.384-2.126A5.88 5.88 0 0 0 19.86.63c-.763-.297-1.635-.499-2.912-.558C15.668.014 15.259 0 12 0z"/><path d="M12 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/><circle cx="18.406" cy="5.594" r="1.44"/></svg>
+                    <span data-i18n="footer.ig">Síguenos en Instagram</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            /* =========================================
+               DICCIONARIO ES / EN
+               ========================================= */
+            var T = {
+                es: {
+                    'nav.problema': 'Problema',
+                    'nav.solucion': 'La teja',
+                    'nav.instalacion': 'Cómo se instala',
+                    'nav.precios': 'Precios',
+                    'nav.colores': 'Colores',
+                    'nav.cotizacion': 'Cotización',
+                    'nav.empresa': 'Empresa',
+                    'nav.cta': 'INICIAR COTIZACIÓN TÉCNICA',
+                    'emp.eyebrow': 'La empresa',
+                    'emp.title': 'Quién está <span class="gold">detrás</span><br>de la teja',
+                    'emp.intro': 'Una fábrica en Itagüí con treinta y cinco años de oficio, un apellido que responde y un techo que lleva diecisiete años puesto. Aquí está todo lo que no cabe en la ficha técnica, incluidas nuestras políticas y nuestros datos oficiales.',
+                    'emp.toc': 'Apartados',
+                    'emp.n1': 'Origen',
+                    'emp.n2': 'Manifiesto',
+                    'emp.n3': 'Misión, visión y valores',
+                    'emp.n4': 'Contra qué peleamos',
+                    'emp.n5': 'Qué rescatamos',
+                    'emp.n6': 'Datos oficiales',
+                    'emp.n7': 'Legal y datos personales',
+                    'emp.origen.title': 'El origen: una casa en <span class="gold">Las Palmas</span>',
+                    'emp.origen.p1': '<strong>Juan David Ospina</strong> lleva más de treinta años en su fábrica de Itagüí, Cauchos Amazonas, haciendo suelas de zapato y bandas para marcas colombianas. Sabe de polímeros porque los trabaja todos los días desde antes de que el reciclaje fuera un argumento de venta.',
+                    'emp.origen.p2': 'Hace diecisiete años fabricó unas tejas de polímero recuperado para su propia casa en Las Palmas, Medellín. No para venderlas. Para techar su casa. Ese techo aguantó granizadas, vendavales y un temblor <strong>sin una sola teja rota</strong>.',
+                    'emp.origen.p3': 'Su hija, <strong>Juanita Ospina</strong>, creció debajo de ese techo. En 2022 decidió retomar el proyecto que su papá había dejado en pausa, y lo convirtió en KASTON. Por eso no vendemos una promesa: vendemos algo que ya lleva diecisiete años puesto, y la fábrica que lo hace sigue siendo la misma.',
+                    'emp.origen.p4': '<strong>KASTON fabrica, no revende.</strong> Cada teja sale de esa planta en Itagüí.',
+                    'emp.origen.pie': 'La primera instalación del sistema, en Las Palmas, Medellín. Diecisiete años a la intemperie.',
+                    'emp.mani.title': 'Manifiesto',
+                    'emp.mani.quote': 'De las tejas para arriba está el exterior. De tu techo para abajo está tu familia. KASTON es lo que hay en medio.',
+                    'emp.mani.firma': 'Juanita Ospina, fundadora',
+                    'emp.prop.title': 'Misión, visión y valores',
+                    'emp.prop.mision.t': 'Misión',
+                    'emp.prop.mision.d': 'Fabricar cubiertas que no haya que volver a cambiar. Convertimos polímero recuperado del sector industrial en tejas que protegen una casa durante generaciones, hechas en nuestra propia planta y respaldadas metro a metro.',
+                    'emp.prop.vision.t': 'Visión',
+                    'emp.prop.vision.d': 'Que en 2030 cambiar el techo cada quince años sea cosa del pasado en Colombia, y que la cubierta de polímero recuperado sea el estándar en Medellín, en el país y en la región andina.',
+                    'emp.val1.t': 'Se prueba, no se promete',
+                    'emp.val1.d': 'Diecisiete años bajo el mismo techo antes de vender el primer metro. Todo dato que publicamos se puede verificar.',
+                    'emp.val2.t': 'Fabricamos, no revendemos',
+                    'emp.val2.d': 'La planta es nuestra y está en Itagüí. Si algo sale mal, no hay a quién echarle la culpa.',
+                    'emp.val3.t': 'Lo que se rescata, se transforma',
+                    'emp.val3.d': 'Trabajamos con polímero recuperado del sector industrial. No es un adorno del discurso: es de lo que está hecha la teja.',
+                    'emp.val4.t': 'Respondemos por el metro instalado',
+                    'emp.val4.d': 'Decimos qué incluye el precio y qué no. Sin sorpresas al final de la obra.',
+                    'emp.enem.title': 'Contra qué peleamos',
+                    'emp.enem.frase': 'El techo con fecha de caducidad.',
+                    'emp.enem.p1': 'La industria de la construcción normalizó algo absurdo: que la parte de la casa que protege a todas las demás sea la que primero se daña. El barro dura entre veinte y cuarenta años. El zinc, entre quince y treinta. Y cada reemplazo cuesta plata, obra y semanas de incomodidad.',
+                    'emp.enem.p2': 'No peleamos contra ninguna empresa. Peleamos contra la idea de que un techo es un consumible. Por eso hablamos de tres cosas y siempre de una a la vez: <strong>escudo</strong> (lo que protege), <strong>herencia</strong> (el último techo que compras, el que heredan tus hijos) y <strong>rescate</strong> (de dónde sale el material).',
+                    'emp.imp.title': 'Qué rescatamos',
+                    'emp.imp.p1': 'Cada metro cuadrado de cubierta KASTON son <strong>12,6 kg de polímero recuperado del sector industrial</strong> que dejan de ser residuo y pasan a ser techo. En una casa de 150 m², eso son cerca de <strong>1,9 toneladas</strong>.',
+                    'emp.imp.c1': 'Polímero recuperado por m²',
+                    'emp.imp.c2': 'Años de vida química del material',
+                    'emp.imp.c3': 'Reciclable al final de su ciclo',
+                    'emp.imp.c4': 'Absorción de agua',
+                    'emp.imp.p2': 'Además, nuestro proceso trabaja a temperaturas mucho más bajas que un horno de teja de barro, que supera los 900 °C. Y cuando dentro de siglos alguien desmonte ese techo, no va a tener un escombro: va a tener materia prima.',
+                    'emp.imp.p3': 'Lo que sí decimos siempre: trabajamos con <strong>polímero recuperado del sector industrial</strong>. La fórmula y el proceso son nuestros y no se publican.',
+                    'emp.datos.title': 'Datos oficiales',
+                    'emp.datos.intro': 'Para constructoras, proveedores y cualquiera que necesite saber con quién está tratando antes de comprar.',
+                    'emp.datos.marca': 'Marca',
+                    'emp.datos.responsable': 'Responsable',
+                    'emp.datos.responsable.d': 'Juanita Ospina, fundadora',
+                    'emp.datos.fabricacion': 'Fabricación',
+                    'emp.datos.fabricacion.d': 'Producción propia en Cauchos Amazonas SAS, Itagüí. KASTON fabrica, no revende.',
+                    'emp.datos.facturacion': 'Facturación',
+                    'emp.datos.facturacion.d': '¿Necesitas RUT o documentos tributarios para registrarnos como proveedor? Escríbenos a <a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a> y te los enviamos.',
+                    'emp.datos.planta': 'Planta de producción',
+                    'emp.datos.correo': 'Correo',
+                    'emp.datos.equipo': 'Equipo',
+                    'emp.datos.equipo.d': 'Juanita Ospina (fundadora, producto y mercado) · Juan David Ospina (fabricación) · Eliana Cano (comercial). Negocio familiar.',
+                    'emp.legal.title': 'Legal y datos personales',
+                    'emp.legal.intro': 'Nada de esto vive escondido en letra chica. Si nos das tus datos para una cotización, tienes derecho a saber qué hacemos con ellos y a pedir que los borremos cuando quieras.',
+                    'emp.legal.priv.d': 'Qué datos guardamos cuando cotizas o creas una cuenta, para qué los usamos y cómo pedir que los eliminemos.',
+                    'emp.legal.terms.d': 'Las reglas de uso del sitio y del cotizador, y el alcance de lo que una cotización significa.',
+                    'emp.legal.hab.t': 'Tratamiento de datos',
+                    'emp.legal.hab.d': '¿Quieres consultar, corregir o eliminar tus datos personales? Escríbenos y lo resolvemos.',
+                    'emp.legal.leer': 'Leer',
+                    'emp.legal.escribir': 'Escribir',
+                    'emp.cta.title': '¿Hablamos de <span class="gold">tu techo</span>?',
+                    'emp.cta.sub': 'Calcula tu proyecto en dos minutos, o escríbenos y lo miramos contigo.',
+                    'emp.cta.wa': 'Escríbenos',
+                    'footer.ig': 'Síguenos en Instagram',
+                    'footer.tagline': 'Innovación para siempre. Cubiertas de polímero recuperado.',
+                    'footer.copy': '&copy; 2026 KASTON. Todos los derechos reservados.',
+                    'footer.priv': 'Política de Privacidad',
+                    'footer.terms': 'Términos y Condiciones',
+                    'footer.specs': 'Ficha técnica',
+                    'footer.comp': 'Comparativa',
+                    'footer.col.prod': 'Producto',
+                    'footer.col.emp': 'Empresa',
+                    'footer.col.legal': 'Legal y contacto'
+                },
+                en: {
+                    'nav.problema': 'Problem',
+                    'nav.solucion': 'The tile',
+                    'nav.instalacion': 'How it installs',
+                    'nav.precios': 'Pricing',
+                    'nav.colores': 'Colors',
+                    'nav.cotizacion': 'Quote',
+                    'nav.empresa': 'Company',
+                    'nav.cta': 'START TECHNICAL QUOTE',
+                    'emp.eyebrow': 'The company',
+                    'emp.title': 'Who is <span class="gold">behind</span><br>the tile',
+                    'emp.intro': 'A factory in Itagüí with thirty five years of craft, a family name that answers for it, and a roof that has been up for seventeen years. This is everything that does not fit on a spec sheet, including our policies and our official records.',
+                    'emp.toc': 'Sections',
+                    'emp.n1': 'Origin',
+                    'emp.n2': 'Manifesto',
+                    'emp.n3': 'Mission, vision and values',
+                    'emp.n4': 'What we fight',
+                    'emp.n5': 'What we rescue',
+                    'emp.n6': 'Official records',
+                    'emp.n7': 'Legal and personal data',
+                    'emp.origen.title': 'The origin: a house in <span class="gold">Las Palmas</span>',
+                    'emp.origen.p1': '<strong>Juan David Ospina</strong> has spent more than thirty years at his factory in Itagüí, Cauchos Amazonas, making shoe soles and industrial belts for Colombian brands. He knows polymers because he has worked with them every day since long before recycling became a sales pitch.',
+                    'emp.origen.p2': 'Seventeen years ago he made a batch of recovered polymer tiles for his own house in Las Palmas, Medellín. Not to sell them. To roof his house. That roof has taken hailstorms, windstorms and an earthquake <strong>without a single broken tile</strong>.',
+                    'emp.origen.p3': 'His daughter, <strong>Juanita Ospina</strong>, grew up under that roof. In 2022 she picked up the project her father had left on pause and turned it into KASTON. That is why we are not selling a promise: we are selling something that has already been up for seventeen years, made in the same factory.',
+                    'emp.origen.p4': '<strong>KASTON manufactures, it does not resell.</strong> Every tile comes out of that plant in Itagüí.',
+                    'emp.origen.pie': 'The first installation of the system, in Las Palmas, Medellín. Seventeen years in the open.',
+                    'emp.mani.title': 'Manifesto',
+                    'emp.mani.quote': 'Above the tiles is the outside world. Below your roof is your family. KASTON is what stands in between.',
+                    'emp.mani.firma': 'Juanita Ospina, founder',
+                    'emp.prop.title': 'Mission, vision and values',
+                    'emp.prop.mision.t': 'Mission',
+                    'emp.prop.mision.d': 'To manufacture roofing that never has to be replaced. We turn recovered industrial polymer into tiles that protect a home for generations, made in our own plant and backed square meter by square meter.',
+                    'emp.prop.vision.t': 'Vision',
+                    'emp.prop.vision.d': 'That by 2030 replacing a roof every fifteen years is a thing of the past in Colombia, and that recovered polymer roofing becomes the standard in Medellín, across the country and throughout the Andean region.',
+                    'emp.val1.t': 'Proven, not promised',
+                    'emp.val1.d': 'Seventeen years under the same roof before selling the first square meter. Every figure we publish can be verified.',
+                    'emp.val2.t': 'We manufacture, we do not resell',
+                    'emp.val2.d': 'The plant is ours and it is in Itagüí. If something goes wrong, there is no one else to blame.',
+                    'emp.val3.t': 'What is rescued gets transformed',
+                    'emp.val3.d': 'We work with recovered industrial polymer. It is not a decoration on the pitch: it is what the tile is made of.',
+                    'emp.val4.t': 'We answer for the installed square meter',
+                    'emp.val4.d': 'We say what the price includes and what it does not. No surprises at the end of the job.',
+                    'emp.enem.title': 'What we fight',
+                    'emp.enem.frase': 'The roof with an expiry date.',
+                    'emp.enem.p1': 'The construction industry normalized something absurd: the part of the house that protects every other part is the first one to fail. Clay lasts twenty to forty years. Zinc, fifteen to thirty. And every replacement costs money, labor and weeks of disruption.',
+                    'emp.enem.p2': 'We do not fight any company. We fight the idea that a roof is a consumable. That is why we talk about three things, always one at a time: <strong>shield</strong> (what it protects), <strong>inheritance</strong> (the last roof you buy, the one your children inherit) and <strong>rescue</strong> (where the material comes from).',
+                    'emp.imp.title': 'What we rescue',
+                    'emp.imp.p1': 'Every square meter of KASTON roofing is <strong>12.6 kg of recovered industrial polymer</strong> that stops being waste and becomes a roof. On a 150 m² house, that is close to <strong>1.9 tonnes</strong>.',
+                    'emp.imp.c1': 'Recovered polymer per m²',
+                    'emp.imp.c2': 'Years of chemical life',
+                    'emp.imp.c3': 'Recyclable at end of life',
+                    'emp.imp.c4': 'Water absorption',
+                    'emp.imp.p2': 'Our process also runs at far lower temperatures than a clay tile kiln, which exceeds 900 °C. And when someone takes that roof down centuries from now, they will not have rubble: they will have raw material.',
+                    'emp.imp.p3': 'What we always state: we work with <strong>polymer recovered from the industrial sector</strong>. The formula and the process are ours and are not published.',
+                    'emp.datos.title': 'Official records',
+                    'emp.datos.intro': 'For construction firms, suppliers and anyone who needs to know who they are dealing with before buying.',
+                    'emp.datos.marca': 'Brand',
+                    'emp.datos.responsable': 'Responsible',
+                    'emp.datos.responsable.d': 'Juanita Ospina, founder',
+                    'emp.datos.fabricacion': 'Manufacturing',
+                    'emp.datos.fabricacion.d': 'Produced in house at Cauchos Amazonas SAS, Itagüí. KASTON manufactures, it does not resell.',
+                    'emp.datos.facturacion': 'Invoicing',
+                    'emp.datos.facturacion.d': 'Need tax records to register us as a supplier? Write to <a href="mailto:kaston.proyectos@gmail.com">kaston.proyectos@gmail.com</a> and we will send them over.',
+                    'emp.datos.planta': 'Production plant',
+                    'emp.datos.correo': 'Email',
+                    'emp.datos.equipo': 'Team',
+                    'emp.datos.equipo.d': 'Juanita Ospina (founder, product and market) · Juan David Ospina (manufacturing) · Eliana Cano (commercial). A family business.',
+                    'emp.legal.title': 'Legal and personal data',
+                    'emp.legal.intro': 'None of this is buried in fine print. If you give us your data for a quote, you have the right to know what we do with it and to ask us to delete it whenever you want.',
+                    'emp.legal.priv.d': 'What data we keep when you request a quote or create an account, what we use it for, and how to ask us to delete it.',
+                    'emp.legal.terms.d': 'The rules for using the site and the quoting tool, and what a quote actually commits us to.',
+                    'emp.legal.hab.t': 'Data handling',
+                    'emp.legal.hab.d': 'Want to review, correct or delete your personal data? Write to us and we will take care of it.',
+                    'emp.legal.leer': 'Read',
+                    'emp.legal.escribir': 'Write to us',
+                    'emp.cta.title': 'Shall we talk about <span class="gold">your roof</span>?',
+                    'emp.cta.sub': 'Price your project in two minutes, or write to us and we will look at it together.',
+                    'emp.cta.wa': 'Write to us',
+                    'footer.ig': 'Follow us on Instagram',
+                    'footer.tagline': 'Innovation forever. Recovered polymer roofing.',
+                    'footer.copy': '&copy; 2026 KASTON. All rights reserved.',
+                    'footer.priv': 'Privacy Policy',
+                    'footer.terms': 'Terms & Conditions',
+                    'footer.specs': 'Spec sheet',
+                    'footer.comp': 'Comparison',
+                    'footer.col.prod': 'Product',
+                    'footer.col.emp': 'Company',
+                    'footer.col.legal': 'Legal and contact'
+                }
+            };
+
+            // Safari en modo privado (y cualquier navegador con el almacenamiento
+            // bloqueado) lanza excepcion al tocar localStorage. Si eso revienta,
+            // los apartados se quedan invisibles y la pagina se ve vacia.
+            function leerIdioma() {
+                try { return localStorage.getItem('kastonLang'); } catch (e) { return null; }
+            }
+
+            function guardarIdioma(lang) {
+                try { localStorage.setItem('kastonLang', lang); } catch (e) { /* sin almacenamiento */ }
+            }
+
+            var currentLang = leerIdioma() || 'es';
+
+            function setLang(lang) {
+                if (!lang || !T[lang]) return;
+                currentLang = lang;
+                guardarIdioma(lang);
+                document.documentElement.lang = lang;
+
+                document.querySelectorAll('[data-i18n]').forEach(function (el) {
+                    var key = el.getAttribute('data-i18n');
+                    if (T[lang][key] !== undefined) el.textContent = T[lang][key];
+                });
+
+                document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+                    var key = el.getAttribute('data-i18n-html');
+                    if (T[lang][key] !== undefined) el.innerHTML = T[lang][key];
+                });
+
+                document.querySelectorAll('.lang-toggle button').forEach(function (btn) {
+                    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+                });
+
+                document.title = lang === 'es'
+                    ? 'KASTON | La Empresa | Origen, Propósito y Datos Oficiales'
+                    : 'KASTON | The Company | Origin, Purpose and Official Records';
+            }
+
+            document.getElementById('langToggle').addEventListener('click', function (e) {
+                var btn = e.target.closest('button[data-lang]');
+                if (btn) setLang(btn.getAttribute('data-lang'));
+            });
+
+            setLang(currentLang);
+
+            /* =========================================
+               MENÚ MÓVIL
+               ========================================= */
+            var hamburger = document.getElementById('hamburger');
+            var navLinks = document.getElementById('navLinks');
+
+            hamburger.addEventListener('click', function () {
+                navLinks.classList.toggle('open');
+                hamburger.classList.toggle('open');
+            });
+
+            navLinks.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A') {
+                    navLinks.classList.remove('open');
+                    hamburger.classList.remove('open');
+                }
+            });
+
+            /* =========================================
+               APARICIÓN DE APARTADOS AL BAJAR
+               ========================================= */
+            var apartados = document.querySelectorAll('.apartado');
+
+            if ('IntersectionObserver' in window) {
+                var apObs = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            apObs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+                apartados.forEach(function (ap) { apObs.observe(ap); });
+            } else {
+                apartados.forEach(function (ap) { ap.classList.add('visible'); });
+            }
+
+            /* =========================================
+               ÍNDICE ACTIVO SEGÚN EL APARTADO VISIBLE
+               ========================================= */
+            var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+
+            // IntersectionObserver no garantiza aviso cuando el usuario SALTA
+            // (clic en el indice, tecla Fin, arrastrar la barra): puede pasar de
+            // largo un apartado y dejarlo invisible para siempre. Este barrido
+            // corre en cada scroll y revela todo lo que ya quedo atras.
+            function revelarRezagados() {
+                var fondo = window.innerHeight;
+                apartados.forEach(function (ap) {
+                    if (!ap.classList.contains('visible') && ap.getBoundingClientRect().top < fondo) {
+                        ap.classList.add('visible');
+                    }
+                });
+            }
+
+            function marcarActivo() {
+                revelarRezagados();
+
+                var limite = window.innerHeight * 0.35;
+                var actual = null;
+
+                apartados.forEach(function (ap) {
+                    if (ap.getBoundingClientRect().top <= limite) actual = ap.id;
+                });
+
+                if (!actual && apartados.length) actual = apartados[0].id;
+
+                tocLinks.forEach(function (a) {
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + actual);
+                });
+            }
+
+            window.addEventListener('scroll', marcarActivo, { passive: true });
+            window.addEventListener('resize', marcarActivo, { passive: true });
+            marcarActivo();
+        })();
+    </script>
+</body>
+
+</html>

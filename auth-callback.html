@@ -48,7 +48,7 @@
 
         const esPopup = !!window.opener && window.opener !== window;
         const volverAlCotizador = (params) => {
-            window.location.replace('/cotizador.html' + (params || ''));
+            window.location.replace('/cotizador' + (params || ''));
         };
 
         const fallar = (detalle) => {
@@ -57,7 +57,7 @@
             msg.className = 'err';
             msg.textContent = 'No se pudo completar el inicio de sesión: ' + detalle;
             const a = document.createElement('a');
-            a.href = '/cotizador.html';
+            a.href = '/cotizador';
             a.textContent = 'Volver al cotizador';
             document.body.appendChild(a);
             if (esPopup) {
