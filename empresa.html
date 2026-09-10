@@ -722,6 +722,78 @@
             .footer-grid { grid-template-columns: 1fr; gap: 28px; }
         }
     </style>
+    <!-- Datos estructurados: le dicen a Google y a las IA quien es KASTON,
+         en vez de dejar que lo deduzcan del texto. -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.kastonproyectos.com/#organizacion",
+      "name": "KASTON",
+      "alternateName": "KASTON Proyectos",
+      "url": "https://www.kastonproyectos.com/",
+      "logo": "https://www.kastonproyectos.com/icon-512.png",
+      "image": "https://www.kastonproyectos.com/real-roof-2.jpg",
+      "slogan": "Innovación para siempre",
+      "description": "KASTON fabrica tejas de cubierta con polímero recuperado del sector industrial, diseñadas para durar 500 años. Producción propia en Itagüí, Antioquia, con 17 años de instalación comprobada en Medellín.",
+      "email": "kaston.proyectos@gmail.com",
+      "telephone": "+57-318-897-8552",
+      "founder": {
+        "@type": "Person",
+        "name": "Juanita Ospina"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Carrera 46 #50-75, Los Naranjos",
+        "addressLocality": "Itagüí",
+        "addressRegion": "Antioquia",
+        "postalCode": "055412",
+        "addressCountry": "CO"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Colombia"
+      },
+      "sameAs": [
+        "https://www.instagram.com/kaston.proyectos"
+      ],
+      "knowsAbout": [
+        "Cubiertas",
+        "Tejas",
+        "Polímero recuperado",
+        "Construcción sostenible",
+        "Impermeabilización de cubiertas"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "ventas",
+        "telephone": "+57-318-897-8552",
+        "email": "kaston.proyectos@gmail.com",
+        "areaServed": "CO",
+        "availableLanguage": [
+          "es",
+          "en"
+        ]
+      }
+    },
+    {
+      "@type": "AboutPage",
+      "@id": "https://www.kastonproyectos.com/empresa#pagina",
+      "url": "https://www.kastonproyectos.com/empresa",
+      "name": "La empresa | KASTON",
+      "about": {
+        "@id": "https://www.kastonproyectos.com/#organizacion"
+      },
+      "isPartOf": {
+        "@id": "https://www.kastonproyectos.com/#sitio"
+      },
+      "inLanguage": "es-CO"
+    }
+  ]
+}
+    </script>
 </head>
 
 <body>
