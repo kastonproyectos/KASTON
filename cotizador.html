@@ -1009,6 +1009,22 @@
             } catch (e) { return null; }
         }
 
+        // Manda la cotizacion recien guardada al correo del cliente, con copia a KASTON.
+        // No bloquea ni avisa: si el envio no esta configurado (sin RESEND_API_KEY) o
+        // falla, guardar sigue funcionando igual. Mismo formato que apiProyectos:
+        // token en el cuerpo, text/plain y sin cookies, por Safari y Cloudflare.
+        function enviarCotizacionPorCorreo(projectId, token) {
+            if (!projectId || !token) return;
+            fetch('/api/send-quote', {
+                method: 'POST',
+                credentials: 'omit',
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                body: JSON.stringify({ projectId, token })
+            }).then(r => {
+                if (!r.ok) r.text().then(t => console.warn('Correo de cotización no enviado:', r.status, t));
+            }).catch(e => console.warn('Correo de cotización no enviado:', e));
+        }
+
         async function apiProyectos(payload) {
             if (!supabase) throw new Error('El servicio de cuentas no está disponible.');
 
@@ -2513,6 +2529,7 @@
                                 const fila = Array.isArray(filas) ? filas[0] : filas;
                                 if (fila && fila.id) {
                                     setProjects(prev => prev.map(p => p.id === fullProj.id ? { ...p, id: fila.id } : p));
+                                    enviarCotizacionPorCorreo(fila.id, token);
                                 }
                             } catch (e) {
                                 console.error('No se pudo leer el id del proyecto guardado:', e);
