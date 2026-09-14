@@ -147,6 +147,23 @@
         /* =============================================
            NAVBAR
            ============================================= */
+        /* Barra de avance: cuanto llevas recorrido del inicio */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+            z-index: 1001;
+            pointer-events: none;
+            transition: width 0.12s linear;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-progress { transition: none; }
+        }
+
         .navbar {
             position: fixed;
             top: 0;
@@ -1731,6 +1748,7 @@
 </head>
 
 <body>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
     <!-- ================================================
      NAVBAR
@@ -3230,25 +3248,43 @@
                 });
             });
 
-            // --- Active nav link tracking ---
-            var sections = document.querySelectorAll('section[id]');
-            var navAnchors = navLinks.querySelectorAll('a[href^="#"]');
+            // --- Seccion activa del menu + barra de avance ---
+            // La version anterior usaba IntersectionObserver con threshold 0.3:
+            // las secciones mas altas que la pantalla nunca llegaban a ese 30% y
+            // no encendian nunca, y las ocho secciones que no estan en el menu
+            // apagaban el resaltado al pasar, asi que parpadeaba. Ahora se mira
+            // la posicion: gana la ultima seccion DEL MENU que ya cruzo la linea,
+            // de modo que las secciones intermedias mantienen encendida la suya.
+            var navAnchors = Array.prototype.slice.call(
+                navLinks.querySelectorAll('a[href^="#"]:not(.nav-cta)')
+            );
 
-            var navObserver = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        var id = entry.target.id;
-                        navAnchors.forEach(function (a) {
-                            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-                        });
-                    }
+            var navTargets = navAnchors.map(function (a) {
+                return { enlace: a, seccion: document.getElementById(a.getAttribute('href').slice(1)) };
+            }).filter(function (t) { return t.seccion; });
+
+            var barra = document.getElementById('scrollProgress');
+
+            function pintarAvance() {
+                var alto = document.documentElement.scrollHeight - window.innerHeight;
+                var pct = alto > 0 ? (window.scrollY / alto) * 100 : 0;
+                if (barra) barra.style.width = Math.min(100, Math.max(0, pct)) + '%';
+
+                var limite = window.innerHeight * 0.35;
+                var actual = null;
+
+                navTargets.forEach(function (t) {
+                    if (t.seccion.getBoundingClientRect().top <= limite) actual = t.enlace;
                 });
-            }, {
-                threshold: 0.3,
-                rootMargin: '-72px 0px -40% 0px'
-            });
 
-            sections.forEach(function (s) { navObserver.observe(s); });
+                navTargets.forEach(function (t) {
+                    t.enlace.classList.toggle('active', t.enlace === actual);
+                });
+            }
+
+            window.addEventListener('scroll', pintarAvance, { passive: true });
+            window.addEventListener('resize', pintarAvance, { passive: true });
+            pintarAvance();
 
             // --- Fade-in animations ---
             var fadeObserver = new IntersectionObserver(function (entries) {
