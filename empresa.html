@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KASTON | La Empresa | Origen, Propósito y Datos Oficiales</title>
     <meta name="description"
-        content="Quién está detrás de KASTON: una fábrica en Itagüí con 35 años, un techo de 17 años en Las Palmas, y los datos oficiales, el propósito y las políticas de la empresa.">
+        content="Quién está detrás de KASTON: una fábrica en Itagüí con 35 años de oficio, su origen, su misión y visión, los datos oficiales y las políticas de la empresa.">
     <meta property="og:title" content="KASTON | La Empresa">
-    <meta property="og:description" content="Una fábrica en Itagüí, un apellido y un techo de 17 años. Todo lo que hay detrás de la teja.">
+    <meta property="og:description" content="Una fábrica en Itagüí, un apellido y 17 años comprobados. Todo lo que hay detrás de la teja.">
     <meta property="og:image" content="real-roof-2.jpg">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="KASTON | La Empresa">
-    <meta name="twitter:description" content="Una fábrica en Itagüí, un apellido y un techo de 17 años.">
+    <meta name="twitter:description" content="Una fábrica en Itagüí, un apellido y 17 años comprobados.">
     <meta name="twitter:image" content="real-roof-2.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,7 +103,15 @@
             justify-content: space-between;
         }
 
-        .nav-logo-img { height: 46px; width: auto; display: block; }
+        .nav-logo-img {
+            height: 130px;
+            width: auto;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .nav-logo-img:hover { transform: scale(1.05); }
 
         .nav-links {
             display: flex;
@@ -464,31 +472,6 @@
 
         .card p { color: var(--muted); font-size: 0.94rem; margin: 0; }
 
-        /* Valores numerados */
-        .valores { display: grid; gap: 2px; margin-top: 8px; }
-
-        .valor {
-            display: grid;
-            grid-template-columns: 62px 1fr;
-            gap: 20px;
-            align-items: start;
-            padding: 22px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .valor:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-
-        .valor-num {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            color: rgba(193, 138, 104, 0.55);
-            line-height: 1;
-            padding-top: 2px;
-        }
-
-        .valor h3 { font-size: 1.02rem; margin-bottom: 6px; letter-spacing: 1.5px; }
-        .valor p { color: var(--muted); font-size: 0.94rem; margin: 0; }
-
         /* Enemigo */
         .enemigo-box {
             border-left: 3px solid var(--gold);
@@ -678,6 +661,11 @@
         /* =============================================
            RESPONSIVE
            ============================================= */
+        /* Igual que el inicio: mismo margen lateral, el logo cae en el mismo sitio */
+        @media (max-width: 900px) {
+            .container { padding: 0 20px; }
+        }
+
         @media (max-width: 1000px) {
             .layout { grid-template-columns: 1fr; gap: 0; padding-top: 44px; }
 
@@ -694,9 +682,6 @@
         }
 
         @media (max-width: 768px) {
-            :root { --nav-height: 84px; }
-
-            .container { padding: 0 22px; }
 
             .nav-links {
                 display: none;
@@ -713,12 +698,10 @@
 
             .nav-links.open { display: flex; }
             .hamburger { display: flex; }
-            .nav-logo-img { height: 38px; }
 
             .page-head { padding: calc(var(--nav-height) + 56px) 0 50px; }
             .manifiesto { padding: 40px 26px; }
             .dato { grid-template-columns: 1fr; gap: 6px; }
-            .valor { grid-template-columns: 40px 1fr; gap: 14px; }
             .footer-grid { grid-template-columns: 1fr; gap: 28px; }
         }
     </style>
@@ -832,9 +815,7 @@
         <div class="container">
             <div class="eyebrow" data-i18n="emp.eyebrow">La empresa</div>
             <h1 data-i18n-html="emp.title">Quién está <span class="gold">detrás</span><br>de la teja</h1>
-            <p data-i18n="emp.intro">Una fábrica en Itagüí con treinta y cinco años de oficio, un apellido que responde
-                y un techo que lleva diecisiete años puesto. Aquí está todo lo que no cabe en la ficha técnica,
-                incluidas nuestras políticas y nuestros datos oficiales.</p>
+            <p data-i18n="emp.intro">Una fábrica en Itagüí con 35 años de oficio, un apellido que responde y 17 años de instalación comprobada. Aquí está todo lo que no cabe en la ficha técnica, incluidas nuestras políticas y nuestros datos oficiales.</p>
         </div>
     </header>
 
@@ -850,7 +831,7 @@
                 <ol>
                     <li><a href="#origen" data-i18n="emp.n1">Origen</a></li>
                     <li><a href="#manifiesto" data-i18n="emp.n2">Manifiesto</a></li>
-                    <li><a href="#proposito" data-i18n="emp.n3">Misión, visión y valores</a></li>
+                    <li><a href="#proposito" data-i18n="emp.n3">Misión y visión</a></li>
                     <li><a href="#enemigo" data-i18n="emp.n4">Contra qué peleamos</a></li>
                     <li><a href="#impacto" data-i18n="emp.n5">Qué rescatamos</a></li>
                     <li><a href="#datos" data-i18n="emp.n6">Datos oficiales</a></li>
@@ -863,30 +844,21 @@
                 <!-- 01 ORIGEN -->
                 <section class="apartado" id="origen">
                     <div class="ap-num">01</div>
-                    <h2 data-i18n-html="emp.origen.title">El origen: una casa en <span class="gold">Las Palmas</span></h2>
+                    <h2 data-i18n-html="emp.origen.title">El origen: una fábrica en <span class="gold">Itagüí</span></h2>
                     <div class="ap-divider"></div>
                     <div class="origen-grid">
                         <div>
-                            <p data-i18n-html="emp.origen.p1"><strong>Juan David Ospina</strong> lleva más de treinta años
-                                en su fábrica de Itagüí, Cauchos Amazonas, haciendo suelas de zapato y bandas para marcas
-                                colombianas. Sabe de polímeros porque los trabaja todos los días, desde mucho antes de que
-                                eso se volviera un argumento de venta.</p>
-                            <p data-i18n-html="emp.origen.p2">Hace diecisiete años fabricó unas tejas de polímero recuperado
-                                para su propia casa en Las Palmas, Medellín. No para venderlas. Para techar su casa. Ese
-                                techo aguantó granizadas, vendavales y un temblor <strong>sin una sola teja rota</strong>.</p>
-                            <p data-i18n-html="emp.origen.p3">Su hija, <strong>Juanita Ospina</strong>, creció debajo de ese
-                                techo. En 2022 decidió retomar el proyecto que su papá había dejado en pausa, y lo convirtió
-                                en KASTON. Por eso no vendemos una promesa: vendemos algo que ya lleva diecisiete años
-                                puesto, y la fábrica que lo hace sigue siendo la misma.</p>
+                            <p data-i18n-html="emp.origen.p1"><strong>Juan David Ospina</strong> lleva más de 30 años en su fábrica de Itagüí, Cauchos Amazonas, haciendo suelas de zapato y bandas para marcas colombianas. Sabe de polímeros porque los trabaja todos los días, desde mucho antes de que eso se volviera un argumento de venta.</p>
+                            <p data-i18n-html="emp.origen.p2">Hace 17 años fabricó las primeras tejas del sistema, sin pensar en venderlas. Esa primera cubierta sigue puesta y ha aguantado granizadas y vendavales <strong>sin una sola teja rota</strong>.</p>
+                            <p data-i18n-html="emp.origen.p3">En 2022 su hija, <strong>Juanita Ospina</strong>, retomó el proyecto que su papá había dejado en pausa y lo convirtió en KASTON. Por eso no vendemos una promesa: vendemos algo con 17 años comprobados, hecho en la misma fábrica.</p>
                             <p data-i18n-html="emp.origen.p4"><strong>KASTON fabrica, no revende.</strong> Cada teja sale de
                                 esa planta en Itagüí.</p>
                         </div>
                         <div>
                             <div class="origen-foto">
-                                <img src="real-roof-2.jpg" alt="Techo KASTON instalado en Las Palmas, Medellín" loading="lazy">
+                                <img src="real-roof-2.jpg" alt="Cubierta KASTON instalada" loading="lazy">
                             </div>
-                            <div class="foto-pie" data-i18n="emp.origen.pie">La primera instalación del sistema, en Las
-                                Palmas, Medellín. Diecisiete años a la intemperie.</div>
+                            <div class="foto-pie" data-i18n="emp.origen.pie">Primera cubierta del sistema. 17 años a la intemperie.</div>
                         </div>
                     </div>
                 </section>
@@ -906,7 +878,7 @@
                 <!-- 03 MISIÓN, VISIÓN Y VALORES -->
                 <section class="apartado" id="proposito">
                     <div class="ap-num">03</div>
-                    <h2 data-i18n="emp.prop.title">Misión, visión y valores</h2>
+                    <h2 data-i18n="emp.prop.title">Misión y visión</h2>
                     <div class="ap-divider"></div>
 
                     <div class="cards">
@@ -918,44 +890,7 @@
                         </div>
                         <div class="card">
                             <h3 data-i18n="emp.prop.vision.t">Visión</h3>
-                            <p data-i18n="emp.prop.vision.d">Que en 2030 cambiar el techo cada quince años sea cosa del
-                                pasado en Colombia, y que la cubierta de polímero recuperado sea el estándar en Medellín,
-                                en el país y en la región andina.</p>
-                        </div>
-                    </div>
-
-                    <div class="valores" style="margin-top:34px;">
-                        <div class="valor">
-                            <div class="valor-num">01</div>
-                            <div>
-                                <h3 data-i18n="emp.val1.t">Se prueba, no se promete</h3>
-                                <p data-i18n="emp.val1.d">Diecisiete años bajo el mismo techo antes de vender el primer
-                                    metro. Todo dato que publicamos se puede verificar.</p>
-                            </div>
-                        </div>
-                        <div class="valor">
-                            <div class="valor-num">02</div>
-                            <div>
-                                <h3 data-i18n="emp.val2.t">Fabricamos, no revendemos</h3>
-                                <p data-i18n="emp.val2.d">La planta es nuestra y está en Itagüí. Si algo sale mal, no hay a
-                                    quién echarle la culpa.</p>
-                            </div>
-                        </div>
-                        <div class="valor">
-                            <div class="valor-num">03</div>
-                            <div>
-                                <h3 data-i18n="emp.val3.t">Lo que se rescata, se transforma</h3>
-                                <p data-i18n="emp.val3.d">Trabajamos con polímero recuperado del sector industrial. No es
-                                    un adorno del discurso: es de lo que está hecha la teja.</p>
-                            </div>
-                        </div>
-                        <div class="valor">
-                            <div class="valor-num">04</div>
-                            <div>
-                                <h3 data-i18n="emp.val4.t">Respondemos por el metro instalado</h3>
-                                <p data-i18n="emp.val4.d">Decimos qué incluye el precio y qué no. Sin sorpresas al final
-                                    de la obra.</p>
-                            </div>
+                            <p data-i18n="emp.prop.vision.d">Que en 2030 cambiar el techo cada 15 años sea cosa del pasado en Colombia, y que la cubierta de polímero recuperado sea el estándar en Medellín, en el país y en la región andina.</p>
                         </div>
                     </div>
                 </section>
@@ -968,14 +903,8 @@
                     <div class="enemigo-box">
                         <div class="frase" data-i18n="emp.enem.frase">El techo con fecha de caducidad.</div>
                     </div>
-                    <p data-i18n-html="emp.enem.p1">La industria de la construcción normalizó algo absurdo: que la parte de
-                        la casa que protege a todas las demás sea la que primero se daña. El barro dura entre veinte y
-                        cuarenta años. El zinc, entre quince y treinta. Y cada reemplazo cuesta plata, obra y semanas de
-                        incomodidad.</p>
-                    <p data-i18n-html="emp.enem.p2">No peleamos contra ninguna empresa. Peleamos contra la idea de que un
-                        techo es un consumible. Por eso hablamos de tres cosas y siempre de una a la vez:
-                        <strong>escudo</strong> (lo que protege), <strong>herencia</strong> (el último techo que compras,
-                        el que heredan tus hijos) y <strong>rescate</strong> (de dónde sale el material).</p>
+                    <p data-i18n-html="emp.enem.p1">La industria de la construcción normalizó algo absurdo: que la parte de la casa que protege a todas las demás sea la que primero se daña. El barro dura entre 20 y 40 años. El zinc, entre 15 y 30. Y cada reemplazo cuesta plata, obra y semanas de incomodidad.</p>
+                    <p data-i18n-html="emp.enem.p2">No peleamos contra ninguna empresa. Peleamos contra la idea de que un techo es un consumible: el techo que instalas hoy debería ser el último que compras.</p>
                 </section>
 
                 <!-- 05 IMPACTO -->
@@ -1004,11 +933,6 @@
                             <div class="l" data-i18n="emp.imp.c4">Absorción de agua</div>
                         </div>
                     </div>
-                    <p style="margin-top:26px;" data-i18n-html="emp.imp.p2">Además, nuestro proceso trabaja a temperaturas
-                        mucho más bajas que un horno de teja de barro, que supera los 900 °C. Y cuando dentro de siglos
-                        alguien desmonte ese techo, no va a tener un escombro: va a tener materia prima.</p>
-                    <p data-i18n-html="emp.imp.p3">Lo que sí decimos siempre: trabajamos con <strong>polímero recuperado del
-                        sector industrial</strong>. La fórmula y el proceso son nuestros y no se publican.</p>
                 </section>
 
                 <!-- 06 DATOS OFICIALES -->
@@ -1103,7 +1027,7 @@
     <section class="cta-empresa">
         <div class="container">
             <h2 data-i18n-html="emp.cta.title">¿Hablamos de <span class="gold">tu techo</span>?</h2>
-            <p data-i18n="emp.cta.sub">Calcula tu proyecto en dos minutos, o escríbenos y lo miramos contigo.</p>
+            <p data-i18n="emp.cta.sub">Calcula tu proyecto en 2 minutos, o escríbenos y lo miramos contigo.</p>
             <div class="cta-botones">
                 <a href="/cotizador" class="btn btn-gold" data-i18n="nav.cta">Cotiza Ahora</a>
                 <a href="https://wa.me/573188978552" target="_blank" rel="noopener noreferrer" class="btn btn-outline"
@@ -1138,7 +1062,7 @@
                     <h4 data-i18n="footer.col.emp">Empresa</h4>
                     <ul>
                         <li><a href="/empresa#origen" data-i18n="emp.n1">Origen</a></li>
-                        <li><a href="/empresa#proposito" data-i18n="emp.n3">Misión, visión y valores</a></li>
+                        <li><a href="/empresa#proposito" data-i18n="emp.n3">Misión y visión</a></li>
                         <li><a href="/empresa#impacto" data-i18n="emp.n5">Qué rescatamos</a></li>
                         <li><a href="/empresa#datos" data-i18n="emp.n6">Datos oficiales</a></li>
                     </ul>
@@ -1181,49 +1105,39 @@
                     'nav.cta': 'INICIAR COTIZACIÓN TÉCNICA',
                     'emp.eyebrow': 'La empresa',
                     'emp.title': 'Quién está <span class="gold">detrás</span><br>de la teja',
-                    'emp.intro': 'Una fábrica en Itagüí con treinta y cinco años de oficio, un apellido que responde y un techo que lleva diecisiete años puesto. Aquí está todo lo que no cabe en la ficha técnica, incluidas nuestras políticas y nuestros datos oficiales.',
+                    'emp.intro': 'Una fábrica en Itagüí con 35 años de oficio, un apellido que responde y 17 años de instalación comprobada. Aquí está todo lo que no cabe en la ficha técnica, incluidas nuestras políticas y nuestros datos oficiales.',
                     'emp.toc': 'Apartados',
                     'emp.n1': 'Origen',
                     'emp.n2': 'Manifiesto',
-                    'emp.n3': 'Misión, visión y valores',
+                    'emp.n3': 'Misión y visión',
                     'emp.n4': 'Contra qué peleamos',
                     'emp.n5': 'Qué rescatamos',
                     'emp.n6': 'Datos oficiales',
                     'emp.n7': 'Legal y datos personales',
-                    'emp.origen.title': 'El origen: una casa en <span class="gold">Las Palmas</span>',
-                    'emp.origen.p1': '<strong>Juan David Ospina</strong> lleva más de treinta años en su fábrica de Itagüí, Cauchos Amazonas, haciendo suelas de zapato y bandas para marcas colombianas. Sabe de polímeros porque los trabaja todos los días, desde mucho antes de que eso se volviera un argumento de venta.',
-                    'emp.origen.p2': 'Hace diecisiete años fabricó unas tejas de polímero recuperado para su propia casa en Las Palmas, Medellín. No para venderlas. Para techar su casa. Ese techo aguantó granizadas, vendavales y un temblor <strong>sin una sola teja rota</strong>.',
-                    'emp.origen.p3': 'Su hija, <strong>Juanita Ospina</strong>, creció debajo de ese techo. En 2022 decidió retomar el proyecto que su papá había dejado en pausa, y lo convirtió en KASTON. Por eso no vendemos una promesa: vendemos algo que ya lleva diecisiete años puesto, y la fábrica que lo hace sigue siendo la misma.',
+                    'emp.origen.title': 'El origen: una fábrica en <span class="gold">Itagüí</span>',
+                    'emp.origen.p1': '<strong>Juan David Ospina</strong> lleva más de 30 años en su fábrica de Itagüí, Cauchos Amazonas, haciendo suelas de zapato y bandas para marcas colombianas. Sabe de polímeros porque los trabaja todos los días, desde mucho antes de que eso se volviera un argumento de venta.',
+                    'emp.origen.p2': 'Hace 17 años fabricó las primeras tejas del sistema, sin pensar en venderlas. Esa primera cubierta sigue puesta y ha aguantado granizadas y vendavales <strong>sin una sola teja rota</strong>.',
+                    'emp.origen.p3': 'En 2022 su hija, <strong>Juanita Ospina</strong>, retomó el proyecto que su papá había dejado en pausa y lo convirtió en KASTON. Por eso no vendemos una promesa: vendemos algo con 17 años comprobados, hecho en la misma fábrica.',
                     'emp.origen.p4': '<strong>KASTON fabrica, no revende.</strong> Cada teja sale de esa planta en Itagüí.',
-                    'emp.origen.pie': 'La primera instalación del sistema, en Las Palmas, Medellín. Diecisiete años a la intemperie.',
+                    'emp.origen.pie': 'Primera cubierta del sistema. 17 años a la intemperie.',
                     'emp.mani.title': 'Manifiesto',
                     'emp.mani.quote': 'De las tejas para arriba está el exterior. De tu techo para abajo está tu familia. KASTON es lo que hay en medio.',
                     'emp.mani.firma': 'Juanita Ospina, fundadora',
-                    'emp.prop.title': 'Misión, visión y valores',
+                    'emp.prop.title': 'Misión y visión',
                     'emp.prop.mision.t': 'Misión',
                     'emp.prop.mision.d': 'Fabricar cubiertas que no haya que volver a cambiar. Convertimos polímero recuperado del sector industrial en tejas que protegen una casa durante generaciones, hechas en nuestra propia planta y respaldadas metro a metro.',
                     'emp.prop.vision.t': 'Visión',
-                    'emp.prop.vision.d': 'Que en 2030 cambiar el techo cada quince años sea cosa del pasado en Colombia, y que la cubierta de polímero recuperado sea el estándar en Medellín, en el país y en la región andina.',
-                    'emp.val1.t': 'Se prueba, no se promete',
-                    'emp.val1.d': 'Diecisiete años bajo el mismo techo antes de vender el primer metro. Todo dato que publicamos se puede verificar.',
-                    'emp.val2.t': 'Fabricamos, no revendemos',
-                    'emp.val2.d': 'La planta es nuestra y está en Itagüí. Si algo sale mal, no hay a quién echarle la culpa.',
-                    'emp.val3.t': 'Lo que se rescata, se transforma',
-                    'emp.val3.d': 'Trabajamos con polímero recuperado del sector industrial. No es un adorno del discurso: es de lo que está hecha la teja.',
-                    'emp.val4.t': 'Respondemos por el metro instalado',
-                    'emp.val4.d': 'Decimos qué incluye el precio y qué no. Sin sorpresas al final de la obra.',
+                    'emp.prop.vision.d': 'Que en 2030 cambiar el techo cada 15 años sea cosa del pasado en Colombia, y que la cubierta de polímero recuperado sea el estándar en Medellín, en el país y en la región andina.',
                     'emp.enem.title': 'Contra qué peleamos',
                     'emp.enem.frase': 'El techo con fecha de caducidad.',
-                    'emp.enem.p1': 'La industria de la construcción normalizó algo absurdo: que la parte de la casa que protege a todas las demás sea la que primero se daña. El barro dura entre veinte y cuarenta años. El zinc, entre quince y treinta. Y cada reemplazo cuesta plata, obra y semanas de incomodidad.',
-                    'emp.enem.p2': 'No peleamos contra ninguna empresa. Peleamos contra la idea de que un techo es un consumible. Por eso hablamos de tres cosas y siempre de una a la vez: <strong>escudo</strong> (lo que protege), <strong>herencia</strong> (el último techo que compras, el que heredan tus hijos) y <strong>rescate</strong> (de dónde sale el material).',
+                    'emp.enem.p1': 'La industria de la construcción normalizó algo absurdo: que la parte de la casa que protege a todas las demás sea la que primero se daña. El barro dura entre 20 y 40 años. El zinc, entre 15 y 30. Y cada reemplazo cuesta plata, obra y semanas de incomodidad.',
+                    'emp.enem.p2': 'No peleamos contra ninguna empresa. Peleamos contra la idea de que un techo es un consumible: el techo que instalas hoy debería ser el último que compras.',
                     'emp.imp.title': 'Qué rescatamos',
                     'emp.imp.p1': 'Cada metro cuadrado de cubierta KASTON son <strong>12,6 kg de polímero recuperado del sector industrial</strong> que dejan de ser residuo y pasan a ser techo. En una casa de 150 m², eso son cerca de <strong>1,9 toneladas</strong>.',
                     'emp.imp.c1': 'Polímero recuperado por m²',
                     'emp.imp.c2': 'Años de vida química del material',
                     'emp.imp.c3': 'Recuperable al final de su ciclo',
                     'emp.imp.c4': 'Absorción de agua',
-                    'emp.imp.p2': 'Además, nuestro proceso trabaja a temperaturas mucho más bajas que un horno de teja de barro, que supera los 900 °C. Y cuando dentro de siglos alguien desmonte ese techo, no va a tener un escombro: va a tener materia prima.',
-                    'emp.imp.p3': 'Lo que sí decimos siempre: trabajamos con <strong>polímero recuperado del sector industrial</strong>. La fórmula y el proceso son nuestros y no se publican.',
                     'emp.datos.title': 'Datos oficiales',
                     'emp.datos.intro': 'Para constructoras, proveedores y cualquiera que necesite saber con quién está tratando antes de comprar.',
                     'emp.datos.marca': 'Marca',
@@ -1246,7 +1160,7 @@
                     'emp.legal.leer': 'Leer',
                     'emp.legal.escribir': 'Escribir',
                     'emp.cta.title': '¿Hablamos de <span class="gold">tu techo</span>?',
-                    'emp.cta.sub': 'Calcula tu proyecto en dos minutos, o escríbenos y lo miramos contigo.',
+                    'emp.cta.sub': 'Calcula tu proyecto en 2 minutos, o escríbenos y lo miramos contigo.',
                     'emp.cta.wa': 'Escríbenos',
                     'footer.ig': 'Síguenos en Instagram',
                     'footer.tagline': 'Innovación para siempre. Cubiertas de polímero recuperado.',
@@ -1270,49 +1184,39 @@
                     'nav.cta': 'START TECHNICAL QUOTE',
                     'emp.eyebrow': 'The company',
                     'emp.title': 'Who is <span class="gold">behind</span><br>the tile',
-                    'emp.intro': 'A factory in Itagüí with thirty five years of craft, a family name that answers for it, and a roof that has been up for seventeen years. This is everything that does not fit on a spec sheet, including our policies and our official records.',
+                    'emp.intro': 'A factory in Itagüí with 35 years of craft, a family name that answers for it, and 17 years of proven installation. This is everything that does not fit on a spec sheet, including our policies and our official records.',
                     'emp.toc': 'Sections',
                     'emp.n1': 'Origin',
                     'emp.n2': 'Manifesto',
-                    'emp.n3': 'Mission, vision and values',
+                    'emp.n3': 'Mission and vision',
                     'emp.n4': 'What we fight',
                     'emp.n5': 'What we rescue',
                     'emp.n6': 'Official records',
                     'emp.n7': 'Legal and personal data',
-                    'emp.origen.title': 'The origin: a house in <span class="gold">Las Palmas</span>',
-                    'emp.origen.p1': '<strong>Juan David Ospina</strong> has spent more than thirty years at his factory in Itagüí, Cauchos Amazonas, making shoe soles and industrial belts for Colombian brands. He knows polymers because he has worked with them every day, since long before any of it became a sales pitch.',
-                    'emp.origen.p2': 'Seventeen years ago he made a batch of recovered polymer tiles for his own house in Las Palmas, Medellín. Not to sell them. To roof his house. That roof has taken hailstorms, windstorms and an earthquake <strong>without a single broken tile</strong>.',
-                    'emp.origen.p3': 'His daughter, <strong>Juanita Ospina</strong>, grew up under that roof. In 2022 she picked up the project her father had left on pause and turned it into KASTON. That is why we are not selling a promise: we are selling something that has already been up for seventeen years, made in the same factory.',
+                    'emp.origen.title': 'The origin: a factory in <span class="gold">Itagüí</span>',
+                    'emp.origen.p1': '<strong>Juan David Ospina</strong> has spent more than 30 years at his factory in Itagüí, Cauchos Amazonas, making shoe soles and industrial belts for Colombian brands. He knows polymers because he has worked with them every day, since long before any of it became a sales pitch.',
+                    'emp.origen.p2': '17 years ago he made the first tiles of the system, with no plan to sell them. That first roof is still up and has taken hailstorms and windstorms <strong>without a single broken tile</strong>.',
+                    'emp.origen.p3': 'In 2022 his daughter, <strong>Juanita Ospina</strong>, picked up the project her father had left on pause and turned it into KASTON. That is why we are not selling a promise: we are selling something proven over 17 years, made in the same factory.',
                     'emp.origen.p4': '<strong>KASTON manufactures, it does not resell.</strong> Every tile comes out of that plant in Itagüí.',
-                    'emp.origen.pie': 'The first installation of the system, in Las Palmas, Medellín. Seventeen years in the open.',
+                    'emp.origen.pie': 'The first roof of the system. 17 years in the open.',
                     'emp.mani.title': 'Manifesto',
                     'emp.mani.quote': 'Above the tiles is the outside world. Below your roof is your family. KASTON is what stands in between.',
                     'emp.mani.firma': 'Juanita Ospina, founder',
-                    'emp.prop.title': 'Mission, vision and values',
+                    'emp.prop.title': 'Mission and vision',
                     'emp.prop.mision.t': 'Mission',
                     'emp.prop.mision.d': 'To manufacture roofing that never has to be replaced. We turn recovered industrial polymer into tiles that protect a home for generations, made in our own plant and backed square meter by square meter.',
                     'emp.prop.vision.t': 'Vision',
-                    'emp.prop.vision.d': 'That by 2030 replacing a roof every fifteen years is a thing of the past in Colombia, and that recovered polymer roofing becomes the standard in Medellín, across the country and throughout the Andean region.',
-                    'emp.val1.t': 'Proven, not promised',
-                    'emp.val1.d': 'Seventeen years under the same roof before selling the first square meter. Every figure we publish can be verified.',
-                    'emp.val2.t': 'We manufacture, we do not resell',
-                    'emp.val2.d': 'The plant is ours and it is in Itagüí. If something goes wrong, there is no one else to blame.',
-                    'emp.val3.t': 'What is rescued gets transformed',
-                    'emp.val3.d': 'We work with recovered industrial polymer. It is not a decoration on the pitch: it is what the tile is made of.',
-                    'emp.val4.t': 'We answer for the installed square meter',
-                    'emp.val4.d': 'We say what the price includes and what it does not. No surprises at the end of the job.',
+                    'emp.prop.vision.d': 'That by 2030 replacing a roof every 15 years is a thing of the past in Colombia, and that recovered polymer roofing becomes the standard in Medellín, across the country and throughout the Andean region.',
                     'emp.enem.title': 'What we fight',
                     'emp.enem.frase': 'The roof with an expiry date.',
-                    'emp.enem.p1': 'The construction industry normalized something absurd: the part of the house that protects every other part is the first one to fail. Clay lasts twenty to forty years. Zinc, fifteen to thirty. And every replacement costs money, labor and weeks of disruption.',
-                    'emp.enem.p2': 'We do not fight any company. We fight the idea that a roof is a consumable. That is why we talk about three things, always one at a time: <strong>shield</strong> (what it protects), <strong>inheritance</strong> (the last roof you buy, the one your children inherit) and <strong>rescue</strong> (where the material comes from).',
+                    'emp.enem.p1': 'The construction industry normalized something absurd: the part of the house that protects every other part is the first one to fail. Clay lasts 20 to 40 years. Zinc, 15 to 30. And every replacement costs money, labor and weeks of disruption.',
+                    'emp.enem.p2': 'We do not fight any company. We fight the idea that a roof is a consumable: the roof you install today should be the last one you buy.',
                     'emp.imp.title': 'What we rescue',
                     'emp.imp.p1': 'Every square meter of KASTON roofing is <strong>12.6 kg of recovered industrial polymer</strong> that stops being waste and becomes a roof. On a 150 m² house, that is close to <strong>1.9 tonnes</strong>.',
                     'emp.imp.c1': 'Recovered polymer per m²',
                     'emp.imp.c2': 'Years of chemical life',
                     'emp.imp.c3': 'Recoverable at end of life',
                     'emp.imp.c4': 'Water absorption',
-                    'emp.imp.p2': 'Our process also runs at far lower temperatures than a clay tile kiln, which exceeds 900 °C. And when someone takes that roof down centuries from now, they will not have rubble: they will have raw material.',
-                    'emp.imp.p3': 'What we always state: we work with <strong>polymer recovered from the industrial sector</strong>. The formula and the process are ours and are not published.',
                     'emp.datos.title': 'Official records',
                     'emp.datos.intro': 'For construction firms, suppliers and anyone who needs to know who they are dealing with before buying.',
                     'emp.datos.marca': 'Brand',
@@ -1335,7 +1239,7 @@
                     'emp.legal.leer': 'Read',
                     'emp.legal.escribir': 'Write to us',
                     'emp.cta.title': 'Shall we talk about <span class="gold">your roof</span>?',
-                    'emp.cta.sub': 'Price your project in two minutes, or write to us and we will look at it together.',
+                    'emp.cta.sub': 'Price your project in 2 minutes, or write to us and we will look at it together.',
                     'emp.cta.wa': 'Write to us',
                     'footer.ig': 'Follow us on Instagram',
                     'footer.tagline': 'Innovation forever. Recovered polymer roofing.',
