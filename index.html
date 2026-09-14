@@ -416,254 +416,6 @@
             z-index: 1;
         }
 
-        /* =============================================
-           REVEAL HERO (video interactivo con datos)
-           ============================================= */
-        .reveal-hero {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            height: 100vh;
-            min-height: 560px;
-            background: #000;
-        }
-
-        .reveal-bg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-            opacity: 0.8;
-        }
-
-        .reveal-scrim {
-            position: absolute;
-            inset: 0;
-            z-index: 2;
-            background: linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.2) 30%, rgba(0,0,0,.3) 68%, rgba(0,0,0,.75) 100%);
-        }
-
-        .reveal-glow {
-            position: absolute;
-            z-index: 3;
-            width: 520px;
-            height: 520px;
-            border-radius: 50%;
-            pointer-events: none;
-            background: radial-gradient(circle, rgba(193,138,104,0.35) 0%, rgba(193,138,104,0.12) 35%, rgba(193,138,104,0) 70%);
-            transform: translate(-999px, -999px);
-            mix-blend-mode: screen;
-        }
-
-        .reveal-heading {
-            position: absolute;
-            top: 14%;
-            left: 0;
-            right: 0;
-            z-index: 5;
-            text-align: center;
-            padding: 0 20px;
-        }
-
-        .reveal-heading h2 {
-            font-family: var(--font-heading);
-            text-transform: uppercase;
-            color: var(--white);
-            line-height: 1;
-        }
-
-        .reveal-l1 {
-            display: block;
-            font-weight: 400;
-            font-size: clamp(1.8rem, 5vw, 3.2rem);
-            letter-spacing: 2px;
-            color: var(--light);
-        }
-
-        .reveal-l2 {
-            display: block;
-            font-weight: 700;
-            font-size: clamp(2.4rem, 7vw, 4.2rem);
-            margin-top: 4px;
-            color: var(--gold);
-        }
-
-        /* En pantallas tactiles no hay cursor: se cambia la instruccion */
-        .reveal-sub .solo-tactil { display: none; }
-
-        @media (hover: none) {
-            .reveal-sub .solo-cursor { display: none; }
-            .reveal-sub .solo-tactil { display: inline; }
-        }
-
-        .reveal-sub {
-            margin-top: 18px;
-            color: rgba(255,255,255,0.65);
-            font-family: var(--font-body);
-            font-size: 1rem;
-        }
-
-        .reveal-hotspot {
-            position: absolute;
-            z-index: 6;
-            pointer-events: none;
-        }
-
-        .reveal-dot {
-            position: relative;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.45);
-            border: 1.5px solid var(--gold);
-            backdrop-filter: blur(4px);
-            box-shadow: 0 0 0 0 rgba(193,138,104,0.6);
-            animation: revealPulse 2.2s infinite;
-            transition: transform .35s var(--ease), background .35s ease;
-        }
-
-        .reveal-dot::before,
-        .reveal-dot::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            background: var(--gold);
-            transition: background .35s ease;
-        }
-
-        .reveal-dot::before {
-            width: 12px;
-            height: 2px;
-            transform: translate(-50%, -50%);
-        }
-
-        .reveal-dot::after {
-            width: 2px;
-            height: 12px;
-            transform: translate(-50%, -50%);
-        }
-
-        .reveal-hotspot.active .reveal-dot {
-            background: var(--gold);
-            transform: rotate(45deg) scale(1.08);
-        }
-
-        .reveal-hotspot.active .reveal-dot::before,
-        .reveal-hotspot.active .reveal-dot::after {
-            background: #000;
-        }
-
-        .reveal-card {
-            position: absolute;
-            top: 40px;
-            left: 50%;
-            transform: translateX(-50%) translateY(6px) scale(.92);
-            white-space: nowrap;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(193,138,104,0.4);
-            border-radius: 12px;
-            padding: 10px 18px;
-            text-align: center;
-            opacity: 0;
-            transition: opacity .35s ease, transform .35s ease;
-        }
-
-        .reveal-num {
-            font-family: var(--font-heading);
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--gold);
-            line-height: 1;
-        }
-
-        .reveal-lbl {
-            font-family: var(--font-body);
-            font-size: 11px;
-            color: rgba(255,255,255,0.75);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        .reveal-hotspot.active .reveal-card {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-
-        .reveal-hotspot.active .reveal-dot {
-            animation: none;
-            box-shadow: 0 0 0 8px rgba(193,138,104,0);
-        }
-
-        @keyframes revealPulse {
-            0% { box-shadow: 0 0 0 0 rgba(193,138,104,0.55); }
-            70% { box-shadow: 0 0 0 14px rgba(193,138,104,0); }
-            100% { box-shadow: 0 0 0 0 rgba(193,138,104,0); }
-        }
-
-        .reveal-bl, .reveal-br {
-            position: absolute;
-            z-index: 5;
-            max-width: 280px;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .reveal-bl { bottom: 56px; left: 40px; }
-
-        .reveal-br {
-            bottom: 40px;
-            right: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 18px;
-        }
-
-        /* Mayor especificidad para ganarle a .hero-stats, que se define después */
-        #reveal .reveal-mobile-stats {
-            display: none;
-        }
-
-        @media (max-width: 900px) {
-            .reveal-hero {
-                height: auto;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                padding: 140px 24px 60px;
-            }
-            .reveal-hotspot { display: none; }
-            .reveal-sub { display: none; }
-            .reveal-heading { position: relative; top: 0; }
-            .reveal-bl, .reveal-br {
-                position: relative;
-                bottom: auto; left: auto; right: auto;
-                max-width: 420px;
-                margin: 12px auto 0;
-                align-items: center;
-                text-align: center;
-            }
-            #reveal .reveal-mobile-stats {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 24px 12px;
-                width: 100%;
-                max-width: 420px;
-                position: relative;
-                z-index: 5;
-                margin: 28px auto 0;
-            }
-        }
-
         .nav-logo-img {
             height: 130px;
             width: auto;
@@ -796,6 +548,14 @@
             color: var(--gold);
             line-height: 1;
             letter-spacing: -0.5px;
+        }
+
+        .hero-claim {
+            margin: 40px auto 0;
+            max-width: 560px;
+            color: var(--light);
+            font-size: 1.05rem;
+            line-height: 1.6;
         }
 
         .hero-stat .label {
@@ -1571,7 +1331,16 @@
             }
 
             .hero-stats {
-                gap: 28px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 28px 12px;
+                max-width: 360px;
+                margin: 0 auto;
+            }
+
+            .hero-claim {
+                margin-top: 32px;
+                font-size: 0.98rem;
             }
 
             .swatch-row {
@@ -1817,6 +1586,10 @@
                     <div class="label" data-i18n="hero.stat1">Años de vida útil</div>
                 </div>
                 <div class="hero-stat">
+                    <div class="number">8 mm</div>
+                    <div class="label" data-i18n="sp.thick">Espesor de Blindaje</div>
+                </div>
+                <div class="hero-stat">
                     <div class="number">0%</div>
                     <div class="label" data-i18n="hero.stat2">Absorción humedad</div>
                 </div>
@@ -1825,56 +1598,10 @@
                     <div class="label" data-i18n="hero.stat3">Rotura en transporte</div>
                 </div>
             </div>
+            <p class="hero-claim fade-in fade-in-d4" data-i18n="hero.claim">No se quiebran con el granizo. No se oxidan. No absorben agua.</p>
         </div>
     </section>
 
-    <!-- ================================================
-     REVEAL HERO (imagen interactiva con datos)
-     ================================================ -->
-    <section class="reveal-hero" id="reveal">
-        <img class="reveal-bg" id="revealBg" src="real-roof-1.jpg" alt="Superficie de tejas KASTON instaladas">
-        <div class="reveal-scrim"></div>
-        <div class="reveal-glow" id="revealGlow"></div>
-
-        <div class="reveal-heading">
-            <h2>
-                <span class="reveal-l1 fade-in" data-i18n="reveal.title1">Diseñada para durar</span>
-                <span class="reveal-l2 fade-in fade-in-d1" data-i18n="reveal.title2">500 años.</span>
-            </h2>
-            <div class="reveal-sub fade-in fade-in-d2"><span class="solo-cursor" data-i18n="reveal.sub">Pasa el cursor por la imagen y compruébalo.</span><span class="solo-tactil" data-i18n="reveal.sub.touch">Toca la imagen y compruébalo.</span></div>
-        </div>
-
-        <div class="reveal-hotspot" id="revealHs1" style="top:30%; left:18%;">
-            <div class="reveal-dot"></div>
-            <div class="reveal-card"><div class="reveal-num">500</div><div class="reveal-lbl" data-i18n="hero.stat1">Años de vida útil</div></div>
-        </div>
-        <div class="reveal-hotspot" id="revealHs2" style="top:42%; left:62%;">
-            <div class="reveal-dot"></div>
-            <div class="reveal-card"><div class="reveal-num">8 mm</div><div class="reveal-lbl" data-i18n="sp.thick">Espesor de Blindaje</div></div>
-        </div>
-        <div class="reveal-hotspot" id="revealHs3" style="top:66%; left:34%;">
-            <div class="reveal-dot"></div>
-            <div class="reveal-card"><div class="reveal-num">0%</div><div class="reveal-lbl" data-i18n="hero.stat2">Absorción humedad</div></div>
-        </div>
-        <div class="reveal-hotspot" id="revealHs4" style="top:60%; left:78%;">
-            <div class="reveal-dot"></div>
-            <div class="reveal-card"><div class="reveal-num">0%</div><div class="reveal-lbl" data-i18n="hero.stat3">Rotura en transporte</div></div>
-        </div>
-
-        <div class="hero-stats reveal-mobile-stats">
-            <div class="hero-stat"><div class="number">500</div><div class="label" data-i18n="hero.stat1">Años de vida útil</div></div>
-            <div class="hero-stat"><div class="number">8mm</div><div class="label" data-i18n="sp.thick">Espesor de Blindaje</div></div>
-            <div class="hero-stat"><div class="number">0%</div><div class="label" data-i18n="hero.stat2">Absorción humedad</div></div>
-            <div class="hero-stat"><div class="number">0%</div><div class="label" data-i18n="hero.stat3">Rotura en transporte</div></div>
-        </div>
-
-        <p class="reveal-bl fade-in fade-in-d1" data-i18n="reveal.bl">No se quiebran con el granizo. No se oxidan. No absorben agua.</p>
-
-        <div class="reveal-br fade-in fade-in-d2">
-            <p data-i18n="reveal.br">Blindaje Total. En serio.</p>
-            <a href="/cotizador" class="btn btn-gold" data-i18n="nav.cta">Cotiza Ahora</a>
-        </div>
-    </section>
 
     <!-- ================================================
      PROBLEMA
@@ -2857,12 +2584,7 @@
                     'hero.stat1': 'Años de vida útil',
                     'hero.stat2': 'Absorción humedad',
                     'hero.stat3': 'Rotura en transporte',
-                    'reveal.title1': 'Diseñada para durar',
-                    'reveal.title2': '500 años.',
-                    'reveal.sub': 'Pasa el cursor por la imagen y compruébalo.',
-                    'reveal.sub.touch': 'Toca la imagen y compruébalo.',
-                    'reveal.bl': 'No se quiebran con el granizo. No se oxidan. No absorben agua.',
-                    'reveal.br': 'Blindaje Total. En serio.',
+                    'hero.claim': 'No se quiebran con el granizo. No se oxidan. No absorben agua.',
                     'prob.label': 'El Problema',
                     'prob.title': 'El Problema <span class="gold">Tradicional</span>',
                     'prob.quote': '"Todo lo que has comprado en tu vida, todavía existe en la tierra hoy en día."',
@@ -3047,12 +2769,7 @@
                     'hero.stat1': 'Years of lifespan',
                     'hero.stat2': 'Moisture absorption',
                     'hero.stat3': 'Transport breakage',
-                    'reveal.title1': 'Designed to last',
-                    'reveal.title2': '500 years.',
-                    'reveal.sub': 'Move your cursor over the image and see for yourself.',
-                    'reveal.sub.touch': 'Tap the image and see for yourself.',
-                    'reveal.bl': 'They don\'t crack in hail. They don\'t rust. They don\'t absorb water.',
-                    'reveal.br': 'Total Armor. Seriously.',
+                    'hero.claim': 'They don\'t crack in hail. They don\'t rust. They don\'t absorb water.',
                     'prob.label': 'The Problem',
                     'prob.title': 'The <span class="gold">Traditional</span> Problem',
                     'prob.quote': '"Everything you\'ve ever bought in your life still exists on Earth today."',
@@ -3341,58 +3058,6 @@
         })();
     </script>
 
-    <!-- Reveal hero: halo que sigue el cursor + hotspots de datos técnicos -->
-    <script>
-        (function () {
-            var hero = document.getElementById('reveal');
-            var glow = document.getElementById('revealGlow');
-            if (!hero || !glow) return;
-
-            var hotspots = Array.prototype.slice.call(hero.querySelectorAll('.reveal-hotspot'));
-            var THRESHOLD = 170;
-            var mouse = { x: -999, y: -999 };
-            var smooth = { x: -999, y: -999 };
-
-            hero.addEventListener('mousemove', function (e) {
-                var rect = hero.getBoundingClientRect();
-                mouse.x = e.clientX - rect.left;
-                mouse.y = e.clientY - rect.top;
-            });
-            hero.addEventListener('mouseleave', function () {
-                mouse.x = -999;
-                mouse.y = -999;
-            });
-
-            // Tabletas: el halo sigue el dedo y deja visible el dato mas cercano
-            function seguirDedo(e) {
-                if (!e.touches || !e.touches.length) return;
-                var rect = hero.getBoundingClientRect();
-                mouse.x = e.touches[0].clientX - rect.left;
-                mouse.y = e.touches[0].clientY - rect.top;
-            }
-            hero.addEventListener('touchstart', seguirDedo, { passive: true });
-            hero.addEventListener('touchmove', seguirDedo, { passive: true });
-
-            function loop() {
-                smooth.x += (mouse.x - smooth.x) * 0.12;
-                smooth.y += (mouse.y - smooth.y) * 0.12;
-
-                glow.style.transform = 'translate(' + (smooth.x - 260) + 'px, ' + (smooth.y - 260) + 'px)';
-
-                var heroRect = hero.getBoundingClientRect();
-                hotspots.forEach(function (hs) {
-                    var r = hs.getBoundingClientRect();
-                    var cx = r.left - heroRect.left + r.width / 2;
-                    var cy = r.top - heroRect.top + r.height / 2;
-                    var d = Math.hypot(smooth.x - cx, smooth.y - cy);
-                    hs.classList.toggle('active', d < THRESHOLD);
-                });
-
-                requestAnimationFrame(loop);
-            }
-            requestAnimationFrame(loop);
-        })();
-    </script>
 
     <!-- Momentos interactivos: glow magnético en las cards de Problema / Solución -->
     <script>
