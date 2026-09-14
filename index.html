@@ -490,6 +490,14 @@
             color: var(--gold);
         }
 
+        /* En pantallas tactiles no hay cursor: se cambia la instruccion */
+        .reveal-sub .solo-tactil { display: none; }
+
+        @media (hover: none) {
+            .reveal-sub .solo-cursor { display: none; }
+            .reveal-sub .solo-tactil { display: inline; }
+        }
+
         .reveal-sub {
             margin-top: 18px;
             color: rgba(255,255,255,0.65);
@@ -634,6 +642,7 @@
                 padding: 140px 24px 60px;
             }
             .reveal-hotspot { display: none; }
+            .reveal-sub { display: none; }
             .reveal-heading { position: relative; top: 0; }
             .reveal-bl, .reveal-br {
                 position: relative;
@@ -1718,7 +1727,7 @@
         {
           "@type": "PropertyValue",
           "name": "Absorción de agua",
-          "value": "0 %"
+          "value": "0%"
         },
         {
           "@type": "PropertyValue",
@@ -1738,7 +1747,7 @@
         {
           "@type": "PropertyValue",
           "name": "Pendiente mínima",
-          "value": "15 %"
+          "value": "15%"
         }
       ]
     }
@@ -1832,7 +1841,7 @@
                 <span class="reveal-l1 fade-in" data-i18n="reveal.title1">Diseñada para durar</span>
                 <span class="reveal-l2 fade-in fade-in-d1" data-i18n="reveal.title2">500 años.</span>
             </h2>
-            <div class="reveal-sub fade-in fade-in-d2" data-i18n="reveal.sub">Pasa el cursor por la imagen y compruébalo.</div>
+            <div class="reveal-sub fade-in fade-in-d2"><span class="solo-cursor" data-i18n="reveal.sub">Pasa el cursor por la imagen y compruébalo.</span><span class="solo-tactil" data-i18n="reveal.sub.touch">Toca la imagen y compruébalo.</span></div>
         </div>
 
         <div class="reveal-hotspot" id="revealHs1" style="top:30%; left:18%;">
@@ -2721,7 +2730,7 @@
                     <ul>
                         <li><a href="/empresa#origen" data-i18n="emp.n1">Origen</a></li>
                         <li><a href="/empresa#manifiesto" data-i18n="emp.n2">Manifiesto</a></li>
-                        <li><a href="/empresa#proposito" data-i18n="emp.n3">Misión, visión y valores</a></li>
+                        <li><a href="/empresa#proposito" data-i18n="emp.n3">Misión y visión</a></li>
                         <li><a href="/empresa#impacto" data-i18n="emp.n5">Qué rescatamos</a></li>
                         <li><a href="/empresa#datos" data-i18n="emp.n6">Datos oficiales</a></li>
                     </ul>
@@ -2826,7 +2835,7 @@
                     'footer.col.legal': 'Legal y contacto',
                     'emp.n1': 'Origen',
                     'emp.n2': 'Manifiesto',
-                    'emp.n3': 'Misión, visión y valores',
+                    'emp.n3': 'Misión y visión',
                     'emp.n5': 'Qué rescatamos',
                     'emp.n6': 'Datos oficiales',
                     'emp.legal.hab.t': 'Tratamiento de datos',
@@ -2851,6 +2860,7 @@
                     'reveal.title1': 'Diseñada para durar',
                     'reveal.title2': '500 años.',
                     'reveal.sub': 'Pasa el cursor por la imagen y compruébalo.',
+                    'reveal.sub.touch': 'Toca la imagen y compruébalo.',
                     'reveal.bl': 'No se quiebran con el granizo. No se oxidan. No absorben agua.',
                     'reveal.br': 'Blindaje Total. En serio.',
                     'prob.label': 'El Problema',
@@ -3040,6 +3050,7 @@
                     'reveal.title1': 'Designed to last',
                     'reveal.title2': '500 years.',
                     'reveal.sub': 'Move your cursor over the image and see for yourself.',
+                    'reveal.sub.touch': 'Tap the image and see for yourself.',
                     'reveal.bl': 'They don\'t crack in hail. They don\'t rust. They don\'t absorb water.',
                     'reveal.br': 'Total Armor. Seriously.',
                     'prob.label': 'The Problem',
@@ -3173,7 +3184,7 @@
                     'footer.col.legal': 'Legal and contact',
                     'emp.n1': 'Origin',
                     'emp.n2': 'Manifesto',
-                    'emp.n3': 'Mission, vision and values',
+                    'emp.n3': 'Mission and vision',
                     'emp.n5': 'What we rescue',
                     'emp.n6': 'Official records',
                     'emp.legal.hab.t': 'Data handling'
@@ -3351,6 +3362,16 @@
                 mouse.x = -999;
                 mouse.y = -999;
             });
+
+            // Tabletas: el halo sigue el dedo y deja visible el dato mas cercano
+            function seguirDedo(e) {
+                if (!e.touches || !e.touches.length) return;
+                var rect = hero.getBoundingClientRect();
+                mouse.x = e.touches[0].clientX - rect.left;
+                mouse.y = e.touches[0].clientY - rect.top;
+            }
+            hero.addEventListener('touchstart', seguirDedo, { passive: true });
+            hero.addEventListener('touchmove', seguirDedo, { passive: true });
 
             function loop() {
                 smooth.x += (mouse.x - smooth.x) * 0.12;
