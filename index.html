@@ -1381,6 +1381,352 @@
                 padding: 12px 24px;
             }
         }
+
+        /* =============================================
+           CAPAS — exterior / techo / familia
+           Por defecto se ve estática (sin JS, movimiento reducido o
+           equipo lento). El JS agrega .capas--live para animarla con el scroll.
+           ============================================= */
+        #capas {
+            padding: 0;
+            background: #000000;
+        }
+
+        .capas-panel {
+            position: relative;
+            height: clamp(560px, 92vh, 900px);
+            overflow: hidden;
+        }
+
+        .capas-sr {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+
+        .capas-copy {
+            position: absolute;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .capas-h {
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: clamp(2.1rem, 6.2vw, 4.8rem);
+            line-height: 1.02;
+            letter-spacing: 0.01em;
+            color: var(--white);
+            max-width: 15ch;
+        }
+
+        .capas-p {
+            font-family: var(--font-body);
+            color: var(--muted);
+            font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+            line-height: 1.6;
+            max-width: 40ch;
+            margin-top: 18px;
+        }
+
+        .capas-num {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            color: var(--gold);
+            font-size: clamp(3.6rem, 12vw, 8.5rem);
+            line-height: 1;
+            letter-spacing: 0.01em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .capas-num small {
+            font-size: 0.42em;
+            letter-spacing: 0.04em;
+            margin-left: 0.12em;
+        }
+
+        /* --- Capa 1: cielo --- */
+        .capas-sky {
+            background: linear-gradient(180deg, #000000 0%, #04070b 55%, #0a0f16 100%);
+        }
+
+        .capas-clouds {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(45% 22% at 18% 4%, rgba(70, 80, 96, 0.28), transparent 70%),
+                radial-gradient(50% 20% at 78% 0%, rgba(60, 68, 82, 0.32), transparent 70%),
+                radial-gradient(35% 16% at 52% 12%, rgba(48, 56, 68, 0.22), transparent 70%);
+        }
+
+        /* Granizo quieto para la versión estática */
+        .capas:not(.capas--live) .capas-sky::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(103deg, transparent 0 46px, rgba(214, 226, 240, 0.10) 46px 47px),
+                repeating-linear-gradient(97deg, transparent 0 83px, rgba(214, 226, 240, 0.07) 83px 84px);
+            -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 100%);
+            mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 100%);
+        }
+
+        .capas-copy--top {
+            inset: 0;
+            justify-content: center;
+        }
+
+        /* --- Capa 2: tejas K-LOCK --- */
+        .capas-roofpanel {
+            background: linear-gradient(180deg, #0a0f16 0%, #05080c 45%, #000000 100%);
+        }
+
+        .capas-copy--num {
+            top: max(13%, calc(var(--nav-height) + 12px));
+        }
+
+        .capas-roof {
+            position: absolute;
+            left: -8%;
+            right: -8%;
+            bottom: 7%;
+            height: 46%;
+            perspective: 1100px;
+            perspective-origin: 50% 0%;
+        }
+
+        .capas-plane {
+            position: absolute;
+            inset: 0;
+            transform: rotateX(46deg);
+            transform-origin: 50% 100%;
+            overflow: hidden;
+            /* manto asfáltico: la base sobre la que se instala */
+            background: #0d0d0e repeating-linear-gradient(0deg, transparent 0 22px, rgba(255, 255, 255, 0.025) 22px 23px);
+        }
+
+        .capas-tile {
+            position: absolute;
+            background: linear-gradient(180deg, #4a4e54 0%, #33363a 42%, #232629 100%);
+            border-radius: 3px 3px 6px 6px;
+            border-left: 1px solid #16181a;
+            border-right: 1px solid #16181a;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 10px 12px -6px rgba(0, 0, 0, 0.8);
+        }
+
+        .capas-tile::after {
+            content: '';
+            position: absolute;
+            top: 7%;
+            left: 50%;
+            width: 24%;
+            height: 9%;
+            transform: translateX(-50%);
+            background: #17191b;
+            border-radius: 2px;
+        }
+
+        .capas-eave {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 7%;
+            background: linear-gradient(180deg, #1d1e20, #0b0b0c);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* --- Capa 3: interior --- */
+        .capas-home {
+            background: linear-gradient(180deg, #130d09 0%, #0c0806 65%, #000000 100%);
+        }
+
+        .capas-ceiling {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6%;
+            background: repeating-linear-gradient(90deg, #2c1e14 0 3px, #1e150e 3px 120px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .capas-glow {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(55% 45% at 84% 28%, rgba(255, 186, 112, 0.30), rgba(255, 150, 80, 0.09) 50%, transparent 72%),
+                radial-gradient(60% 18% at 55% 96%, rgba(255, 170, 100, 0.12), transparent 70%);
+        }
+
+        .capas-lamp {
+            position: absolute;
+            top: 6%;
+            left: 86%;
+            width: 2px;
+            height: 13%;
+            background: #3a2a1e;
+        }
+
+        .capas-lamp span {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 84px;
+            height: 38px;
+            transform: translateX(-50%);
+            background: #2e2118;
+            clip-path: polygon(28% 0, 72% 0, 100% 100%, 0 100%);
+        }
+
+        .capas-lamp span::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -14px;
+            width: 40px;
+            height: 22px;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background: radial-gradient(closest-side, #ffe2b0, rgba(255, 200, 130, 0));
+        }
+
+        .capas-window {
+            position: absolute;
+            left: 9%;
+            bottom: 26%;
+            width: 18%;
+            max-width: 240px;
+            aspect-ratio: 3 / 4;
+            border: 6px solid #2a1c12;
+            border-radius: 2px;
+            background:
+                repeating-linear-gradient(104deg, transparent 0 13px, rgba(200, 215, 235, 0.16) 13px 14px),
+                linear-gradient(180deg, #04070b, #0b111a);
+            box-shadow: 0 0 0 1px rgba(255, 190, 120, 0.10);
+        }
+
+        .capas-window::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 5px;
+            transform: translateX(-50%);
+            background: #2a1c12;
+        }
+
+        .capas-sofa {
+            position: absolute;
+            right: 12%;
+            bottom: 11%;
+            width: min(44%, 520px);
+            aspect-ratio: 3.4;
+            background: #2b1e16;
+            border-radius: 16px 16px 8px 8px;
+            box-shadow: inset 0 10px 0 rgba(255, 190, 120, 0.10);
+        }
+
+        .capas-sofa::before {
+            content: '';
+            position: absolute;
+            left: 4%;
+            right: 4%;
+            bottom: 70%;
+            height: 80%;
+            background: #241912;
+            border-radius: 18px 18px 0 0;
+            box-shadow: inset 0 8px 0 rgba(255, 190, 120, 0.08);
+        }
+
+        .capas-copy--home {
+            top: max(24%, calc(var(--nav-height) + 40px));
+        }
+
+        /* --- Modo animado --- */
+        .capas-hail {
+            display: none;
+        }
+
+        .capas--live .capas-track {
+            height: 420vh;
+        }
+
+        .capas--live .capas-stage {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            height: 100svh;
+            overflow: hidden;
+            background: #000000;
+        }
+
+        .capas--live .capas-world {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 300%;
+            will-change: transform;
+        }
+
+        .capas--live .capas-panel {
+            height: 33.3334%;
+        }
+
+        .capas--live .capas-copy--num {
+            opacity: 0;
+            transform: translate3d(0, 24px, 0);
+            transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+        }
+
+        .capas--live .capas-copy--num.is-on {
+            opacity: 1;
+            transform: none;
+        }
+
+        .capas--live .capas-hail {
+            display: block;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        @media (max-width: 700px) {
+            .capas-lamp {
+                left: 84%;
+            }
+
+            .capas-window {
+                left: 6%;
+                bottom: 14%;
+                width: 26%;
+            }
+
+            .capas-sofa {
+                right: 6%;
+                width: 54%;
+            }
+
+            .capas-roof {
+                height: 42%;
+            }
+        }
     </style>
     <!-- Respaldo: si el navegador no ejecuta JS, mostrar todo el contenido igual -->
     <noscript>
@@ -1684,6 +2030,47 @@
             <div class="fade-in" data-i18n-html="hero.reframe"
                 style="max-width:820px; margin:56px auto 0; padding:24px 30px; border:1px solid rgba(193,138,104,0.30); border-radius:12px; background:rgba(193,138,104,0.06); color:var(--light); font-size:1.15rem; line-height:1.6; text-align:center;">
                 No es un plástico cualquiera: es el material <strong style="color:var(--white);">más resistente que existe</strong>, rescatado y convertido en tu techo. No se quiebra, no se oxida, no absorbe agua.
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+     CAPAS — exterior / techo / familia (animación con el scroll)
+     ================================================ -->
+    <section id="capas" class="capas">
+        <div class="capas-track">
+            <div class="capas-stage">
+                <div class="capas-world">
+                    <div class="capas-panel capas-sky">
+                        <div class="capas-clouds" aria-hidden="true"></div>
+                        <div class="capas-copy capas-copy--top" data-capas="t1">
+                            <h2 class="capas-h" data-i18n="capas.t1">De las tejas para arriba está el exterior.</h2>
+                            <p class="capas-p" data-i18n="capas.t1b">Granizo, viento, sol y lluvia: todo eso le cae encima a tu techo, todos los días.</p>
+                        </div>
+                    </div>
+                    <div class="capas-panel capas-roofpanel">
+                        <div class="capas-copy capas-copy--num" data-capas="num">
+                            <p class="capas-num"><span class="capas-sr">225 km/h</span><span aria-hidden="true"><span class="capas-num-v">225</span><small>km/h</small></span></p>
+                            <p class="capas-p" data-i18n="capas.numb">Vientos que soporta el sistema K-LOCK sin que se vuele una teja. Cada pieza encaja con la siguiente.</p>
+                        </div>
+                        <div class="capas-roof" aria-hidden="true">
+                            <div class="capas-plane"></div>
+                        </div>
+                        <div class="capas-eave" aria-hidden="true"></div>
+                    </div>
+                    <div class="capas-panel capas-home">
+                        <div class="capas-glow" aria-hidden="true"></div>
+                        <div class="capas-ceiling" aria-hidden="true"></div>
+                        <div class="capas-window" aria-hidden="true"></div>
+                        <div class="capas-lamp" aria-hidden="true"><span></span></div>
+                        <div class="capas-sofa" aria-hidden="true"></div>
+                        <div class="capas-copy capas-copy--home" data-capas="t3">
+                            <h2 class="capas-h" data-i18n="capas.t3">De tu techo para abajo está tu familia.</h2>
+                            <p class="capas-p" data-i18n="capas.t3b">Una teja que no se quiebra, no gotea y no se vuela es lo que separa una cosa de la otra.</p>
+                        </div>
+                    </div>
+                </div>
+                <canvas class="capas-hail" aria-hidden="true"></canvas>
             </div>
         </div>
     </section>
@@ -2585,6 +2972,11 @@
                     'hero.stat2': 'Absorción humedad',
                     'hero.stat3': 'Rotura en transporte',
                     'hero.claim': 'No se quiebran con el granizo. No se oxidan. No absorben agua.',
+                    'capas.t1': 'De las tejas para arriba está el exterior.',
+                    'capas.t1b': 'Granizo, viento, sol y lluvia: todo eso le cae encima a tu techo, todos los días.',
+                    'capas.numb': 'Vientos que soporta el sistema K-LOCK sin que se vuele una teja. Cada pieza encaja con la siguiente.',
+                    'capas.t3': 'De tu techo para abajo está tu familia.',
+                    'capas.t3b': 'Una teja que no se quiebra, no gotea y no se vuela es lo que separa una cosa de la otra.',
                     'prob.label': 'El Problema',
                     'prob.title': 'El Problema <span class="gold">Tradicional</span>',
                     'prob.quote': '"Todo lo que has comprado en tu vida, todavía existe en la tierra hoy en día."',
@@ -2770,6 +3162,11 @@
                     'hero.stat2': 'Moisture absorption',
                     'hero.stat3': 'Transport breakage',
                     'hero.claim': 'They don\'t crack in hail. They don\'t rust. They don\'t absorb water.',
+                    'capas.t1': 'Above the tiles is the outside world.',
+                    'capas.t1b': 'Hail, wind, sun and rain: all of it lands on your roof, every single day.',
+                    'capas.numb': 'Winds the K-LOCK system withstands without a single tile blowing off. Each piece locks into the next.',
+                    'capas.t3': 'Below your roof is your family.',
+                    'capas.t3b': 'A tile that doesn\'t crack, leak or blow away is what keeps one from the other.',
                     'prob.label': 'The Problem',
                     'prob.title': 'The <span class="gold">Traditional</span> Problem',
                     'prob.quote': '"Everything you\'ve ever bought in your life still exists on Earth today."',
@@ -3204,6 +3601,284 @@
 
             var initial = document.querySelector('.swatch[data-color].active') || swatches[0];
             syncTag(initial);
+        })();
+    </script>
+    <!-- Capas: exterior / techo / familia — animación ligada al scroll -->
+    <script>
+        (function () {
+            'use strict';
+            var sec = document.getElementById('capas');
+            if (!sec) return;
+
+            var track = sec.querySelector('.capas-track');
+            var stage = sec.querySelector('.capas-stage');
+            var world = sec.querySelector('.capas-world');
+            var plane = sec.querySelector('.capas-plane');
+            var canvas = sec.querySelector('.capas-hail');
+            var t1 = sec.querySelector('[data-capas="t1"]');
+            var num = sec.querySelector('[data-capas="num"]');
+            var numV = sec.querySelector('.capas-num-v');
+            var t3 = sec.querySelector('[data-capas="t3"]');
+            var glow = sec.querySelector('.capas-glow');
+            var lamp = sec.querySelector('.capas-lamp');
+
+            // --- Tejas: se crean siempre (la versión estática también las muestra) ---
+            // Se instalan de abajo hacia arriba y de izquierda a derecha; cada
+            // hilera superior traslapa a la de abajo, como el K-LOCK.
+            var COLS = 7, ROWS = 5, PITCH = 100 / ROWS, tiles = [];
+            for (var r = ROWS - 1; r >= 0; r--) {
+                var shift = r % 2 ? 0.5 : 0;
+                for (var c = shift ? -1 : 0; c < COLS; c++) {
+                    var el = document.createElement('div');
+                    el.className = 'capas-tile';
+                    el.style.left = ((c + shift) / COLS * 100) + '%';
+                    el.style.width = (100 / COLS) + '%';
+                    el.style.top = (r * PITCH - PITCH * 0.28) + '%';
+                    el.style.height = (PITCH * 1.28) + '%';
+                    el.style.zIndex = ROWS - r;
+                    plane.appendChild(el);
+                    tiles.push({ el: el, v: -1 });
+                }
+            }
+
+            // --- ¿Animada o estática? ---
+            var param = (location.search.match(/[?&]capas=(live|static)/) || [])[1];
+            var rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+            var conn = navigator.connection || {};
+            var weak = !!conn.saveData ||
+                (navigator.deviceMemory !== undefined && navigator.deviceMemory <= 2);
+            var live = param === 'live' || (param !== 'static' && !rm.matches && !weak);
+            // Si va a menos de ~45 cuadros por segundo, pasa a la versión estática
+            var fpsTest = param !== 'live';
+            if (!live) return;
+            sec.classList.add('capas--live');
+
+            function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+            function smooth(v) { v = clamp(v); return v * v * (3 - 2 * v); }
+            function outBack(v) { var s = 1.6; v -= 1; return v * v * ((s + 1) * v + s) + 1; }
+
+            var stageH = 0, W = 0, H = 0, dpr = 1, roofTop = 0, camPx = 0, lastP = -1;
+            var ctx = canvas.getContext('2d');
+
+            function measure() {
+                var prevW = W, prevH = H;
+                stageH = stage.clientHeight;
+                W = stage.clientWidth;
+                H = stageH;
+                if (W !== prevW || H !== prevH) {
+                    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+                    canvas.width = Math.round(W * dpr);
+                    canvas.height = Math.round(H * dpr);
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                }
+                roofTop = plane.getBoundingClientRect().top - world.getBoundingClientRect().top;
+                if (W !== prevW) seedHail();
+                lastP = -1;
+            }
+
+            function progress() {
+                var rect = track.getBoundingClientRect();
+                return clamp(-rect.top / (rect.height - stageH));
+            }
+
+            // p va de 0 (entra la sección) a 1 (sale). Guion:
+            // 0–.16 cielo · .16–.32 baja al techo · .30–.62 se ensamblan las tejas
+            // (al terminar, el 225 cuenta solo, por tiempo) · .76–.90 baja al interior
+            // · .82–.94 se enciende la casa
+            function apply(p) {
+                var cam = p < 0.16 ? 0 : p < 0.32 ? smooth((p - 0.16) / 0.16) :
+                    p < 0.76 ? 1 : 1 + smooth((p - 0.76) / 0.14);
+                camPx = cam * stageH;
+                world.style.transform = 'translate3d(0,' + (-camPx).toFixed(1) + 'px,0)';
+
+                var a = smooth((p - 0.10) / 0.10);
+                t1.style.opacity = 1 - a;
+                t1.style.transform = 'translate3d(0,' + (-40 * a) + 'px,0)';
+
+                var q = clamp((p - 0.30) / 0.32);
+                if (q >= 0.9 && !numOn) playNum();
+                else if (p < 0.2 && numOn) resetNum();
+
+                var n = tiles.length, dur = 0.16, step = (1 - dur) / (n - 1);
+                for (var i = 0; i < n; i++) {
+                    var t = clamp((q - i * step) / dur);
+                    var tl = tiles[i];
+                    if (t === tl.v) continue;
+                    tl.v = t;
+                    tl.el.style.opacity = Math.min(1, t * 3);
+                    tl.el.style.transform = t === 1 ? 'none' :
+                        'translate3d(0,' + (-(1 - outBack(t)) * 70).toFixed(1) + '%,0)';
+                }
+
+                a = smooth((p - 0.82) / 0.12);
+                glow.style.opacity = a;
+                lamp.style.opacity = 0.35 + 0.65 * a;
+
+                a = smooth((p - 0.88) / 0.07);
+                t3.style.opacity = a;
+                t3.style.transform = 'translate3d(0,' + (30 * (1 - a)) + 'px,0)';
+            }
+
+            // --- 225 km/h: aparece cuando el techo está casi listo y cuenta
+            // solo, por tiempo (no con el scroll). Se reinicia al volver al cielo.
+            var numOn = false, numRaf = 0;
+
+            function playNum() {
+                numOn = true;
+                num.classList.add('is-on');
+                var t0 = 0;
+                cancelAnimationFrame(numRaf);
+                numRaf = requestAnimationFrame(function tick(now) {
+                    if (!t0) t0 = now;
+                    var k = Math.min(1, (now - t0) / 1500);
+                    numV.textContent = Math.round(225 * (1 - Math.pow(1 - k, 3)));
+                    if (k < 1) numRaf = requestAnimationFrame(tick);
+                });
+            }
+
+            function resetNum() {
+                numOn = false;
+                cancelAnimationFrame(numRaf);
+                num.classList.remove('is-on');
+                numV.textContent = '0';
+            }
+
+            // --- Granizo (canvas) ---
+            var hail = [], bits = [], cleared = false;
+
+            function spawn(h, anywhere) {
+                h.vy = H * (1.0 + Math.random() * 0.6);
+                h.vx = h.vy * 0.2;
+                h.x = Math.random() * W * 1.25 - W * 0.25;
+                h.y = anywhere ? Math.random() * H : -Math.random() * H * 0.4 - 10;
+                h.r = (W < 700 ? 0.9 : 1.2) + Math.random() * 1.5;
+            }
+
+            function seedHail() {
+                var count = Math.max(28, Math.min(90, Math.round(W * H / 15000)));
+                hail = [];
+                bits = [];
+                for (var i = 0; i < count; i++) { var h = {}; spawn(h, true); hail.push(h); }
+            }
+
+            function drawHail(dt) {
+                var floor = Math.min(H, roofTop - camPx);
+                if (floor <= 0) {
+                    if (!cleared) { ctx.clearRect(0, 0, W, H); cleared = true; }
+                    return;
+                }
+                cleared = false;
+                ctx.clearRect(0, 0, W, H);
+
+                ctx.beginPath();
+                for (var i = 0; i < hail.length; i++) {
+                    var h = hail[i];
+                    h.x += h.vx * dt;
+                    h.y += h.vy * dt;
+                    if (h.y >= floor) {
+                        if (floor < H && bits.length < 60) {
+                            for (var k = 0; k < 2; k++) {
+                                bits.push({ x: h.x, y: floor, vx: (Math.random() - 0.5) * 140, vy: -60 - Math.random() * 150, life: 0.35 });
+                            }
+                        }
+                        spawn(h, false);
+                        continue;
+                    }
+                    ctx.moveTo(h.x - h.vx * 0.03, h.y - h.vy * 0.03);
+                    ctx.lineTo(h.x, h.y);
+                }
+                ctx.strokeStyle = 'rgba(214,226,240,0.22)';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                ctx.beginPath();
+                for (i = 0; i < hail.length; i++) {
+                    h = hail[i];
+                    ctx.moveTo(h.x + h.r, h.y);
+                    ctx.arc(h.x, h.y, h.r, 0, 6.2832);
+                }
+                for (i = bits.length - 1; i >= 0; i--) {
+                    var b = bits[i];
+                    b.life -= dt;
+                    if (b.life <= 0) { bits.splice(i, 1); continue; }
+                    b.vy += 900 * dt;
+                    b.x += b.vx * dt;
+                    b.y += b.vy * dt;
+                    ctx.moveTo(b.x + 0.9, b.y);
+                    ctx.arc(b.x, b.y, 0.9, 0, 6.2832);
+                }
+                ctx.fillStyle = 'rgba(226,234,244,0.85)';
+                ctx.fill();
+            }
+
+            // --- Ciclo: solo corre mientras la sección está en pantalla ---
+            var raf = 0, last = 0, visible = false, frames = 0, slow = 0, sampled = 0;
+
+            function loop(now) {
+                raf = requestAnimationFrame(loop);
+                var dt = last ? now - last : 16;
+                last = now;
+
+                if (fpsTest && ++frames > 15 && dt < 120) {
+                    slow += dt;
+                    if (++sampled === 90) {
+                        fpsTest = false;
+                        if (slow / sampled > 1000 / 45) { goStatic(); return; }
+                    }
+                }
+
+                var p = progress();
+                if (p !== lastP) { apply(p); lastP = p; }
+                drawHail(Math.min(dt, 50) / 1000);
+            }
+
+            function start() {
+                if (raf || !live || !visible || document.hidden) return;
+                last = 0;
+                raf = requestAnimationFrame(loop);
+            }
+
+            function stop() {
+                if (raf) cancelAnimationFrame(raf);
+                raf = 0;
+            }
+
+            function goStatic() {
+                if (!live) return;
+                var p = progress();
+                live = false;
+                stop();
+                cancelAnimationFrame(numRaf);
+                num.classList.remove('is-on');
+                sec.classList.remove('capas--live');
+                [world, t1, num, t3, glow, lamp].forEach(function (el) { el.removeAttribute('style'); });
+                tiles.forEach(function (tl) { tl.el.style.opacity = ''; tl.el.style.transform = ''; });
+                numV.textContent = '225';
+                // Deja al lector en el mismo punto del recorrido
+                if (p > 0 && p < 1) {
+                    var top = sec.getBoundingClientRect().top + window.pageYOffset;
+                    window.scrollTo({ top: top + p * Math.max(0, sec.offsetHeight - window.innerHeight), behavior: 'instant' });
+                }
+            }
+
+            numV.textContent = '0';
+            measure();
+            apply(progress());
+
+            new IntersectionObserver(function (entries) {
+                visible = entries[0].isIntersecting;
+                if (visible) start(); else stop();
+            }, { rootMargin: '100px 0px' }).observe(sec);
+
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) stop(); else start();
+            });
+
+            window.addEventListener('resize', function () { if (live) measure(); });
+            window.addEventListener('load', function () { if (live) measure(); });
+
+            var onRM = function (e) { if (e.matches) goStatic(); };
+            if (rm.addEventListener) rm.addEventListener('change', onRM); else if (rm.addListener) rm.addListener(onRM);
         })();
     </script>
 </body>
