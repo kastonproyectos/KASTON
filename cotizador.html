@@ -27,15 +27,28 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    /* Paleta del manual de marca: negro de base, cobre para señalar,
+                       verde solo cuando se habla de medio ambiente. */
                     colors: {
-                        graphite: '#0D0D0D',
+                        graphite: '#000000',
+                        surface: '#111111',
+                        surfaceHigh: '#1A1A1A',
                         bronze: '#C18A68',
-                        slateBlue: '#0066FF',
-                        greenNeon: '#00FF88',
+                        bronzeDeep: '#8A6F4E',
+                        bronzeLight: '#D49B76',
+                        verde: '#4A5B38',
+                        muted: '#BCBCBC',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        heading: ['Oswald', 'sans-serif'],
+                        sans: ['Inter', 'Arial', 'sans-serif'],
+                        heading: ['Oswald', 'Arial Narrow', 'Arial', 'sans-serif'],
+                    },
+                    /* Bordes rectos, sin esquinas muy redondeadas (manual, sección Color) */
+                    borderRadius: {
+                        lg: '6px',
+                        xl: '6px',
+                        '2xl': '8px',
+                        '3xl': '10px',
                     }
                 }
             }
@@ -43,18 +56,110 @@
     </script>
     <style>
         body {
-            background-color: #0D0D0D;
+            background-color: #000000;
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* Titulares como en kastonproyectos.com: Oswald, mayúsculas, interletra +0,04 em */
+        h1, h2, h3, h4 {
+            font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.15;
+        }
+
+        /* Tarjeta de la web: superficie #111 con borde cobre al 15 % */
         .glass-panel {
-            background-color: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #111111;
+            border: 1px solid rgba(193, 138, 104, 0.15);
+        }
+
+        /* Antetítulo cobre (PASO 01, RESULTADO...) */
+        .k-kicker {
+            font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #C18A68;
+        }
+
+        .k-divider {
+            width: 60px;
+            height: 3px;
+            background: #C18A68;
+        }
+
+        /* Botón cobre y botón de contorno, iguales a los de la web */
+        .k-btn {
+            font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 6px;
+            transition: background-color .25s, color .25s, border-color .25s, transform .25s;
+        }
+
+        .k-btn-gold {
+            background: #C18A68;
+            color: #000;
+            border: 1px solid #C18A68;
+        }
+
+        .k-btn-gold:hover:not(:disabled) {
+            background: #D49B76;
+            border-color: #D49B76;
+            transform: translateY(-1px);
+        }
+
+        .k-btn-outline {
+            background: transparent;
+            color: #C18A68;
+            border: 1px solid rgba(193, 138, 104, 0.5);
+        }
+
+        .k-btn-outline:hover:not(:disabled) {
+            background: rgba(193, 138, 104, 0.1);
+            border-color: #C18A68;
+        }
+
+        /* Tarjetas de modalidad: la .card de la web */
+        .k-card {
+            background: #111111;
+            border: 1px solid rgba(193, 138, 104, 0.15);
+            border-left: 3px solid rgba(193, 138, 104, 0.4);
+            border-radius: 8px;
+            transition: border-color .35s ease, transform .35s ease, box-shadow .35s ease;
+        }
+
+        .k-card-link:hover {
+            border-color: #C18A68;
+            border-left-color: #C18A68;
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(193, 138, 104, 0.14);
+        }
+
+        /* Cifra con barra cobre a la izquierda, como los datos de la web */
+        .k-stat {
+            background: #111111;
+            border: 1px solid rgba(193, 138, 104, 0.12);
+            border-left: 3px solid #C18A68;
+            border-radius: 8px;
+        }
+
+        .k-num {
+            font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.01em;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .k-card, .k-btn { transition: none; }
+            .k-card-link:hover, .k-btn-gold:hover:not(:disabled) { transform: none; }
         }
 
         .card,
@@ -81,7 +186,7 @@
             background: #C18A68;
             cursor: pointer;
             margin-top: -10px;
-            box-shadow: 0 0 10px rgba(193, 138, 104, 0.8);
+            border: 3px solid #000;
             transition: transform 0.1s;
         }
 
@@ -831,7 +936,26 @@
                 return () => cancelAnimationFrame(frame);
             }, [value]);
 
-            return <span>{current.toFixed(decimals)}</span>;
+            // Separador de miles y coma decimal según el idioma (manual: 12,6 kg · 6.300 tejas)
+            const locale = document.documentElement.lang === 'en' ? 'en-US' : 'es-CO';
+            return <span>{Number(current.toFixed(decimals)).toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</span>;
+        }
+
+        // Encabezado de cada bloque: antetítulo cobre y titular Oswald, como las secciones de la web.
+        function PasoTitulo({ antetitulo, titulo, children }) {
+            return (
+                <div className="flex flex-col gap-1.5">
+                    <div className="k-kicker">{antetitulo}</div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-white font-semibold text-xl md:text-2xl">{titulo}</h3>
+                        {children}
+                    </div>
+                </div>
+            );
+        }
+
+        function EtiquetaObligatorio({ texto }) {
+            return <span className="font-heading text-[10px] text-bronze border border-bronze/40 px-2 py-0.5 rounded uppercase tracking-[2px]">{texto}</span>;
         }
 
         function Gauge({ value, max, label, sublabel, color, decimals = 0, suffix = '', prefix = '' }) {
@@ -859,14 +983,14 @@
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-2xl font-bold tracking-tight text-white drop-shadow-md" style={{ color }}>
+                            <span className="text-2xl font-bold tracking-wide text-white drop-shadow-md" style={{ color }}>
                                 {prefix}<AnimatedNumber value={value} decimals={decimals} />{suffix}
                             </span>
                             <span className="text-xs text-white/50">{sublabel}</span>
                         </div>
                     </div>
                     {label && <div className="text-sm font-semibold tracking-wide text-white uppercase text-center mt-2">{label}</div>}
-                    {sublabel && <div className="text-[10px] text-white/50 uppercase tracking-widest text-center">{sublabel}</div>}
+                    {sublabel && <div className="text-[11px] text-white/50 uppercase tracking-widest text-center">{sublabel}</div>}
                 </div>
             );
         }
@@ -908,7 +1032,7 @@
 
             return (
                 <div className="relative inline-block ml-2 mt-1" onMouseEnter={() => setIsVisible(true)} onMouseLeave={() => setIsVisible(false)}>
-                    <div ref={iconRef} className="w-4 h-4 rounded-full border border-white/30 text-white/50 flex items-center justify-center text-[10px] cursor-help hover:border-bronze hover:text-bronze transition-colors">
+                    <div ref={iconRef} className="w-4 h-4 rounded-full border border-white/30 text-white/50 flex items-center justify-center text-[11px] cursor-help hover:border-bronze hover:text-bronze transition-colors">
                         i
                     </div>
                     {isVisible && ReactDOM.createPortal(
@@ -921,9 +1045,9 @@
                                 transform: `translate(-50%, ${position.isBelow ? '0' : '-100%'})`,
                                 zIndex: 99999
                             }}
-                            className="w-64 p-4 bg-[#0A0A0A] border border-bronze/60 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] pointer-events-none"
+                            className="w-64 p-4 bg-[#0A0A0A] border border-bronze/60 rounded-lg pointer-events-none"
                         >
-                            <div className="text-[10px] uppercase font-bold text-bronze mb-2 border-b border-white/10 pb-2">{title}</div>
+                            <div className="text-[11px] uppercase font-bold text-bronze mb-2 border-b border-white/10 pb-2">{title}</div>
                             {technicalValue && <div className="text-xs font-sans text-white mb-2"><span className="text-[#0066FF] font-bold">Unidad:</span> {technicalValue}</div>}
                             <div className="text-[11px] text-white/80 leading-relaxed">
                                 {description}
@@ -985,7 +1109,7 @@
                     <div className="grid grid-cols-4 gap-3">
                         {KASTON_COLORS.map(c => (
                             <button key={c.id} onClick={() => onSelectColor(c.id)}
-                                className={`rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${selectedColor === c.id ? 'border-white scale-105 shadow-[0_0_12px_rgba(255,255,255,.25)]' : 'border-white/15 hover:border-white/40'}`}>
+                                className={`rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${selectedColor === c.id ? 'border-white scale-105' : 'border-white/15 hover:border-white/40'}`}>
                                 <div style={{ backgroundColor: c.hex, height:'44px', position:'relative' }}>
                                     {c.star && <span style={{ position:'absolute', top:'4px', right:'6px', color:'#C18A68', fontSize:'11px' }}>★</span>}
                                 </div>
@@ -1015,12 +1139,13 @@
             const pitchBelowMin = pitchMode === 'known' && pitchValue < 15;
 
             return (
-                <div className="glass-panel rounded-2xl p-6 flex flex-col gap-6 animate-fade-in">
+                <div className="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-6 animate-fade-in">
                     {/* ── Tipo de techo ─────────────────────────────── */}
                     <div>
-                        <div className="flex items-center gap-3 mb-4">
-                            <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofTypeTitle}</h3>
-                            <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
+                        <div className="mb-5">
+                            <PasoTitulo antetitulo={`${t.step} 02`} titulo={t.roofTypeTitle}>
+                                <EtiquetaObligatorio texto={t.mandatory} />
+                            </PasoTitulo>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 relative">
                             {ROOF_TYPES.map(rt => {
@@ -1032,10 +1157,10 @@
                                     onClick={() => onSelectType(rt.id)}
                                     className={`relative flex flex-col justify-between h-full text-center items-center p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer gap-2
                                         ${elegido
-                                            ? 'border-bronze bg-bronze/15 scale-[1.03] shadow-[0_0_22px_rgba(193,138,104,0.3)]'
-                                            : `border-white/10 bg-white/5 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20 ${apagada ? 'opacity-40 hover:opacity-100' : ''}`}`}>
+                                            ? 'border-bronze bg-bronze/10'
+                                            : `border-white/10 bg-surfaceHigh hover:-translate-y-1 hover:border-bronze/50 ${apagada ? 'opacity-40 hover:opacity-100' : ''}`}`}>
                                     {elegido && (
-                                        <span className="absolute top-1 left-1 z-10 w-5 h-5 rounded-full bg-bronze text-graphite flex items-center justify-center text-[11px] font-black shadow-md">&#10003;</span>
+                                        <span className="absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded bg-bronze text-graphite flex items-center justify-center text-[11px] font-black">&#10003;</span>
                                     )}
                                     <div className="absolute top-1 right-1 z-10" onClick={(e) => e.stopPropagation()}>
                                         <InfoTooltip title={language === 'en' ? rt.nameEn : rt.name} description={language === 'en' ? rt.descEn : rt.description} />
@@ -1049,7 +1174,7 @@
                                             </div>
                                         )}
                                     </div>
-                                    <span className={`text-[10px] mt-auto font-bold tracking-wide text-center leading-tight w-full ${elegido ? 'text-bronze' : 'text-white/60'}`}>
+                                    <span className={`font-heading text-xs mt-auto uppercase tracking-wide text-center leading-tight w-full ${elegido ? 'text-bronze' : 'text-white/70'}`}>
                                         {language === 'en' ? rt.nameEn : rt.name}
                                     </span>
                                 </button>
@@ -1058,19 +1183,20 @@
                         </div>
                         <div className="mt-3 min-h-[16px]">
                             {!selectedType
-                                ? <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.roofTypeReq}</p>
-                                : <p className="text-[10px] text-bronze uppercase tracking-widest font-bold">&#10003; {t.roofTypeChosen} {language === 'en' ? activeRoof?.nameEn : activeRoof?.name}</p>
+                                ? <p className="text-[11px] text-muted uppercase tracking-widest">{t.roofTypeReq}</p>
+                                : <p className="text-[11px] text-bronze uppercase tracking-widest font-bold">&#10003; {t.roofTypeChosen} {language === 'en' ? activeRoof?.nameEn : activeRoof?.name}</p>
                             }
                         </div>
                     </div>
 
 
                     {/* ── Pendiente, OBLIGATORIO ────────────────────── */}
-                    {activeRoof?.id !== 'otro' && <div className="border-t border-white/10 pt-5">
-                        <div className="flex items-center gap-3 mb-4">
-                            <h3 className="text-base font-heading font-bold text-white uppercase tracking-wider">{t.roofPitchTitle}</h3>
-                            <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">{t.mandatory}</span>
-                            <InfoTooltip title={t.pitchMinTitle} description={t.pitchMinDesc} />
+                    {activeRoof?.id !== 'otro' && <div className="border-t border-bronze/15 pt-7">
+                        <div className="mb-5">
+                            <PasoTitulo antetitulo={`${t.step} 03`} titulo={t.roofPitchTitle}>
+                                <EtiquetaObligatorio texto={t.mandatory} />
+                                <InfoTooltip title={t.pitchMinTitle} description={t.pitchMinDesc} />
+                            </PasoTitulo>
                         </div>
 
                         {/* Dos opciones explícitas */}
@@ -1102,7 +1228,7 @@
                         </div>
 
                         {pitchMode === null && (
-                            <p className="text-[10px] text-red-400/70 uppercase tracking-widest">{t.pitchSelectReq}</p>
+                            <p className="text-[11px] text-muted uppercase tracking-widest">{t.pitchSelectReq}</p>
                         )}
 
                         {pitchMode === 'known' && (
@@ -1117,15 +1243,15 @@
                                         ${pitchBelowMin ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-bronze'}`} />
                                 <div className="flex flex-col gap-1">
                                     <span className="text-white/50 text-sm uppercase tracking-widest">{t.pitchUnit}</span>
-                                    <span className="text-[10px] text-white/30 uppercase tracking-widest">{t.pitchRange}</span>
+                                    <span className="text-[11px] text-white/50 uppercase tracking-widest">{t.pitchRange}</span>
                                 </div>
                             </div>
                         )}
                         {pitchBelowMin && (
-                            <p className="text-[10px] text-red-400 mt-2 font-semibold">{t.pitchMinError}</p>
+                            <p className="text-[11px] text-red-400 mt-2 font-semibold">{t.pitchMinError}</p>
                         )}
                         {(requiresMinPitch && pitchMode === 'unknown') && (
-                            <p className="text-[10px] text-yellow-400/80 mt-2 font-semibold">{t.pitchShedWarn}</p>
+                            <p className="text-[11px] text-yellow-400/80 mt-2 font-semibold">{t.pitchShedWarn}</p>
                         )}
                     </div>}
                 </div>
@@ -1342,13 +1468,12 @@
         function ServiceBanner({ language }) {
             const t = T[language] || T['es'];
             return (
-                <div className="w-full max-w-5xl mt-8 glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-4 rounded-xl relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
+                <div className="w-full max-w-5xl mt-8 k-stat p-6 flex flex-col md:flex-row items-center justify-between gap-4 rounded-xl relative overflow-hidden group">
                     <div className="relative z-10 w-full md:w-auto">
-                        <h4 className="text-lg font-bold text-white uppercase tracking-wider mb-1">{t.svcBannerTitle}</h4>
+                        <h4 className="text-xl font-semibold text-white mb-1">{t.svcBannerTitle}</h4>
                         <p className="text-white/50 text-sm tracking-wide">{t.svcBannerDesc}</p>
                     </div>
-                    <a href="mailto:kaston.proyectos@gmail.com" className="bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(193,138,104,0.4)] relative z-10 text-sm whitespace-nowrap text-center">
+                    <a href="mailto:kaston.proyectos@gmail.com" className="k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 relative z-10 text-sm whitespace-nowrap text-center">
                         {t.svcBannerAction}
                     </a>
                 </div>
@@ -1417,23 +1542,22 @@
                     <div className="w-full max-w-5xl flex flex-col gap-8 animate-fade-in">
                         <div className="flex flex-col items-center justify-center py-20 opacity-50">
                             <svg className="w-20 h-20 text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                            <p className="text-white uppercase tracking-widest font-semibold">{t.noSavedProj}</p>
+                            <p className="font-heading text-white text-lg uppercase tracking-[2px]">{t.noSavedProj}</p>
                             <p className="text-xs text-white/50 mt-2">{t.noSavedD}</p>
                         </div>
-                        <div className="w-full glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
+                        <div className="w-full k-stat p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
                             <div className="relative z-10 flex-1">
-                                <h4 className="text-lg font-bold text-white uppercase tracking-wider mb-2">{t.needStruct}</h4>
+                                <h4 className="text-xl font-semibold text-white mb-2">{t.needStruct}</h4>
                                 <p className="text-white/60 text-sm tracking-wide mb-3">{t.contactUs}</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-white/40 uppercase tracking-wider font-sans">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-white/55 uppercase tracking-wider font-sans">
                                     <span>▸ Ubicación / Municipio</span>
                                     <span>▸ Medidas m² o ft²</span>
                                     <span>▸ Obra nueva o refuerzo</span>
                                     <span>▸ Material (Acero / Madera / Mixto)</span>
                                 </div>
-                                <p className="text-[10px] text-bronze/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
+                                <p className="text-[11px] text-bronze/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
                             </div>
-                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="flex-shrink-0 bg-bronze/20 hover:bg-bronze text-bronze hover:text-graphite font-heading font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 border border-bronze/50 relative z-10 text-sm text-center shadow-[0_0_20px_rgba(193,138,104,0.2)] hover:shadow-[0_0_30px_rgba(193,138,104,0.4)]">
+                            <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="k-btn k-btn-gold flex-shrink-0 px-6 py-4 relative z-10 text-sm text-center no-underline">
                                 {t.contactK}
                             </a>
                         </div>
@@ -1449,44 +1573,49 @@
                                 <svg className="w-5 h-5 text-bronze flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                 <p className="text-sm text-white/70">{isEs ? 'Estás viendo tu último acceso guardado. Inicia sesión para editar o agregar proyectos.' : 'Viewing your last saved session. Sign in to edit or add projects.'}</p>
                             </div>
-                            <button onClick={() => setCurrentTab('profile')} className="flex-shrink-0 text-xs bg-bronze text-graphite font-bold uppercase tracking-widest px-4 py-2 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                            <button onClick={() => setCurrentTab('profile')} className="k-btn k-btn-gold flex-shrink-0 text-xs px-4 py-2 cursor-pointer">
                                 {isEs ? 'Iniciar sesión' : 'Sign in'}
                             </button>
                         </div>
                     )}
-                    <h2 className="text-2xl font-heading font-bold tracking-tight text-white uppercase border-b border-white/10 pb-4">{t.myProjects}</h2>
+                    <div className="flex flex-col gap-2">
+                        <div className="k-kicker">KASTON</div>
+                        <h2 className="text-3xl md:text-4xl font-bold text-white">{t.myProjects}</h2>
+                        <div className="k-divider mt-3"></div>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {projects.map(proj => (
-                            <div key={proj.id} className="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-bronze/50 transition-colors">
+                            <div key={proj.id} className="k-card p-6 relative overflow-hidden group">
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <h3 className="text-lg font-bold text-white uppercase tracking-wide">{proj.nombre}</h3>
-                                        <p className="text-xs text-bronze">{proj.fecha}</p>
+                                        <h3 className="text-xl font-semibold text-white">{proj.nombre}</h3>
+                                        <p className="font-heading text-xs text-bronze tracking-[2px] mt-1">{proj.fecha}</p>
                                     </div>
-                                    <span className="bg-greenNeon/20 text-greenNeon px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-greenNeon/30">
-                                        [ESG] {proj.plastico_kg.toLocaleString()} kg
+                                    <span className="flex items-center gap-2 font-heading text-[11px] text-muted uppercase tracking-[2px] flex-shrink-0 mt-1">
+                                        <span className="inline-block w-2 h-2 bg-verde"></span>
+                                        {Number(proj.plastico_kg || 0).toLocaleString(isEs ? 'es-CO' : 'en-US', { maximumFractionDigits: 0 })} kg {t.projRecovered}
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 mb-6">
                                     <div>
-                                        <p className="text-xs text-white/40 uppercase tracking-widest">{t.totArea}</p>
-                                        <p className="text-xl font-medium text-white">{proj.area} <span className="text-sm text-white/40">{proj.unidad}</span></p>
+                                        <p className="font-heading text-[11px] text-muted uppercase tracking-[2px]">{t.totArea}</p>
+                                        <p className="k-num text-2xl text-white mt-1">{proj.area} <span className="text-sm text-muted">{proj.unidad}</span></p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-white/40 uppercase tracking-widest">{t.invTiles}</p>
-                                        <p className="text-xl font-bold text-bronze">{proj.divisa === 'EUR' ? '€' : '$'}{proj.inversion_tejas ? formatCurrency(proj.inversion_tejas, proj.divisa) : 0} <span className="text-sm font-light">{proj.divisa || 'COP'}</span></p>
+                                        <p className="font-heading text-[11px] text-muted uppercase tracking-[2px]">{t.invTiles}</p>
+                                        <p className="k-num text-2xl font-semibold text-bronze mt-1">{proj.divisa === 'EUR' ? '€' : '$'}{proj.inversion_tejas ? formatCurrency(proj.inversion_tejas, proj.divisa) : 0} <span className="text-sm font-light">{proj.divisa || 'COP'}</span></p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2 mb-2">
-                                    <button onClick={() => onEditProject(proj)} className="flex-1 bg-white/5 hover:border-bronze border border-white/10 text-white text-xs uppercase tracking-widest py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+                                    <button onClick={() => onEditProject(proj)} className="k-btn k-btn-outline flex-1 text-xs py-3 flex items-center justify-center gap-2">
                                         {t.editProj}
                                     </button>
-                                    <button onClick={() => onDeleteProject(proj.id)} className="flex-[0.5] bg-white/5 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 border border-white/10 text-white/50 text-xs uppercase tracking-widest py-3 rounded-xl font-bold transition-colors flex items-center justify-center">
+                                    <button onClick={() => onDeleteProject(proj.id)} className="k-btn flex-[0.5] hover:text-white hover:border-white/40 border border-white/15 text-white/60 text-xs py-3 flex items-center justify-center">
                                         {t.delete}
                                     </button>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <p className="text-[10px] text-white/40 uppercase tracking-widest text-center">{language === 'en' ? 'Receive your quote via:' : 'Recibir cotización por:'}</p>
+                                    <p className="font-heading text-[11px] text-muted uppercase tracking-[2px] text-center mt-2">{language === 'en' ? 'Receive your quote via:' : 'Recibir cotización por:'}</p>
                                     <div className="flex gap-2">
                                         <button onClick={async () => {
                                             if (proj.tipoConstruccion === 'zinc') {
@@ -1507,7 +1636,7 @@
                                             } else {
                                                 onQuoteProject(proj);
                                             }
-                                        }} className="flex-1 bg-bronze/10 border border-bronze/50 hover:bg-bronze hover:text-graphite text-bronze text-xs uppercase tracking-widest py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-1.5">
+                                        }} className="k-btn k-btn-outline flex-1 text-xs py-3 flex items-center justify-center gap-1.5">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                             {language === 'en' ? 'Email' : 'Correo'}
                                         </button>
@@ -1530,7 +1659,7 @@
                                             } else {
                                                 onWhatsAppQuoteProject(proj);
                                             }
-                                        }} className="flex-1 bg-green-900/30 border border-green-700/50 hover:bg-green-600 hover:border-green-500 hover:text-white text-green-400 text-xs uppercase tracking-widest py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-1.5">
+                                        }} className="k-btn k-btn-gold flex-1 text-xs py-3 flex items-center justify-center gap-1.5">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                                             WhatsApp
                                         </button>
@@ -1538,7 +1667,7 @@
                                     <button onClick={() => {
                                         const needsWaiver = (proj.tipoConstruccion === 'zinc');
                                         handleDownloadPDF(proj, needsWaiver);
-                                    }} className="w-full bg-white/5 border border-white/20 hover:border-white hover:bg-white/10 text-white text-xs uppercase tracking-widest py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                                    }} className="k-btn w-full border border-white/20 hover:border-white text-white text-xs py-3 flex items-center justify-center gap-2">
                                         {t.downPdf}
                                     </button>
                                 </div>
@@ -1546,20 +1675,19 @@
                         ))}
                     </div>
                     {/* Aviso: asesoría de estructura */}
-                    <div className="w-full glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden mt-2">
-                        <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
+                    <div className="w-full k-stat p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden mt-2">
                         <div className="relative z-10 flex-1">
-                            <h4 className="text-lg font-bold text-white uppercase tracking-wider mb-2">{t.needStruct}</h4>
+                            <h4 className="text-xl font-semibold text-white mb-2">{t.needStruct}</h4>
                             <p className="text-white/60 text-sm tracking-wide mb-3">{t.contactUs}</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-white/40 uppercase tracking-wider font-sans">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-white/55 uppercase tracking-wider font-sans">
                                 <span>▸ Ubicación / Municipio</span>
                                 <span>▸ Medidas m² o ft²</span>
                                 <span>▸ Obra nueva o refuerzo</span>
                                 <span>▸ Material (Acero / Madera / Mixto)</span>
                             </div>
-                            <p className="text-[10px] text-bronze/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
+                            <p className="text-[11px] text-bronze/60 uppercase tracking-widest font-bold mt-3">Estándar: Ingeniería de Protección · Vientos hasta 225 km/h</p>
                         </div>
-                        <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="flex-shrink-0 bg-bronze/20 hover:bg-bronze text-bronze hover:text-graphite font-heading font-bold uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 border border-bronze/50 relative z-10 text-sm text-center shadow-[0_0_20px_rgba(193,138,104,0.2)] hover:shadow-[0_0_30px_rgba(193,138,104,0.4)]">
+                        <a href={`mailto:KASTON.PROYECTOS@GMAIL.COM?subject=${ASESORIA_SUBJECT}&body=${ASESORIA_BODY}`} className="k-btn k-btn-gold flex-shrink-0 px-6 py-4 relative z-10 text-sm text-center no-underline">
                             {t.contactK}
                         </a>
                     </div>
@@ -1626,8 +1754,8 @@
 
             const Avatar = ({ size = 'md' }) => {
                 const cls = size === 'lg'
-                    ? 'w-28 h-28 text-4xl border-[3px] shadow-[0_0_30px_rgba(193,138,104,0.35)]'
-                    : 'w-20 h-20 text-3xl border-2 shadow-[0_0_20px_rgba(193,138,104,0.25)]';
+                    ? 'w-28 h-28 text-4xl border-[3px]'
+                    : 'w-20 h-20 text-3xl border-2';
                 return photoPreview
                     ? <img src={photoPreview} alt={userName} className={`rounded-full object-cover border-bronze ${cls}`} />
                     : <div className={`rounded-full bg-bronze/15 border-bronze flex items-center justify-center font-bold text-bronze ${cls}`}>{fallbackInitial}</div>;
@@ -1680,7 +1808,7 @@
             };
 
             const EyeBtn = ({ show, toggle }) => (
-                <button type="button" onClick={toggle} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors cursor-pointer">
+                <button type="button" onClick={toggle} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/70 transition-colors cursor-pointer">
                     {show
                         ? <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" /></svg>
                         : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -1689,7 +1817,7 @@
             );
 
             const inputCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-bronze transition-all text-sm";
-            const FieldLabel = ({ children }) => <p className="text-[10px] text-white/35 uppercase tracking-widest mb-1.5 font-semibold">{children}</p>;
+            const FieldLabel = ({ children }) => <p className="text-[11px] text-white/35 uppercase tracking-widest mb-1.5 font-semibold">{children}</p>;
 
             /* ── MODO EDICIÓN ── */
             if (isEditMode) return (
@@ -1697,12 +1825,12 @@
 
                     {/* Top bar */}
                     <div className="flex items-center justify-between">
-                        <button onClick={() => { setIsEditMode(false); setFeedback(null); }} className="flex items-center gap-2 text-white/40 hover:text-white transition-colors text-xs uppercase tracking-widest cursor-pointer">
+                        <button onClick={() => { setIsEditMode(false); setFeedback(null); }} className="flex items-center gap-2 text-white/55 hover:text-white transition-colors text-xs uppercase tracking-widest cursor-pointer">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                             {t.back}
                         </button>
                         <button onClick={handleSave} disabled={saving}
-                            className="flex items-center gap-2 bg-bronze hover:bg-white text-graphite font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-40 shadow-[0_0_15px_rgba(193,138,104,0.2)]">
+                            className="flex items-center gap-2 k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-40">
                             {saving
                                 ? <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>{isEs ? 'Guardando' : 'Saving'}</>
                                 : <>{isEs ? 'Guardar cambios' : 'Save changes'} <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg></>
@@ -1730,7 +1858,7 @@
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 </div>
                             </div>
-                            <span className="text-[10px] text-white/30 uppercase tracking-widest">{isEs ? 'Toca para cambiar foto' : 'Tap to change photo'}</span>
+                            <span className="text-[11px] text-white/50 uppercase tracking-widest">{isEs ? 'Toca para cambiar foto' : 'Tap to change photo'}</span>
                             <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
                         </label>
                     </div>
@@ -1744,8 +1872,8 @@
                         </div>
                         <div>
                             <FieldLabel>{t.idNum} · {idType}</FieldLabel>
-                            <input type="text" value={idNumber} disabled className="w-full bg-white/3 border border-white/5 rounded-xl px-4 py-3 text-white/30 text-sm cursor-not-allowed" title="Inmutable por seguridad" />
-                            <p className="text-[9px] text-white/20 mt-1 tracking-widest">{isEs ? 'El documento no puede modificarse.' : 'Document cannot be changed.'}</p>
+                            <input type="text" value={idNumber} disabled className="w-full bg-white/3 border border-white/5 rounded-xl px-4 py-3 text-white/50 text-sm cursor-not-allowed" title="Inmutable por seguridad" />
+                            <p className="text-[10px] text-white/20 mt-1 tracking-widest">{isEs ? 'El documento no puede modificarse.' : 'Document cannot be changed.'}</p>
                         </div>
                     </div>
 
@@ -1786,7 +1914,7 @@
                                         className={`${inputCls} border ${confirmPassword && newPassword !== confirmPassword ? 'border-red-500/50' : confirmPassword && newPassword === confirmPassword ? 'border-green-500/50' : 'border-white/10'}`}
                                         placeholder={t.passPlace} />
                                     {confirmPassword && newPassword === confirmPassword && newPassword.length >= 6 && (
-                                        <p className="text-green-400 text-[10px] mt-1.5 flex items-center gap-1">
+                                        <p className="text-green-400 text-[11px] mt-1.5 flex items-center gap-1">
                                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                             {isEs ? 'Contraseñas coinciden' : 'Passwords match'}
                                         </p>
@@ -1812,9 +1940,9 @@
                             <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             <div className="flex-1">
                                 <p className="text-sm text-white/80 font-semibold mb-0.5">{isEs ? 'Completa tu perfil' : 'Complete your profile'}</p>
-                                <p className="text-xs text-white/40">{isEs ? 'Agrega tu documento y teléfono para generar cotizaciones completas.' : 'Add your ID and phone to generate complete quotes.'}</p>
+                                <p className="text-xs text-white/55">{isEs ? 'Agrega tu documento y teléfono para generar cotizaciones completas.' : 'Add your ID and phone to generate complete quotes.'}</p>
                             </div>
-                            <button onClick={() => setIsEditMode(true)} className="flex-shrink-0 text-[10px] bg-bronze text-graphite font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                            <button onClick={() => setIsEditMode(true)} className="flex-shrink-0 text-[11px] bg-bronze text-graphite font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg cursor-pointer hover:bg-bronzeLight transition-colors">
                                 {isEs ? 'Completar' : 'Complete'}
                             </button>
                         </div>
@@ -1824,12 +1952,12 @@
                     <div className="glass-panel rounded-2xl p-6 flex flex-col items-center gap-4 relative text-center">
                         <Avatar size="lg" />
                         <div>
-                            <h2 className="text-2xl font-heading font-bold text-white uppercase tracking-tight leading-tight">{userName}</h2>
-                            <span className="inline-block mt-1.5 bg-bronze/20 border border-bronze/40 text-bronze text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">{userRole}</span>
+                            <h2 className="text-2xl font-heading font-bold text-white uppercase tracking-wide leading-tight">{userName}</h2>
+                            <span className="inline-block mt-1.5 bg-bronze/20 border border-bronze/40 text-bronze text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded">{userRole}</span>
                         </div>
-                        <div className="flex flex-col items-center gap-1 text-xs text-white/40">
+                        <div className="flex flex-col items-center gap-1 text-xs text-white/55">
                             <span>{session?.user?.email}</span>
-                            {idNumber && <span className="text-white/25">{idType} · {idNumber}</span>}
+                            {idNumber && <span className="text-white/50">{idType} · {idNumber}</span>}
                         </div>
                         <button onClick={() => setIsEditMode(true)}
                             className="mt-1 flex items-center gap-2 bg-white/5 hover:bg-bronze hover:text-graphite border border-white/10 hover:border-bronze text-white/60 hover:text-graphite font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all cursor-pointer">
@@ -1929,8 +2057,8 @@
 
                     // Anillos: hasta 25 km es área metropolitana; hasta 60 km, afueras.
                     L.circle([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], {
-                        radius: RADIO_AFUERAS_KM * 1000, color: '#C18A68', weight: 1,
-                        dashArray: '6 6', fillColor: '#C18A68', fillOpacity: 0.04, interactive: false
+                        radius: RADIO_AFUERAS_KM * 1000, color: '#C18A68', weight: 1, opacity: 0.45,
+                        fillColor: '#C18A68', fillOpacity: 0.04, interactive: false
                     }).addTo(map);
                     L.circle([KASTON_ORIGEN.lat, KASTON_ORIGEN.lng], {
                         radius: ZONAS_TODO_COSTO[0].maxKm * 1000, color: '#C18A68', weight: 1.5,
@@ -2038,11 +2166,11 @@
             const esLejana = Boolean(zone) && !zone.precioM2;
 
             return (
-                <div className={`glass-panel rounded-2xl p-6 flex flex-col gap-4 mt-2 border ${zone ? (esLejana ? 'border-white/15 bg-white/5' : 'border-bronze/30 bg-bronze/5') : 'border-2 border-bronze/40 bg-bronze/5'}`}>
-                    <div className="flex items-center justify-between gap-3 border-b border-bronze/20 pb-3">
-                        <div className="text-[10px] text-bronze uppercase tracking-[0.15em] font-bold">{t.geoTitle}</div>
+                <div className={`glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-4 mt-2 ${zone ? (esLejana ? 'border-white/15' : 'border-bronze/30') : 'border-bronze/40'}`}>
+                    <div className="flex items-end justify-between gap-3">
+                        <PasoTitulo antetitulo={`${t.step} 04`} titulo={t.geoTitle} />
                         {zone && (
-                            <button onClick={() => { onReset(); setManualOpen(false); }} className="text-[10px] text-white/40 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer">{t.geoChange}</button>
+                            <button onClick={() => { onReset(); setManualOpen(false); }} className="k-btn k-btn-outline px-4 py-2 text-[11px] cursor-pointer flex-shrink-0">{t.geoChange}</button>
                         )}
                     </div>
 
@@ -2051,7 +2179,7 @@
                     {/* Buscar por dirección, barrio o código postal */}
                     {!mapaRoto && (
                         <div className="flex flex-col gap-2">
-                            <label className="text-[10px] text-white/40 uppercase tracking-widest">{t.geoSearchLabel}</label>
+                            <label className="text-[11px] text-white/55 uppercase tracking-widest">{t.geoSearchLabel}</label>
                             <div className="flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="text"
@@ -2062,7 +2190,7 @@
                                     className="flex-1 min-w-0 bg-black/40 border border-white/15 focus:border-bronze focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 transition-colors"
                                 />
                                 <button onClick={buscarDireccion} disabled={buscando || query.trim().length < 3}
-                                    className={`flex-shrink-0 px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all ${buscando || query.trim().length < 3 ? 'opacity-40 cursor-not-allowed bg-white/5 border border-white/10 text-white/40' : 'bg-bronze border border-bronze text-graphite hover:bg-white cursor-pointer'}`}>
+                                    className={`flex-shrink-0 px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all ${buscando || query.trim().length < 3 ? 'opacity-40 cursor-not-allowed bg-white/5 border border-white/10 text-white/55' : 'bg-bronze border border-bronze text-graphite hover:bg-bronzeLight hover:border-bronzeLight cursor-pointer'}`}>
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                     {buscando ? t.geoSearching : t.geoSearchBtn}
                                 </button>
@@ -2073,7 +2201,7 @@
 
                             {resultados && resultados.length > 0 && (
                                 <div className="flex flex-col gap-1.5 border border-white/10 rounded-xl p-2 bg-black/30">
-                                    <div className="text-[10px] text-white/40 uppercase tracking-widest px-2 pt-1">{t.geoSearchResults}</div>
+                                    <div className="text-[11px] text-white/55 uppercase tracking-widest px-2 pt-1">{t.geoSearchResults}</div>
                                     {resultados.map((r, i) => (
                                         <button key={r.place_id || i} onClick={() => fijarDesdeResultado(r)}
                                             className="w-full text-left px-3 py-2.5 rounded-lg border border-transparent hover:border-bronze/50 hover:bg-bronze/10 transition-all cursor-pointer">
@@ -2083,7 +2211,7 @@
                                 </div>
                             )}
 
-                            <p className="text-[10px] text-white/30">{t.geoSearchHint}</p>
+                            <p className="text-[11px] text-white/50">{t.geoSearchHint}</p>
                         </div>
                     )}
 
@@ -2091,10 +2219,10 @@
                         <>
                             <div ref={divRef}
                                  className="w-full rounded-xl overflow-hidden border border-white/10"
-                                 style={{ height: '320px', background: '#0D0D0D', zIndex: 0 }} />
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-white/40 uppercase tracking-widest">
+                                 style={{ height: '320px', background: '#000000', zIndex: 0 }} />
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-white/55 uppercase tracking-widest">
                                 <span className="flex items-center gap-1.5"><span style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(193,138,104,.45)', border: '1px solid #C18A68', display: 'inline-block' }}></span>{t.zoneMetro}</span>
-                                <span className="flex items-center gap-1.5"><span style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(193,138,104,.12)', border: '1px dashed #C18A68', display: 'inline-block' }}></span>{t.zoneAfueras}</span>
+                                <span className="flex items-center gap-1.5"><span style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(193,138,104,.12)', border: '1px solid rgba(193,138,104,.45)', display: 'inline-block' }}></span>{t.zoneAfueras}</span>
                             </div>
                         </>
                     )}
@@ -2105,7 +2233,7 @@
 
                     {!mapaRoto && (
                         <button onClick={usarGPS} disabled={geoStatus === 'asking'}
-                            className={`w-full justify-center transition-all duration-300 border px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center gap-3 ${geoStatus === 'asking' ? 'opacity-50 cursor-wait bg-black text-white/40 border-white/10' : 'bg-white/5 border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite cursor-pointer'}`}>
+                            className={`w-full justify-center transition-all duration-300 border px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center gap-3 ${geoStatus === 'asking' ? 'opacity-50 cursor-wait bg-black text-white/55 border-white/10' : 'bg-white/5 border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite cursor-pointer'}`}>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             {geoStatus === 'asking' ? t.geoAsking : t.geoUseLocation}
                         </button>
@@ -2126,23 +2254,23 @@
 
                     {/* Respaldo manual: siempre disponible */}
                     {!manualOpen ? (
-                        <button onClick={() => setManualOpen(true)} className="text-[11px] text-white/40 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer text-center">
+                        <button onClick={() => setManualOpen(true)} className="text-[11px] text-white/55 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer text-center">
                             {t.geoManualLink}
                         </button>
                     ) : (
                         <div className="flex flex-col gap-2 border-t border-white/10 pt-4">
-                            <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">{t.geoManualTitle}</div>
+                            <div className="text-[11px] text-white/55 uppercase tracking-widest mb-1">{t.geoManualTitle}</div>
                             {ZONAS_TODO_COSTO.map(z => (
                                 <button key={z.id} onClick={() => { onManual(z.id); setManualOpen(false); }}
                                     className={`w-full text-left px-4 py-3 rounded-xl border transition-all cursor-pointer ${zone && zone.id === z.id && source === 'manual' ? 'border-bronze bg-bronze/15' : 'border-white/10 bg-white/5 hover:border-bronze/50 hover:bg-bronze/10'}`}>
                                     <div className="text-xs text-white font-bold">{zonaNombre[z.id]}</div>
-                                    <div className="text-[10px] text-white/40 mt-0.5">{t['zoneHint_' + z.id]}</div>
+                                    <div className="text-[11px] text-white/55 mt-0.5">{t['zoneHint_' + z.id]}</div>
                                 </button>
                             ))}
                         </div>
                     )}
 
-                    <p className="text-[10px] text-white/30 leading-relaxed">{t.geoPrivacy}</p>
+                    <p className="text-[11px] text-white/50 leading-relaxed">{t.geoPrivacy}</p>
                 </div>
             );
         }
@@ -2204,13 +2332,10 @@
             };
 
             return (
-                <div className="glass-panel rounded-2xl p-6 flex flex-col gap-4 mt-2">
-                    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-3">
-                        <div>
-                            <div className="text-[10px] text-bronze uppercase tracking-[0.15em] font-bold">{t.photosTitle}</div>
-                            <p className="text-xs text-white/60 leading-relaxed mt-2">{t.photosHint}</p>
-                        </div>
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest flex-shrink-0 mt-0.5">{t.optional}</span>
+                <div className="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-5 mt-2">
+                    <div>
+                        <PasoTitulo antetitulo={t.optional} titulo={t.photosTitle} />
+                        <p className="text-sm text-white/70 leading-relaxed mt-2">{t.photosHint}</p>
                     </div>
 
                     {cargandoGuardadas && <p className="text-xs text-white/50">{t.photosLoadingSaved}</p>}
@@ -2232,7 +2357,7 @@
 
                     {fotos.length < MAX_FOTOS_TECHO && !cargandoGuardadas && (
                         <button type="button" onClick={() => inputRef.current && inputRef.current.click()} disabled={cargando}
-                            className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-xs font-bold uppercase tracking-widest bg-bronze/10 border border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite transition-all disabled:opacity-50 disabled:cursor-wait">
+                            className="k-btn k-btn-outline w-full flex items-center justify-center gap-2 py-4 text-xs disabled:opacity-50 disabled:cursor-wait">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                             {cargando ? t.photosLoading : (fotos.length ? t.photosAddMore : t.photosAdd)}
                             {fotos.length > 0 && !cargando && <span className="font-normal opacity-70">· {fotos.length}/{MAX_FOTOS_TECHO}</span>}
@@ -2481,7 +2606,7 @@
                 <div className="w-full max-w-5xl flex flex-col gap-8 w-full animate-fade-in">
                     {showZincModal && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                            <div className="glass-panel p-8 rounded-2xl max-w-md w-full text-center border border-bronze shadow-[0_0_30px_rgba(193,138,104,0.3)] animate-fade-in">
+                            <div className="glass-panel p-8 rounded-2xl max-w-md w-full text-center border border-bronze animate-fade-in">
                                 <div className="w-16 h-16 rounded-full bg-bronze/20 text-bronze flex items-center justify-center mx-auto mb-6">
                                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
@@ -2489,7 +2614,7 @@
                                     {t.zincAlertBody1} <strong>{areaM2.toLocaleString('en-US', { maximumFractionDigits: 1 })} m²</strong> {t.zincAlertBody2} <strong>{(areaM2 * KASTON_UNITS_PER_M2).toLocaleString('en-US', { maximumFractionDigits: 0 })} {t.zincAlertBody3}</strong> (a 300g por unidad y {KASTON_UNITS_PER_M2} tejas por m²), {t.zincAlertBody4} <strong>{(areaM2 * 12.6).toLocaleString('en-US', { maximumFractionDigits: 1 })} kg</strong> {t.zincAlertBody5}
                                 </h3>
                                 <div className="flex gap-4 mt-8 flex-col sm:flex-row">
-                                    <button onClick={handleZincYes} className="flex-1 py-3 px-4 bg-bronze hover:bg-white text-graphite font-bold rounded-xl uppercase tracking-widest transition-colors cursor-pointer text-xs">
+                                    <button onClick={handleZincYes} className="flex-1 py-3 px-4 k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold rounded-xl uppercase tracking-widest transition-colors cursor-pointer text-xs">
                                         {t.adviseBtn}
                                     </button>
                                     <button onClick={handleZincNo} className="flex-1 py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/20 text-white rounded-xl uppercase tracking-widest transition-colors font-bold cursor-pointer text-xs">
@@ -2499,29 +2624,25 @@
                             </div>
                         </div>
                     )}
-                    <div className="glass-panel rounded-2xl p-8 flex flex-col gap-7 relative overflow-hidden">
-                        <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-bronze rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
-                        <div className="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-bronze rounded-full opacity-10 blur-[100px] pointer-events-none"></div>
+                    <div className="glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-7 relative overflow-hidden">
 
                         {/* Título */}
-                        <h2 className="text-lg font-heading font-bold tracking-widest text-white uppercase relative z-10">
-                            {t.typeAreaProj}
-                        </h2>
+                        <PasoTitulo antetitulo={`${t.step} 01`} titulo={t.typeAreaProj} />
 
                         {/* Modalidad elegida */}
-                        <div className="relative z-10 flex items-center justify-between gap-4 p-4 rounded-xl bg-bronze/10 border border-bronze/30">
+                        <div className="relative z-10 flex items-center justify-between gap-4 px-5 py-4 rounded-xl bg-surfaceHigh border border-bronze/15 border-l-[3px] border-l-bronze">
                             <div>
-                                <div className="text-[10px] text-white/50 uppercase tracking-[0.15em] font-bold mb-1">{t.chosenModality}</div>
-                                <div className="text-bronze text-sm font-bold uppercase tracking-widest">{modality === 'full' ? t.allInc : t.onlyTile}</div>
+                                <div className="font-heading text-[11px] text-muted uppercase tracking-[2px] mb-1">{t.chosenModality}</div>
+                                <div className="font-heading text-bronze text-lg font-medium uppercase tracking-wide">{modality === 'full' ? t.allInc : t.onlyTile}</div>
                             </div>
-                            <button onClick={() => { setTriageFlow(null); setCurrentTab('triage'); }} className="text-[10px] text-white/40 hover:text-bronze uppercase tracking-widest underline transition-colors cursor-pointer">{t.changeModality}</button>
+                            <button onClick={() => { setTriageFlow(null); setCurrentTab('triage'); }} className="k-btn k-btn-outline px-4 py-2 text-[11px] cursor-pointer flex-shrink-0">{t.changeModality}</button>
                         </div>
 
                         {/* Tipo de construcción (opcional) */}
                         <div className="relative z-10">
-                            <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-2 font-bold">{t.constType}</label>
+                            <label className="block font-heading text-xs text-muted uppercase tracking-[2px] mb-2">{t.constType}</label>
                             <select value={constructionType} onChange={(e) => setConstructionType(e.target.value)}
-                                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-medium focus:outline-none focus:border-bronze transition-all appearance-none cursor-pointer hover:border-white/25">
+                                className="w-full bg-black border border-white/15 rounded-xl px-4 py-3.5 text-white text-sm font-medium focus:outline-none focus:border-bronze transition-all appearance-none cursor-pointer hover:border-bronze/50" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C18A68' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}>
                                 {[{ val: 'Residencial', label: t.constRes }, { val: 'Comercial', label: t.constCom }, { val: 'Industrial', label: t.constInd }, { val: 'Institucional', label: t.constInst }, { val: 'Agropecuario', label: t.constAgro }, { val: 'Otros', label: t.constOth }].map(tipo => (
                                     <option key={tipo.val} value={tipo.val}>{tipo.label}</option>
                                 ))}
@@ -2530,7 +2651,7 @@
 
                         {/* Área del proyecto */}
                         <div className="relative z-10">
-                            <label className="block text-[10px] text-white/50 uppercase tracking-[0.15em] mb-4 font-bold">{language === 'en' ? 'Project area' : 'Área del proyecto'}</label>
+                            <label className="block font-heading text-xs text-muted uppercase tracking-[2px] mb-4">{language === 'en' ? 'Project area' : 'Área del proyecto'}</label>
                             <div className="flex items-end gap-4 mb-6">
                                 <input
                                     type="number"
@@ -2559,10 +2680,10 @@
                                         setInputValue(clamped);
                                         setInputText(String(clamped));
                                     }}
-                                    className="bg-transparent text-7xl w-44 outline-none border-b-2 border-bronze/40 focus:border-bronze text-bronze text-center font-black transition-colors drop-shadow-[0_0_20px_rgba(193,138,104,0.35)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    className="k-num bg-transparent text-7xl w-48 outline-none border-b-2 border-bronze/40 focus:border-bronze text-bronze text-center font-semibold transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                                 <select value={unit} onChange={handleUnitChange}
-                                    className="bg-transparent text-3xl font-light text-white/40 mb-2 outline-none cursor-pointer hover:text-white/70 transition-colors appearance-none">
+                                    className="font-heading bg-transparent text-3xl text-muted mb-2 outline-none cursor-pointer hover:text-white transition-colors appearance-none">
                                     <option value="m2" className="bg-graphite text-base">m²</option>
                                     <option value="ft2" className="bg-graphite text-base">ft²</option>
                                 </select>
@@ -2583,9 +2704,9 @@
                                     }
                                 }} className="w-full cursor-pointer h-8"
                             />
-                            <div className="flex justify-between text-xs text-white/25 uppercase mt-2 tracking-widest">
-                                <span>{sliderMin} {unit}</span>
-                                <span>{sliderMax} {unit}</span>
+                            <div className="flex justify-between font-heading text-xs text-white/50 mt-2 tracking-[2px]">
+                                <span>{sliderMin} {unit === 'ft2' ? 'ft²' : 'm²'}</span>
+                                <span>{sliderMax.toLocaleString(language === 'en' ? 'en-US' : 'es-CO')} {unit === 'ft2' ? 'ft²' : 'm²'}</span>
                             </div>
                         </div>
                     </div>
@@ -2600,28 +2721,28 @@
                     />
 
                     {isSpecialDesign ? (
-                        <div className="glass-panel rounded-2xl p-8 flex flex-col items-center justify-center border border-bronze/30 bg-bronze/5 text-center mt-2 animate-fade-in">
-                            <div className="w-12 h-12 rounded-full bg-bronze/20 text-bronze flex items-center justify-center text-xl font-black mb-4">&#9733;</div>
-                            <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-3">{t.specialTitle}</h3>
+                        <div className="k-stat p-8 flex flex-col items-center justify-center text-center mt-2 animate-fade-in">
+                            <div className="k-divider mb-6"></div>
+                            <h3 className="text-2xl font-semibold text-white mb-3">{t.specialTitle}</h3>
                             <p className="text-white/80 text-sm leading-relaxed max-w-2xl mx-auto">{t.specialBody}</p>
                         </div>
                     ) : (
                     <>
                     {/* Requisitos de obra (todo costo) o nota de manual (solo tejas) */}
                     {modality === 'full' ? (
-                        <div className="glass-panel rounded-2xl p-6 border border-bronze/30 bg-bronze/5 flex flex-col gap-3 mt-2">
-                            <div className="text-[10px] text-bronze uppercase tracking-[0.15em] font-bold border-b border-bronze/20 pb-3">{t.reqObraTitle}</div>
-                            <ul className="flex flex-col gap-3 text-xs text-white/75 leading-relaxed list-none">
+                        <div className="k-stat p-6 flex flex-col gap-4 mt-2">
+                            <div className="k-kicker">{t.reqObraTitle}</div>
+                            <ul className="flex flex-col gap-3 text-sm text-white/80 leading-relaxed list-none">
                                 <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#10003;</span><span>{t.reqObra1}</span></li>
                                 <li className="flex items-start gap-3"><span className="text-bronze mt-0.5 flex-shrink-0">&#10003;</span><span>{t.reqObra2}</span></li>
                             </ul>
                         </div>
                     ) : (
-                        <div className="glass-panel rounded-2xl p-6 border border-bronze/30 bg-bronze/5 flex items-start gap-3 mt-2">
-                            <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div className="k-stat p-6 flex items-start gap-4 mt-2">
+                            <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeWidth={1.8} d="M12 8v.01M12 11v6M3 3h18v18H3z"/></svg>
                             <div className="flex flex-col gap-2">
-                                <p className="text-bronze text-xs leading-relaxed">{t.manualNote}</p>
-                                <p className="text-white/50 text-xs leading-relaxed">{t.supplyPriceNote}</p>
+                                <p className="text-white text-sm leading-relaxed">{t.manualNote}</p>
+                                <p className="text-muted text-sm leading-relaxed">{t.supplyPriceNote}</p>
                             </div>
                         </div>
                     )}
@@ -2640,82 +2761,88 @@
                         />
                     )}
 
+                    {/* Resultado */}
+                    <div className="mt-6 flex flex-col gap-2">
+                        <div className="k-kicker">{t.resultKicker}</div>
+                        <h2 className="text-white font-bold text-3xl md:text-4xl">{t.resultTitle}</h2>
+                        <div className="k-divider mt-3"></div>
+                    </div>
+
                     {/* Métricas del proyecto (ambas modalidades) */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="glass-panel p-5 rounded-2xl flex flex-col items-center text-center">
-                            <div className="text-3xl font-black text-bronze tabular-nums"><AnimatedNumber value={metrics.units} /></div>
-                            <div className="text-[10px] text-white/40 uppercase tracking-widest mt-2">{t.tilesNeeded}</div>
+                        <div className="k-stat px-6 py-6">
+                            <div className="k-num text-bronze text-4xl font-semibold"><AnimatedNumber value={metrics.units} /></div>
+                            <div className="text-muted text-xs uppercase tracking-[2px] mt-2">{t.tilesNeeded}</div>
                         </div>
-                        <div className="glass-panel p-5 rounded-2xl flex flex-col items-center text-center">
-                            <div className="text-3xl font-black text-bronze tabular-nums"><AnimatedNumber value={areaM2 * 12.6} decimals={0} /> <span className="text-base font-light">kg</span></div>
-                            <div className="text-[10px] text-white/40 uppercase tracking-widest mt-2">{t.totalWeight}</div>
+                        <div className="k-stat px-6 py-6">
+                            <div className="flex items-baseline gap-1.5"><span className="k-num text-bronze text-4xl font-semibold"><AnimatedNumber value={areaM2 * 12.6} decimals={0} /></span><span className="k-num text-bronze/80 text-base">kg</span></div>
+                            <div className="text-muted text-xs uppercase tracking-[2px] mt-2">{t.totalWeight}</div>
                         </div>
-                        <div className="glass-panel p-5 rounded-2xl flex flex-col items-center text-center">
-                            <div className="text-3xl font-black text-bronze tabular-nums">225 <span className="text-base font-light">km/h</span></div>
-                            <div className="text-[10px] text-white/40 uppercase tracking-widest mt-2">{t.windResist}</div>
+                        <div className="k-stat px-6 py-6">
+                            <div className="flex items-baseline gap-1.5"><span className="k-num text-bronze text-4xl font-semibold">225</span><span className="k-num text-bronze/80 text-base">km/h</span></div>
+                            <div className="text-muted text-xs uppercase tracking-[2px] mt-2">{t.windResist}</div>
                         </div>
                     </div>
 
-                    {/* Impacto ambiental */}
-                    <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4 relative overflow-hidden">
-                        <div className="text-[10px] text-greenNeon/70 uppercase tracking-[0.15em] font-bold border-b border-greenNeon/20 pb-3">{t.esgImpact}</div>
-                        <div className="flex items-start gap-3">
-                            <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">&#127807;</span>
-                            <p className="text-xs text-white/70 leading-relaxed">
-                                {language === 'en'
-                                    ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1} /> kg</strong> of plastic removed from the planet, transformed into an indestructible roof.</>
-                                    : <><strong className="text-greenNeon"><AnimatedNumber value={metrics.plasticUpcycled} decimals={1} /> kg</strong> de plástico quitados del planeta, transformados en un techo indestructible.</>}
-                            </p>
+                    {/* Impacto ambiental: el verde recuperado solo aparece aquí (manual, sección Color) */}
+                    <div className="rounded-2xl p-6 md:p-7 flex flex-col gap-5" style={{ background: '#111111', border: '1px solid rgba(74,91,56,0.45)', borderLeft: '3px solid #4A5B38' }}>
+                        <div className="flex items-center gap-3">
+                            <span className="inline-block w-2.5 h-2.5 bg-verde"></span>
+                            <span className="font-heading text-xs text-muted uppercase tracking-[3px]">{t.esgImpact}</span>
                         </div>
-                        <div className="flex items-start gap-3">
-                            <span className="text-greenNeon text-base mt-0.5 flex-shrink-0">&#128168;</span>
-                            <p className="text-xs text-white/70 leading-relaxed">
-                                {language === 'en'
-                                    ? <><strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0} /> kg</strong> of CO&#8322; that won&#39;t pollute the air.</>
-                                    : <>Evitaste que <strong className="text-greenNeon"><AnimatedNumber value={metrics.co2Reduced} decimals={0} /> kg</strong> de CO&#8322; contaminaran el aire.</>}
-                            </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <div className="flex items-baseline gap-1.5"><span className="k-num text-white text-3xl font-semibold"><AnimatedNumber value={metrics.plasticUpcycled} decimals={0} /></span><span className="k-num text-white/70 text-base">kg</span></div>
+                                <p className="text-sm text-white/70 leading-relaxed mt-1">{t.esgPlastic}</p>
+                            </div>
+                            <div>
+                                <div className="flex items-baseline gap-1.5"><span className="k-num text-white text-3xl font-semibold"><AnimatedNumber value={metrics.co2Reduced} decimals={0} /></span><span className="k-num text-white/70 text-base">kg</span></div>
+                                <p className="text-sm text-white/70 leading-relaxed mt-1">{t.esgCo2}</p>
+                            </div>
                         </div>
                     </div>
 
                     {/* Inversión estimada: en "todo costo" depende de la zona resuelta arriba */}
                     {zonaFueraDeCobertura ? (
-                        <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-white/20 bg-white/5 relative overflow-hidden mt-2 gap-4">
-                            <h3 className="text-xl tracking-tight text-white uppercase font-semibold text-center">{t.zoneOutTitle}</h3>
-                            <p className="text-xs text-white/60 leading-relaxed text-center max-w-md">{t.zoneOutBody}</p>
+                        <div className="k-stat p-7 flex flex-col items-center relative overflow-hidden mt-2 gap-4">
+                            <h3 className="text-2xl text-white font-semibold text-center">{t.zoneOutTitle}</h3>
+                            <p className="text-sm text-white/70 leading-relaxed text-center max-w-md">{t.zoneOutBody}</p>
                             <div className="flex flex-col sm:flex-row gap-2 w-full max-w-md">
                                 <a href={`https://wa.me/573188978552?text=${encodeURIComponent(t.zoneOutWhatsapp)}`}
                                    target="_blank" rel="noopener noreferrer"
-                                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest bg-green-900/40 border border-green-700/50 text-green-400 hover:bg-green-600 hover:text-white hover:border-green-500 transition-all no-underline">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                   className="k-btn k-btn-gold flex-1 flex items-center justify-center gap-2 py-3 text-xs no-underline">
+                                    <IconoWhatsApp size={14} />
                                     WhatsApp
                                 </a>
                                 <a href={`mailto:kaston.proyectos@gmail.com?subject=${encodeURIComponent(t.zoneOutMailSubject)}`}
-                                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest bg-bronze/10 border border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite transition-all no-underline">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                   className="k-btn k-btn-outline flex-1 flex items-center justify-center gap-2 py-3 text-xs no-underline">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden="true"><path d="M3 5h18v14H3z" /><path d="M3 6l9 7 9-7" /></svg>
                                     {t.emailBtn}
                                 </a>
                             </div>
                         </div>
                     ) : (modality === 'full' && !zone) ? (
-                        <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-white/20 bg-white/5 mt-2 gap-2">
-                            <h3 className="text-xl tracking-tight text-white/70 uppercase font-semibold text-center">{t.estInvest}</h3>
-                            <p className="text-xs text-white/40 leading-relaxed text-center max-w-md">{t.priceNeedsZone}</p>
+                        <div className="rounded-2xl p-8 flex flex-col items-center mt-2 gap-3" style={{ background: '#111111', border: '1px solid rgba(193,138,104,0.2)' }}>
+                            <div className="k-kicker">{t.estInvest}</div>
+                            <p className="text-sm text-white/70 leading-relaxed text-center max-w-md">{t.priceNeedsZone}</p>
                         </div>
                     ) : (
-                    <div className="glass-panel rounded-2xl p-6 flex flex-col items-center border-l-4 border-l-bronze bg-gradient-to-r from-bronze/5 to-transparent relative overflow-hidden mt-2">
-                        <h3 className="text-2xl tracking-tight text-white mb-1 uppercase font-semibold text-center">{t.estInvest}</h3>
-                        <p className="text-sm text-white/50 tracking-wider mb-4 text-center">{modality === 'full' ? t.allInc : t.onlyTile}</p>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-bronze text-2xl font-light">{currency === 'EUR' ? '\u20ac' : '$'}</span>
-                            <span className="text-bronze text-5xl font-black tabular-nums tracking-tighter drop-shadow-[0_0_20px_rgba(193,138,104,0.4)]">{formatCurrency(modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost, currency)}</span>
-                            <span className="text-bronze/50 text-xs uppercase tracking-widest ml-1">{currency}</span>
+                    <div className="relative overflow-hidden mt-2 rounded-2xl px-6 py-9 md:px-10 md:py-12 flex flex-col items-center text-center" style={{ background: '#000000', border: '1px solid rgba(193,138,104,0.35)', borderTop: '3px solid #C18A68' }}>
+                        <div className="k-kicker mb-2">{t.estInvest}</div>
+                        <h3 className="text-white text-xl md:text-2xl font-semibold mb-6">{modality === 'full' ? t.allInc : t.onlyTile}</h3>
+                        <div className="flex items-baseline justify-center gap-1.5 whitespace-nowrap">
+                            <span className="k-num text-bronze text-2xl sm:text-3xl md:text-4xl">{currency === 'EUR' ? '\u20ac' : '$'}</span>
+                            <span className="k-num text-bronze text-[2.75rem] sm:text-6xl md:text-7xl font-semibold leading-none">{formatCurrency(modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost, currency)}</span>
+                            <span className="hidden sm:inline k-num text-bronze/70 text-sm uppercase tracking-[2px] ml-1">{currency}</span>
                         </div>
-                        <p className="text-[11px] text-white/40 tracking-wide mt-2 text-center">
+                        <p className="k-num text-muted text-base tracking-wide mt-4 text-center">
+                            <span className="sm:hidden">{currency} · </span>
                             {currency === 'COP'
                                 ? `$${formatCurrency(modality === 'full' ? metrics.tarifaTodoCosto : PRECIO_SOLO_TEJA_M2, 'COP')} / m\u00b2`
                                 : `${currency === 'EUR' ? '\u20ac' : '$'}${formatCurrency((modality === 'full' ? metrics.tarifaTodoCosto : PRECIO_SOLO_TEJA_M2) * (rates[currency] || 1), currency)} / m\u00b2`}
                         </p>
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest mt-3 text-center">{t.pdfVisitNote}</p>
+                        <div className="w-12 h-px bg-bronze/40 my-6"></div>
+                        <p className="text-sm text-white/60 leading-relaxed max-w-md text-center">{t.pdfVisitNote}</p>
                     </div>
                     )}
                     </>
@@ -2724,31 +2851,31 @@
                     <FotosTecho language={language} fotos={fotosTecho} onChange={cambiarFotos} cargandoGuardadas={cargandoFotos} sinCargar={fotosSinCargar && !fotosCambiadas.current} />
 
                     {!isFormComplete && !isPdfDownloaded && (
-                        <div className="w-full mt-4 p-4 rounded-xl border border-white/10 bg-white/5 flex items-start gap-3">
-                            <svg className="w-5 h-5 text-white/30 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <p className="text-white/40 text-xs uppercase tracking-wide leading-relaxed">{t.formIncompleteHint}</p>
+                        <div className="w-full mt-4 px-5 py-4 rounded-xl border border-white/10 bg-surface flex items-start gap-3">
+                            <svg className="w-5 h-5 text-muted flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeWidth={1.8} d="M12 8v.01M12 11v6M3 3h18v18H3z" /></svg>
+                            <p className="text-muted text-sm leading-relaxed">{t.formIncompleteHint}</p>
                         </div>
                     )}
                     {isFormComplete && !isPdfDownloaded && (
-                        <div className="w-full mt-4 p-4 rounded-xl border-2 border-bronze bg-bronze/10 flex items-start gap-3 animate-pulse">
-                            <svg className="w-6 h-6 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <div className="k-stat w-full mt-4 px-5 py-4 flex items-start gap-3">
+                            <svg className="w-5 h-5 text-bronze flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeWidth={1.8} d="M12 4v11m0 0l-4-4m4 4l4-4M4 20h16" /></svg>
                             <div>
-                                <p className="text-bronze font-black uppercase tracking-widest text-xs mb-1">{t.reqAction}</p>
-                                <p className="text-bronze/80 text-xs uppercase tracking-wide">{t.reqActionDesc}</p>
+                                <p className="font-heading text-bronze uppercase tracking-[2px] text-sm mb-1">{t.reqAction}</p>
+                                <p className="text-white/80 text-sm leading-relaxed">{t.reqActionDesc}</p>
                             </div>
                         </div>
                     )}
                     <div className="flex flex-col md:flex-row justify-end gap-3 mt-4 relative z-10">
-                        <button onClick={handlePDF} disabled={!isFormComplete} className={`flex-1 md:flex-none justify-center transition-all duration-300 border px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-sm flex items-center gap-3 relative overflow-hidden group shadow-[0_0_15px_rgba(0,0,0,0.5)] ${!isFormComplete ? 'opacity-40 cursor-not-allowed bg-black text-white/30 border-white/10' : (!isPdfDownloaded ? 'bg-bronze border-bronze text-graphite hover:bg-white cursor-pointer' : 'bg-white/5 border-white/20 hover:bg-bronze hover:border-bronze hover:text-graphite text-white cursor-pointer')}`}>
+                        <button onClick={handlePDF} disabled={!isFormComplete} className={`k-btn flex-1 md:flex-none justify-center px-8 py-4 text-sm flex items-center gap-3 relative overflow-hidden group ${!isFormComplete ? 'cursor-not-allowed bg-surface text-white/40 border border-white/10' : (!isPdfDownloaded ? 'k-btn-gold cursor-pointer' : 'k-btn-outline cursor-pointer')}`}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             <span className="relative z-10">{isPdfDownloaded ? t.pdfDownloaded : t.downPdfQuote}</span>
                         </button>
                         <div className="flex gap-2 relative">
-                            <button onClick={() => setTriageFlow(null)} className="flex-[0.5] border border-white/5 bg-black/50 hover:bg-white/5 text-white/50 text-xs py-4 rounded-xl uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2">
+                            <button onClick={() => setTriageFlow(null)} aria-label={t.changeModality} className="flex-[0.5] px-5 border border-white/15 bg-black hover:border-bronze hover:text-bronze text-white/60 text-xs py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                             </button>
                             {isPdfDownloaded && (
-                                <button onClick={handleSave} className="flex-1 md:flex-none justify-center transition-all duration-300 border px-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm flex items-center gap-2 relative z-10 shadow-[0_0_15px_rgba(0,0,0,0.5)] bg-bronze border-bronze text-graphite hover:bg-white cursor-pointer animate-fade-in">
+                                <button onClick={handleSave} className="k-btn k-btn-gold flex-1 md:flex-none justify-center px-6 py-4 text-sm flex items-center gap-2 relative z-10 cursor-pointer animate-fade-in">
                                     {t.saveThisProj}
                                 </button>
                             )}
@@ -2762,24 +2889,23 @@
             const t = T[language] || T['es'];
             return (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)' }}>
-                    <div className="relative w-full max-w-lg bg-[#0f0f0f] border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.8)] animate-fade-in">
-                        {/* Franja bronce top */}
-                        <div style={{ height:'3px', background:'linear-gradient(90deg,#C18A68,#a8754f)' }} />
-                        <div className="p-8 flex flex-col gap-6">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] text-bronze uppercase tracking-[0.2em] font-bold">{t.welcomeTag}</span>
-                                <h2 className="text-xl font-heading font-bold text-white leading-snug">{t.welcomeTitle}</h2>
+                    <div className="relative w-full max-w-lg bg-surface rounded-2xl overflow-hidden animate-fade-in" style={{ border: '1px solid rgba(193,138,104,0.2)', borderTop: '3px solid #C18A68' }}>
+                        <div className="p-8 md:p-10 flex flex-col gap-6">
+                            <div className="flex flex-col gap-2">
+                                <span className="k-kicker">{t.welcomeTag}</span>
+                                <h2 className="text-2xl font-semibold text-white">{t.welcomeTitle}</h2>
+                                <div className="k-divider mt-3"></div>
                             </div>
-                            <p className="text-[15px] text-white/85 leading-7">{t.welcomeBody}</p>
+                            <p className="text-[15px] text-[#F4F4F4] font-light leading-7">{t.welcomeBody}</p>
                             <div className="flex flex-col sm:flex-row gap-3 pt-2">
                                 <button
                                     onClick={onAccept}
-                                    className="flex-1 bg-bronze hover:bg-white text-[#0d0d0d] font-bold uppercase tracking-widest text-sm py-3.5 rounded-xl transition-all duration-200 cursor-pointer">
+                                    className="k-btn k-btn-gold flex-1 text-[13px] py-3.5 px-4 cursor-pointer">
                                     {t.welcomeAccept}
                                 </button>
                                 <button
                                     onClick={() => { window.location.href = 'https://kastonproyectos.com'; }}
-                                    className="flex-1 border border-white/15 hover:border-white/30 text-white/50 hover:text-white/80 font-semibold uppercase tracking-widest text-sm py-3.5 rounded-xl transition-all duration-200 cursor-pointer">
+                                    className="k-btn flex-1 border border-white/15 hover:border-white/40 text-white/60 hover:text-white text-[13px] py-3.5 px-4 cursor-pointer">
                                     {t.welcomeDecline}
                                 </button>
                             </div>
@@ -3072,25 +3198,26 @@
                             setShowWelcomeModal(false);
                         }} />
                     )}
-                    <header className="w-full border-b border-white/10 sticky top-0 z-50" style={{ backgroundColor: '#0E0E0E' }}>
+                    <header className="w-full sticky top-0 z-50" style={{ backgroundColor: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 1px 0 rgba(193,138,104,0.15)' }}>
                         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between w-full gap-3">
                             <div className="flex items-center gap-3 flex-shrink-0">
                                 {typeof KASTON_LOGO !== 'undefined' ? (
                                     <img src={KASTON_LOGO} alt="KASTON" width="231" height="130" style={{ height: 'clamp(55px, 10vw, 130px)', width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))', flexShrink: 0 }} />
                                 ) : (
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold shadow-[0_0_15px_rgba(193,138,104,0.5)]">K</div>
+                                        <div className="w-8 h-8 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold">K</div>
                                         <h1 className="text-xl font-bold tracking-wider">KASTON</h1>
                                     </div>
                                 )}
                             </div>
-                            <div className="flex items-center gap-3 ml-auto flex-shrink-0">
-                                <div className="flex bg-transparent border border-white/20 rounded-full overflow-hidden">
-                                    <button onClick={() => handleLanguageChange('es')} className={`px-3 py-1 text-xs transition-colors cursor-pointer ${language === 'es' ? 'bg-bronze text-graphite font-bold' : 'text-white/50 hover:text-white'}`}>ES</button>
-                                    <button onClick={() => handleLanguageChange('en')} className={`px-3 py-1 text-xs transition-colors cursor-pointer ${language === 'en' ? 'bg-bronze text-graphite font-bold' : 'text-white/50 hover:text-white'}`}>EN</button>
+                            <div className="flex items-center gap-4 ml-auto flex-shrink-0">
+                                <a href="/" className="hidden md:inline text-[13px] font-medium text-muted hover:text-bronze transition-colors no-underline">{t.backToSite}</a>
+                                <div className="flex rounded-md overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(193,138,104,0.25)' }}>
+                                    <button onClick={() => handleLanguageChange('es')} className={`font-heading px-3 py-1.5 text-[11px] font-semibold tracking-[1.5px] transition-colors cursor-pointer ${language === 'es' ? 'bg-bronze text-graphite' : 'text-muted hover:text-white'}`}>ES</button>
+                                    <button onClick={() => handleLanguageChange('en')} className={`font-heading px-3 py-1.5 text-[11px] font-semibold tracking-[1.5px] transition-colors cursor-pointer ${language === 'en' ? 'bg-bronze text-graphite' : 'text-muted hover:text-white'}`}>EN</button>
                                 </div>
                                 {session && (
-                                    <button onClick={() => { onLogout(); setCurrentTab('profile'); }} className="text-xs text-white/30 hover:text-bronze uppercase tracking-widest transition-colors cursor-pointer border border-white/10 hover:border-bronze px-3 py-1 rounded">{t.logout}</button>
+                                    <button onClick={() => { onLogout(); setCurrentTab('profile'); }} className="font-heading text-[11px] text-muted hover:text-bronze uppercase tracking-[2px] transition-colors cursor-pointer border border-white/15 hover:border-bronze px-3 py-1.5 rounded-md">{t.logout}</button>
                                 )}
                             </div>
                         </div>
@@ -3105,7 +3232,7 @@
                         {currentTab === 'projects' && (
                             (session || projects.length > 0)
                                 ? <ProjectsTab language={language} session={session} projects={projects} onEditProject={handleEditProject} onDeleteProject={handleDeleteProject} onQuoteProject={handleQuoteProject} onWhatsAppQuoteProject={handleWhatsAppQuoteProject} rates={rates} setCurrentTab={setCurrentTab} />
-                                : <div className="w-full flex-grow flex flex-col items-center justify-center p-8 mt-20 text-center animate-fade-in"><p className="text-white/50 tracking-widest uppercase mb-6 text-sm">{t.authReq}</p><h2 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">{t.loginToView}</h2><button onClick={() => setCurrentTab('profile')} className="bg-bronze hover:bg-white text-graphite px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-colors cursor-pointer shadow-[0_0_20px_rgba(193,138,104,0.3)]">{t.goToProfile}</button></div>
+                                : <div className="w-full flex-grow flex flex-col items-center justify-center p-8 mt-20 text-center animate-fade-in"><p className="text-white/50 tracking-widest uppercase mb-6 text-sm">{t.authReq}</p><h2 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">{t.loginToView}</h2><button onClick={() => setCurrentTab('profile')} className="k-btn bg-bronze hover:bg-bronzeLight text-graphite px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-colors cursor-pointer">{t.goToProfile}</button></div>
                         )}
                         {currentTab === 'profile' && (
                             session ? <ProfileTab language={language} settings={settings} updateSettings={(newSets) => setSettings({ ...settings, ...newSets })} session={session} extraData={extraData} /> :
@@ -3142,20 +3269,20 @@
                     </a>
 
                     {/* Bottom Tab Bar */}
-                    <div className="fixed bottom-0 left-0 right-0 glass-panel border-t border-white/10 p-2 z-50 flex justify-center pb-safe" style={{ boxShadow: '0 -10px 30px rgba(0,0,0,0.5)' }}>
+                    <div className="fixed bottom-0 left-0 right-0 px-2 z-50 flex justify-center pb-safe" style={{ background: 'rgba(0,0,0,0.94)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 -1px 0 rgba(193,138,104,0.15)' }}>
                         <div className="max-w-md w-full flex justify-around items-center">
-                            <button onClick={() => { setCurrentTab('triage'); setTriageFlow(null); }} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto rounded-lg transition-colors duration-300 min-h-[56px] ${currentTab === 'triage' || currentTab === 'dashboard' ? 'text-bronze' : 'text-white/40 hover:text-white/70'}`}>
+                            <button onClick={() => { setCurrentTab('triage'); setTriageFlow(null); }} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto transition-colors duration-300 min-h-[60px] border-t-2 ${currentTab === 'triage' || currentTab === 'dashboard' ? 'text-bronze border-bronze' : 'text-white/55 hover:text-white/80 border-transparent'}`}>
                                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                                <span className="text-[10px] uppercase font-bold tracking-widest">{t.bottomDash}</span>
+                                <span className="text-[11px] uppercase font-bold tracking-widest">{t.bottomDash}</span>
                             </button>
-                            <button onClick={() => setCurrentTab('projects')} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto rounded-lg transition-colors duration-300 relative min-h-[56px] ${currentTab === 'projects' ? 'text-bronze' : 'text-white/40 hover:text-white/70'}`}>
+                            <button onClick={() => setCurrentTab('projects')} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto transition-colors duration-300 relative min-h-[60px] border-t-2 ${currentTab === 'projects' ? 'text-bronze border-bronze' : 'text-white/55 hover:text-white/80 border-transparent'}`}>
                                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                                <span className="text-[10px] uppercase font-bold tracking-widest">{t.bottomProj}</span>
+                                <span className="text-[11px] uppercase font-bold tracking-widest">{t.bottomProj}</span>
                                 {projects.length > 0 && <span className="absolute top-2 right-4 bg-bronze border border-graphite w-2 h-2 rounded-full"></span>}
                             </button>
-                            <button onClick={() => setCurrentTab('profile')} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto rounded-lg transition-colors duration-300 min-h-[56px] ${currentTab === 'profile' ? 'text-bronze' : 'text-white/40 hover:text-white/70'}`}>
+                            <button onClick={() => setCurrentTab('profile')} className={`bottom-nav-btn flex flex-col items-center justify-center p-3 min-w-[6.5rem] w-auto transition-colors duration-300 min-h-[60px] border-t-2 ${currentTab === 'profile' ? 'text-bronze border-bronze' : 'text-white/55 hover:text-white/80 border-transparent'}`}>
                                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                <span className="text-[10px] uppercase font-bold tracking-widest">{t.bottomProf}</span>
+                                <span className="text-[11px] uppercase font-bold tracking-widest">{t.bottomProf}</span>
                             </button>
                         </div>
                     </div>
@@ -3357,7 +3484,7 @@
                 : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>;
 
             const FieldLabel = ({ children }) => (
-                <label className="block text-[10px] text-white/40 uppercase tracking-widest mb-1.5 font-semibold">{children}</label>
+                <label className="block text-[11px] text-white/55 uppercase tracking-widest mb-1.5 font-semibold">{children}</label>
             );
 
             const inputCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-bronze transition-all text-sm";
@@ -3385,7 +3512,7 @@
                         <div className="flex rounded-xl overflow-hidden border border-white/10 p-1 gap-1 bg-white/5">
                             {['login', 'register'].map(m => (
                                 <button key={m} onClick={() => switchMode(m)}
-                                    className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer ${mode === m ? 'bg-bronze text-graphite shadow-[0_0_15px_rgba(193,138,104,0.3)]' : 'text-white/40 hover:text-white'}`}>
+                                    className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer ${mode === m ? 'bg-bronze text-graphite' : 'text-white/55 hover:text-white'}`}>
                                     {m === 'login' ? (isEs ? 'Iniciar Sesión' : 'Sign In') : (isEs ? 'Crear Cuenta' : 'Register')}
                                 </button>
                             ))}
@@ -3411,7 +3538,7 @@
                                 <OAuthButtons loading={loading} onOAuth={handleOAuth} isEs={isEs} />
                                 <div className="flex items-center gap-3">
                                     <div className="flex-1 h-px bg-white/10" />
-                                    <span className="text-[10px] text-white/25 uppercase tracking-widest">{isEs ? 'o con correo' : 'or with email'}</span>
+                                    <span className="text-[11px] text-white/50 uppercase tracking-widest">{isEs ? 'o con correo' : 'or with email'}</span>
                                     <div className="flex-1 h-px bg-white/10" />
                                 </div>
                                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -3423,10 +3550,10 @@
                                         <FieldLabel>{t.passLabel}</FieldLabel>
                                         <div className="relative">
                                             <input type={showPass ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)} className={inputCls + ' pr-12'} placeholder={t.passPlace} autoComplete="current-password" />
-                                            <button type="button" onClick={() => setShowPass(p => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors cursor-pointer"><EyeIcon show={showPass} /></button>
+                                            <button type="button" onClick={() => setShowPass(p => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/70 transition-colors cursor-pointer"><EyeIcon show={showPass} /></button>
                                         </div>
                                     </div>
-                                    <button type="submit" disabled={loading} className="mt-1 w-full bg-bronze hover:bg-white text-graphite font-bold py-4 rounded-xl uppercase tracking-widest transition-all duration-200 cursor-pointer disabled:opacity-40 shadow-[0_0_20px_rgba(193,138,104,0.2)] flex items-center justify-center gap-2">
+                                    <button type="submit" disabled={loading} className="mt-1 w-full k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold py-4 rounded-xl uppercase tracking-widest transition-all duration-200 cursor-pointer disabled:opacity-40 flex items-center justify-center gap-2">
                                         {loading ? <><Spinner />{isEs ? 'Ingresando...' : 'Signing in...'}</> : t.enterDash}
                                     </button>
                                 </form>
@@ -3447,7 +3574,7 @@
                                                         ? <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                                         : s}
                                                 </div>
-                                                <span className={`text-[9px] uppercase tracking-widest hidden sm:block transition-colors ${s === step ? 'text-bronze' : s < step ? 'text-white/40' : 'text-white/15'}`}>
+                                                <span className={`text-[10px] uppercase tracking-widest hidden sm:block transition-colors ${s === step ? 'text-bronze' : s < step ? 'text-white/55' : 'text-white/15'}`}>
                                                     {s === 1 ? (isEs ? 'Identidad' : 'Identity') : s === 2 ? (isEs ? 'Foto' : 'Photo') : (isEs ? 'Acceso' : 'Access')}
                                                 </span>
                                             </div>
@@ -3506,10 +3633,10 @@
                                                 className={inputCls}
                                                 placeholder={idType === 'Pasaporte' ? 'AB1234567' : t.idPlace}
                                                 inputMode={idType === 'Pasaporte' ? 'text' : 'numeric'} />
-                                            <p className="text-[9px] text-white/25 mt-1.5 tracking-widest">{idType === 'Pasaporte' ? t.passportFmtHint : t.numericOnlyHint}</p>
+                                            <p className="text-[10px] text-white/50 mt-1.5 tracking-widest">{idType === 'Pasaporte' ? t.passportFmtHint : t.numericOnlyHint}</p>
                                         </div>
                                         <button onClick={handleNextStep} disabled={!stepValid[1]}
-                                            className="w-full py-4 rounded-xl bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(193,138,104,0.2)]">
+                                            className="w-full py-4 rounded-xl k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
                                             {isEs ? 'Continuar' : 'Continue'} →
                                         </button>
                                     </div>
@@ -3518,34 +3645,34 @@
                                 {/* Step 2: Foto */}
                                 {step === 2 && (
                                     <div className="flex flex-col items-center gap-6">
-                                        <p className="text-white/40 text-sm text-center">{isEs ? 'Sube una foto clara de tu rostro para identificación corporativa.' : 'Upload a clear face photo for corporate identification.'}</p>
+                                        <p className="text-white/55 text-sm text-center">{isEs ? 'Sube una foto clara de tu rostro para identificación corporativa.' : 'Upload a clear face photo for corporate identification.'}</p>
 
                                         <label className="cursor-pointer flex flex-col items-center gap-3 group">
                                             {photoPreview ? (
                                                 <div className="relative">
-                                                    <img src={photoPreview} alt="Preview" className="w-36 h-36 rounded-full object-cover border-4 border-bronze shadow-[0_0_30px_rgba(193,138,104,0.35)]" />
+                                                    <img src={photoPreview} alt="Preview" className="w-36 h-36 rounded-full object-cover border-4 border-bronze" />
                                                     <div className="absolute bottom-1 right-1 w-9 h-9 bg-bronze rounded-full flex items-center justify-center text-graphite shadow-lg">
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="w-36 h-36 rounded-full border-2 border-dashed border-bronze/40 bg-white/5 flex flex-col items-center justify-center text-white/30 group-hover:border-bronze group-hover:text-bronze transition-all">
+                                                <div className="w-36 h-36 rounded-full border border-bronze/40 bg-white/5 flex flex-col items-center justify-center text-white/50 group-hover:border-bronze group-hover:text-bronze transition-all">
                                                     <svg className="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                    <span className="text-[10px] uppercase tracking-widest">{isEs ? 'Subir foto' : 'Upload photo'}</span>
+                                                    <span className="text-[11px] uppercase tracking-widest">{isEs ? 'Subir foto' : 'Upload photo'}</span>
                                                 </div>
                                             )}
-                                            <span className="text-[10px] text-white/25 uppercase tracking-widest">
+                                            <span className="text-[11px] text-white/50 uppercase tracking-widest">
                                                 {photoPreview ? (isEs ? 'Toca para cambiar' : 'Tap to change') : (isEs ? 'Toca para seleccionar' : 'Tap to select')}
                                             </span>
                                             <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
                                         </label>
 
                                         <div className="flex gap-3 w-full">
-                                            <button onClick={() => { setStep(1); setError(null); }} className="flex-shrink-0 px-5 py-3 rounded-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 text-sm uppercase tracking-widest transition-all cursor-pointer">
+                                            <button onClick={() => { setStep(1); setError(null); }} className="flex-shrink-0 px-5 py-3 rounded-xl border border-white/10 text-white/55 hover:text-white hover:border-white/30 text-sm uppercase tracking-widest transition-all cursor-pointer">
                                                 ←
                                             </button>
                                             <button onClick={() => { setError(null); setStep(3); }} disabled={!stepValid[2]}
-                                                className="flex-1 py-3 rounded-xl bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+                                                className="flex-1 py-3 rounded-xl k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
                                                 {isEs ? 'Continuar' : 'Continue'} →
                                             </button>
                                         </div>
@@ -3559,7 +3686,7 @@
                                         <OAuthButtons loading={loading} onOAuth={handleOAuth} isEs={isEs} />
                                         <div className="flex items-center gap-3">
                                             <div className="flex-1 h-px bg-white/10" />
-                                            <span className="text-[10px] text-white/25 uppercase tracking-widest">{isEs ? 'o crea con correo' : 'or create with email'}</span>
+                                            <span className="text-[11px] text-white/50 uppercase tracking-widest">{isEs ? 'o crea con correo' : 'or create with email'}</span>
                                             <div className="flex-1 h-px bg-white/10" />
                                         </div>
                                         <div>
@@ -3570,10 +3697,10 @@
                                             <FieldLabel>{t.passLabel}</FieldLabel>
                                             <div className="relative">
                                                 <input type={showRegPass ? 'text' : 'password'} value={regPassword} onChange={e => setRegPassword(e.target.value)} className={inputCls + ' pr-12'} placeholder={isEs ? 'Mínimo 6 caracteres' : 'Min. 6 characters'} autoComplete="new-password" />
-                                                <button type="button" onClick={() => setShowRegPass(p => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors cursor-pointer"><EyeIcon show={showRegPass} /></button>
+                                                <button type="button" onClick={() => setShowRegPass(p => !p)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/70 transition-colors cursor-pointer"><EyeIcon show={showRegPass} /></button>
                                             </div>
                                             {regPassword.length > 0 && regPassword.length < 6 && (
-                                                <p className="text-yellow-500/70 text-[10px] mt-1.5 tracking-widest">{isEs ? 'Mínimo 6 caracteres' : 'Minimum 6 characters'}</p>
+                                                <p className="text-yellow-500/70 text-[11px] mt-1.5 tracking-widest">{isEs ? 'Mínimo 6 caracteres' : 'Minimum 6 characters'}</p>
                                             )}
                                         </div>
                                         <div>
@@ -3584,24 +3711,24 @@
                                                     placeholder={t.passPlace} autoComplete="new-password" />
                                             </div>
                                             {confirmPassword && regPassword !== confirmPassword && (
-                                                <p className="text-red-400 text-[10px] mt-1.5 tracking-widest flex items-center gap-1">
+                                                <p className="text-red-400 text-[11px] mt-1.5 tracking-widest flex items-center gap-1">
                                                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                                                     {t.passMismatch}
                                                 </p>
                                             )}
                                             {confirmPassword && regPassword === confirmPassword && regPassword.length >= 6 && (
-                                                <p className="text-green-400 text-[10px] mt-1.5 tracking-widest flex items-center gap-1">
+                                                <p className="text-green-400 text-[11px] mt-1.5 tracking-widest flex items-center gap-1">
                                                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                                     {isEs ? 'Contraseñas coinciden' : 'Passwords match'}
                                                 </p>
                                             )}
                                         </div>
                                         <div className="flex gap-3 mt-1">
-                                            <button onClick={() => { setStep(2); setError(null); }} className="flex-shrink-0 px-5 py-3 rounded-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 text-sm uppercase tracking-widest transition-all cursor-pointer">
+                                            <button onClick={() => { setStep(2); setError(null); }} className="flex-shrink-0 px-5 py-3 rounded-xl border border-white/10 text-white/55 hover:text-white hover:border-white/30 text-sm uppercase tracking-widest transition-all cursor-pointer">
                                                 ←
                                             </button>
                                             <button onClick={handleRegister} disabled={loading || !stepValid[3]}
-                                                className="flex-1 py-3 rounded-xl bg-bronze hover:bg-white text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(193,138,104,0.2)] flex items-center justify-center gap-2">
+                                                className="flex-1 py-3 rounded-xl k-btn bg-bronze hover:bg-bronzeLight text-graphite font-bold uppercase tracking-widest text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                                                 {loading ? <><Spinner />{isEs ? 'Creando cuenta...' : 'Creating...'}</> : t.createAcc}
                                             </button>
                                         </div>
@@ -3627,6 +3754,30 @@
                 bottomProf: "Perfil",
                 trTitle: "Cotiza tu proyecto",
                 trSub: "Elige cómo quieres tu cubierta KASTON",
+                trKicker: "Cotizador KASTON",
+                trLead: "Mira cuánto cuesta tu techo en 2 minutos. Eliges la modalidad, nos cuentas de tu techo y descargas tu cotización en PDF.",
+                trChooseKicker: "Modalidades",
+                trHeroAlt: "Techo KASTON instalado en Las Palmas, Medellín",
+                trSealAlt: "Sello 17 años comprobados, Medellín, Colombia",
+                trStatYears: "años",
+                trStat1: "Vida útil proyectada",
+                trStat2: "Resistencia al viento",
+                trStat3Num: "12,6",
+                trStat3: "Peso por m²",
+                routeAPrice: "$85.000",
+                routeAUnit: "por m² · suministro",
+                routeBFrom: "Desde",
+                routeBPrice: "$153.000",
+                routeBUnit: "por m² · instalado",
+                routeCUnit: "Visita sin costo",
+                routeCta: "Cotizar",
+                backToSite: "Volver al sitio",
+                step: "Paso",
+                projRecovered: "recuperados",
+                resultKicker: "Resultado",
+                resultTitle: "Tu cotización",
+                esgPlastic: "de plástico quitados del planeta, transformados en un techo indestructible.",
+                esgCo2: "de CO₂ que no van a contaminar el aire.",
                 welcomeTag: "Cotizador Técnico KASTON",
                 welcomeTitle: "¡Hola! Te damos la bienvenida al Cotizador Técnico de KASTON.",
                 welcomeBody: "Queremos que el proceso de cotizar tu proyecto sea lo más sencillo, transparente y rápido posible. Diseñamos esta herramienta para que funcione como nuestro primer filtro de ahorro de tiempo: tú nos compartes lo que ya conoces de tu espacio y nosotros avanzamos de inmediato. Así, cuando programemos tu visita técnica presencial, iremos directo al grano para concluir los detalles finales de tu instalación sin hacerte perder tiempo en papeleos previos.",
@@ -3646,7 +3797,7 @@
                 chosenModality: "Modalidad elegida",
                 changeModality: "Cambiar",
                 reqObraTitle: "Requisitos de obra",
-                reqObra1: "Tu estructura debe soportar 12.6 kg/m².",
+                reqObra1: "Tu estructura debe soportar 12,6 kg/m².",
                 reqObra2: "Debes entregar la estructura con manto asfáltico ya instalado. KASTON no instala estructura ni manto.",
 
                 /* ── Ubicación de la obra y zonas de instalación ── */
@@ -3708,7 +3859,7 @@
                 needStruct: "¿NECESITA INSTALAR ESTRUCTURA?",
                 contactUs: "Comuníquese con nosotros para atención personalizada.",
                 contactK: "Contactar KASTON",
-                zincMsg: "REQUERIMIENTO TÉCNICO: Debido al peso de estabilidad del sistema KASTON (12.6 kg/m2), se requiere una estructura portante reforzada. ¿Desea incluir en su proyecto la cotización y acompañamiento de estructura por parte de KASTON?",
+                zincMsg: "REQUERIMIENTO TÉCNICO: Debido al peso de estabilidad del sistema KASTON (12,6 kg/m²), se requiere una estructura portante reforzada. ¿Desea incluir en su proyecto la cotización y acompañamiento de estructura por parte de KASTON?",
                 settingsTab: "Configuración",
                 back: "Volver",
                 idMgmt: "Gestión de Identidad",
@@ -3959,7 +4110,7 @@
                 awaitConfirm: "Registro exitoso! Por favor revisa tu bandeja de entrada para confirmar tu cuenta antes de iniciar sesión.",
                 selectImg: "Seleccionar imagen",
                 svcBannerTitle: "¡Advertencia Estructural!",
-                svcBannerDesc: "El peso de KASTON (12.6 kg/m²) excede el límite de soporte configurado para esta simulación. Requiere un análisis técnico.",
+                svcBannerDesc: "El peso de KASTON (12,6 kg/m²) excede el límite de soporte configurado para esta simulación. Requiere un análisis técnico.",
                 svcBannerAction: "kaston.proyectos@gmail.com"
             },
             en: {
@@ -3974,6 +4125,30 @@
                 bottomProf: "Profile",
                 trTitle: "Quote your project",
                 trSub: "Choose how you want your KASTON roof",
+                trKicker: "KASTON quote tool",
+                trLead: "See what your roof costs in 2 minutes. Pick an option, tell us about your roof and download your quote as a PDF.",
+                trChooseKicker: "Options",
+                trHeroAlt: "KASTON roof installed in Las Palmas, Medellín",
+                trSealAlt: "17 proven years seal, Medellín, Colombia",
+                trStatYears: "years",
+                trStat1: "Projected service life",
+                trStat2: "Wind resistance",
+                trStat3Num: "12.6",
+                trStat3: "Weight per m²",
+                routeAPrice: "$85,000",
+                routeAUnit: "per m² · supply",
+                routeBFrom: "From",
+                routeBPrice: "$153,000",
+                routeBUnit: "per m² · installed",
+                routeCUnit: "Free site visit",
+                routeCta: "Get a quote",
+                backToSite: "Back to site",
+                step: "Step",
+                projRecovered: "recovered",
+                resultKicker: "Result",
+                resultTitle: "Your quote",
+                esgPlastic: "of plastic removed from the planet, transformed into an indestructible roof.",
+                esgCo2: "of CO₂ that won't pollute the air.",
                 welcomeTag: "KASTON Technical Quoter",
                 welcomeTitle: "Hello! Welcome to KASTON's Technical Quoter.",
                 welcomeBody: "We want the process of quoting your project to be as simple, transparent, and fast as possible. We designed this tool as our first time-saving filter: you share what you already know about your space and we move forward immediately. When we schedule your in-person technical visit, we'll go straight to the point to finalize installation details without wasting your time on paperwork.",
@@ -4385,59 +4560,105 @@
             return <MainDashboard session={session} extraData={extraData} onLogout={() => { if (supabase) supabase.auth.signOut(); setSession(null); setExtraData(null); }} onAuth={handleAuth} />;
         }
 
+        // Ícono de WhatsApp en línea con el texto del botón (toma el color del texto).
+        function IconoWhatsApp({ size = 14 }) {
+            return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>;
+        }
+
+        function IconoFlecha() {
+            return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg>;
+        }
+
         function TriageScreen({ language, onSelectFlow }) {
             const t = T[language] || T['es'];
+            const rutas = [
+                { id: 'supply', num: '01', titulo: t.routeA, desde: '', precio: t.routeAPrice, unidad: t.routeAUnit, desc: t.routeADesc },
+                { id: 'full', num: '02', titulo: t.routeB, desde: t.routeBFrom, precio: t.routeBPrice, unidad: t.routeBUnit, desc: t.routeBDesc },
+            ];
+            // Cifras de la sección de datos oficiales del manual de marca.
+            const cifras = [
+                { num: '+500', unidad: t.trStatYears, texto: t.trStat1 },
+                { num: '225', unidad: 'km/h', texto: t.trStat2 },
+                { num: t.trStat3Num, unidad: 'kg', texto: t.trStat3 },
+            ];
             return (
-                <div className="w-full flex-grow flex flex-col justify-start relative pb-12">
-                    <div className="fixed top-0 right-0 w-full h-full bg-bronze rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(30%, -30%)' }}></div>
-                    <div className="fixed bottom-0 left-0 w-full h-full bg-bronze rounded-full opacity-5 blur-[200px] pointer-events-none" style={{ transform: 'translate(-30%, 30%)' }}></div>
-
-                    <div className="max-w-4xl w-full z-10 animate-fade-in flex flex-col items-center pt-8 mb-auto mx-auto pb-8">
-                        <div className="mb-10 text-center">
-                            {typeof KASTON_LOGO !== 'undefined' ? (
-                                <img src={KASTON_LOGO} alt="KASTON" width="231" height="130" style={{ height: '130px', width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))', margin: '0 auto 1rem', display: 'block' }} />
-                            ) : (
-                                <div className="w-16 h-16 rounded bg-bronze text-[#0D0D0D] flex items-center justify-center font-bold text-4xl mx-auto mb-4 shadow-[0_0_20px_rgba(193,138,104,0.5)]">K</div>
-                            )}
-                            <h1 className="text-3xl font-heading font-bold tracking-tight text-white uppercase mt-4 mb-2">{t.trTitle}</h1>
-                            <p className="text-white/50 tracking-widest text-sm uppercase">{t.trSub}</p>
+                <div className="w-full max-w-5xl flex flex-col gap-12 md:gap-16 animate-fade-in pb-12">
+                    {/* Portada: techo real de Las Palmas con capa negra para que el texto se lea */}
+                    <section className="relative overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(193,138,104,0.15)' }}>
+                        <img src="cotizador-techo.jpg" alt={t.trHeroAlt} className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.45) 100%)' }}></div>
+                        <div className="relative px-6 py-14 md:px-14 md:py-20 max-w-2xl">
+                            <div className="k-kicker mb-4">{t.trKicker}</div>
+                            <h1 className="text-white font-bold text-[2.6rem] md:text-6xl">{t.trTitle}</h1>
+                            <div className="k-divider my-6"></div>
+                            <p className="text-[#F4F4F4] font-light text-base md:text-lg leading-relaxed">{t.trLead}</p>
                         </div>
+                    </section>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                            <button onClick={() => onSelectFlow('supply')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
-                                <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeA}</h3>
-                                <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeASub}</div>
-                                <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">{t.routeADesc}</p>
-                            </button>
+                    {/* Modalidades */}
+                    <section className="flex flex-col gap-7">
+                        <div>
+                            <div className="k-kicker mb-2">{t.trChooseKicker}</div>
+                            <h2 className="text-white font-bold text-2xl md:text-3xl">{t.trSub}</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            {rutas.map(r => (
+                                <button key={r.id} onClick={() => onSelectFlow(r.id)} className="k-card k-card-link group p-7 text-left flex flex-col cursor-pointer">
+                                    <span className="k-num text-bronze text-sm tracking-[3px] mb-5">{r.num}</span>
+                                    <h3 className="text-white font-semibold text-2xl mb-5 md:min-h-[2.3em]">{r.titulo}</h3>
+                                    <div className="flex items-baseline gap-2 flex-wrap">
+                                        {r.desde && <span className="text-muted text-sm">{r.desde}</span>}
+                                        <span className="k-num text-bronze text-4xl font-semibold">{r.precio}</span>
+                                    </div>
+                                    <div className="text-muted text-[11px] uppercase tracking-[2px] mt-1 mb-5">{r.unidad}</div>
+                                    <p className="text-sm text-white/70 leading-relaxed flex-grow">{r.desc}</p>
+                                    <span className="font-heading mt-7 pt-5 border-t border-bronze/15 flex items-center justify-between text-bronze text-[13px] font-semibold uppercase tracking-[2px]">
+                                        {t.routeCta}
+                                        <span className="transition-transform duration-300 group-hover:translate-x-1"><IconoFlecha /></span>
+                                    </span>
+                                </button>
+                            ))}
 
-                            <button onClick={() => onSelectFlow('full')} className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/50 transition-all duration-300 relative overflow-hidden cursor-pointer">
-                                <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeB}</h3>
-                                <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeBSub}</div>
-                                <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-grow">{t.routeBDesc}</p>
-                            </button>
-
-                            <div className="glass-panel p-6 text-left rounded-2xl flex flex-col group hover:border-bronze/30 transition-all duration-300 relative overflow-hidden">
-                                <h3 className="text-xl font-heading font-bold text-white uppercase tracking-wider mb-2">{t.routeC}</h3>
-                                <div className="text-bronze font-bold text-xs uppercase tracking-widest mb-4">{t.routeCSub}</div>
-                                <p className="text-sm text-white/50 flex-grow mb-5">{t.routeCDesc}</p>
-                                <div className="flex flex-col gap-2 mt-auto border-t border-bronze/20 pt-4">
+                            <div className="k-card p-7 text-left flex flex-col">
+                                <span className="k-num text-bronze text-sm tracking-[3px] mb-5">03</span>
+                                <h3 className="text-white font-semibold text-2xl mb-5 md:min-h-[2.3em]">{t.routeC}</h3>
+                                <div className="k-num text-bronze text-xl font-medium uppercase tracking-wide">{t.routeCSub}</div>
+                                <div className="text-muted text-[11px] uppercase tracking-[2px] mt-1 mb-5">{t.routeCUnit}</div>
+                                <p className="text-sm text-white/70 leading-relaxed flex-grow">{t.routeCDesc}</p>
+                                <div className="flex flex-col gap-2 mt-7 pt-5 border-t border-bronze/15">
                                     <a
                                         href={`https://wa.me/573188978552?text=${encodeURIComponent('¡Hola! Elegí la opción de proyecto desde cero o cambiar zinc en la web y me gustaría recibir la asesoría personalizada para diseñar mi techo.')}`}
                                         target="_blank" rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-green-900/40 border border-green-700/50 text-green-400 hover:bg-green-600 hover:text-white hover:border-green-500 transition-all no-underline">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                        className="k-btn k-btn-gold flex items-center justify-center gap-2 w-full py-3 text-[12px] no-underline">
+                                        <IconoWhatsApp size={14} />
                                         WhatsApp
                                     </a>
                                     <a
                                         href={`mailto:kaston.proyectos@gmail.com?subject=${encodeURIComponent('Asesoría Personalizada - Proyecto desde Cero / Zinc')}`}
-                                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-bronze/10 border border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite transition-all no-underline">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                        className="k-btn k-btn-outline flex items-center justify-center gap-2 w-full py-3 text-[12px] no-underline">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden="true"><path d="M3 5h18v14H3z" /><path d="M3 6l9 7 9-7" /></svg>
                                         {t.emailBtn}
                                     </a>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
+
+                    {/* Cifras oficiales y sello de prueba */}
+                    <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {cifras.map(c => (
+                            <div key={c.texto} className="k-stat px-5 py-6">
+                                <div className="flex items-baseline gap-1.5">
+                                    <span className="k-num text-bronze text-4xl font-semibold">{c.num}</span>
+                                    <span className="k-num text-bronze/80 text-base">{c.unidad}</span>
+                                </div>
+                                <div className="text-muted text-xs mt-2 leading-snug">{c.texto}</div>
+                            </div>
+                        ))}
+                        <div className="flex items-center justify-center py-2">
+                            <img src="sello-17-anos.png" alt={t.trSealAlt} width="112" height="112" className="w-24 h-24 md:w-28 md:h-28" />
+                        </div>
+                    </section>
                 </div>
             )
         }
