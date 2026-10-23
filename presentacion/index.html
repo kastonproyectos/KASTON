@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KASTON — Presentación Comercial</title>
+<meta name="description" content="El último techo de cada una de tus propiedades. Presentación comercial KASTON.">
+<meta name="robots" content="noindex, nofollow, noarchive"><!-- Página oculta: solo accesible con el link directo, no se indexa en buscadores -->
+<style>
+  :root{
+    --accent:#b8956b;
+    --chrome:rgba(255,255,255,.55);
+    --chrome-hover:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:#000;
+    color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Stage: centers a 16:9 deck and letterboxes it in pure black, like Canva present mode */
+  .stage{
+    position:fixed; inset:0;
+    display:grid; place-items:center;
+    background:#000;
+    cursor:pointer;
+  }
+  .deck{
+    position:relative;
+    aspect-ratio:16/9;
+    width:min(100vw, 177.7778vh);   /* 16/9 of viewport height */
+    height:auto;
+    background:#000;
+    overflow:hidden;
+    box-shadow:0 0 60px rgba(0,0,0,.6);
+  }
+
+  .slide{
+    position:absolute; inset:0;
+    opacity:0; visibility:hidden;
+    transition:opacity .18s ease;
+    z-index:1;
+  }
+  .slide.active{opacity:1; visibility:visible; z-index:2}
+
+  .slide .bg{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+    user-select:none; -webkit-user-drag:none;
+  }
+  /* Full-page video, clipped to its on-slide frame so only the moving footage shows;
+     everything else is the crisp PNG underneath. Frames are pixel-registered 1920x1080. */
+  .slide video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:fill;
+    display:block;
+    z-index:3;
+    pointer-events:none;
+  }
+
+  /* ---------- Chrome (UI overlay, hidden in fullscreen / on idle) ---------- */
+  .ui{position:fixed; inset:0; z-index:50; pointer-events:none}
+  .ui.hide{opacity:0; transition:opacity .4s ease}
+
+  .nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:52px; height:52px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(0,0,0,.35); backdrop-filter:blur(4px);
+    color:var(--chrome); font-size:22px; line-height:1;
+    display:grid; place-items:center;
+    cursor:pointer; pointer-events:auto;
+    transition:all .15s ease; opacity:0;
+  }
+  .stage:hover ~ .ui .nav, .ui:hover .nav{opacity:.8}
+  .nav:hover{color:var(--chrome-hover); border-color:var(--accent); background:rgba(0,0,0,.6)}
+  .nav.prev{left:18px}
+  .nav.next{right:18px}
+
+  .bar{
+    position:absolute; left:0; right:0; bottom:0;
+    display:flex; align-items:center; gap:16px;
+    padding:14px 20px;
+    font-size:13px; color:var(--chrome);
+    background:linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,0));
+    pointer-events:none;
+  }
+  .bar .spacer{flex:1}
+  .bar button{
+    pointer-events:auto; cursor:pointer;
+    background:transparent; border:1px solid rgba(255,255,255,.2);
+    color:var(--chrome); border-radius:6px; padding:6px 11px;
+    font-size:12px; letter-spacing:.04em; transition:all .15s ease;
+    font-family:inherit;
+  }
+  .bar button:hover{color:var(--chrome-hover); border-color:var(--accent)}
+  .counter{font-variant-numeric:tabular-nums; letter-spacing:.08em}
+  .counter b{color:#fff; font-weight:600}
+  .brand{letter-spacing:.22em; font-weight:600; color:rgba(255,255,255,.7); font-size:12px}
+  .brand span{color:var(--accent)}
+
+  /* progress dots */
+  .dots{display:flex; gap:7px; pointer-events:auto}
+  .dot{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.25); cursor:pointer; transition:all .15s ease}
+  .dot:hover{background:rgba(255,255,255,.55)}
+  .dot.on{background:var(--accent); transform:scale(1.25)}
+
+  /* load hint */
+  .hint{
+    position:absolute; left:50%; bottom:64px; transform:translateX(-50%);
+    background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.14);
+    color:rgba(255,255,255,.8); font-size:13px; letter-spacing:.03em;
+    padding:9px 16px; border-radius:999px; pointer-events:none;
+    transition:opacity .6s ease;
+  }
+  .hint kbd{
+    font-family:inherit; background:rgba(255,255,255,.12); border-radius:4px;
+    padding:1px 6px; margin:0 2px; font-size:12px; color:#fff;
+  }
+
+  @media (max-width:640px){
+    .nav{width:42px;height:42px;font-size:18px}
+    .bar{font-size:11px;gap:10px;padding:10px 12px}
+    .brand{display:none}
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+
+  <div class="ui" id="ui">
+    <button class="nav prev" id="prev" title="Anterior (←)">‹</button>
+    <button class="nav next" id="next" title="Siguiente (→)">›</button>
+
+    <div class="bar">
+      <span class="brand">KAST<span>O</span>N</span>
+      <span class="spacer"></span>
+      <div class="dots" id="dots"></div>
+      <span class="spacer"></span>
+      <span class="counter"><b id="cur">1</b> / <span id="tot">11</span></span>
+      <button id="btnFs" title="Pantalla completa (F)">Pantalla completa</button>
+    </div>
+
+    <div class="hint" id="hint">
+      <kbd>←</kbd><kbd>→</kbd> o clic para avanzar · <kbd>F</kbd> pantalla completa
+    </div>
+  </div>
+
+<script>
+const SLIDES = [
+  { img:'assets/slide-01.png', video:'assets/video-01.mp4', clip:'inset(0% 0% 0% 51%)' },
+  { img:'assets/slide-02.png', video:'assets/video-02.mp4', clip:'inset(25.333% 56.442% 16.465% 10.820%)' },
+  { img:'assets/slide-03.png' },
+  { img:'assets/slide-04.png' },
+  { img:'assets/slide-05.png' },
+  { img:'assets/slide-06.png', video:'assets/video-06.mp4', clip:'inset(24.288% 53.949% 16.667% 5.250%)' },
+  { img:'assets/slide-07.png' },
+  { img:'assets/slide-08.png' },
+  { img:'assets/slide-09.png' },
+  { img:'assets/slide-10.png' },
+  { img:'assets/slide-11.png' },
+];
+
+const stage = document.getElementById('stage');
+const deck  = document.createElement('div');
+deck.className = 'deck';
+stage.appendChild(deck);
+
+// Build slides
+SLIDES.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'slide';
+  el.dataset.index = i;
+
+  const img = document.createElement('img');
+  img.className = 'bg';
+  img.src = s.img;
+  img.alt = 'Diapositiva ' + (i+1);
+  img.draggable = false;
+  el.appendChild(img);
+
+  if (s.video){
+    const v = document.createElement('video');
+    v.src = s.video;
+    v.muted = true; v.loop = true; v.playsInline = true;
+    v.setAttribute('muted',''); v.setAttribute('playsinline','');
+    v.setAttribute('webkit-playsinline','');
+    v.preload = 'auto';
+    v.style.clipPath = s.clip;
+    v.style.webkitClipPath = s.clip;
+    el.appendChild(v);
+    s._v = v;
+  }
+  deck.appendChild(el);
+  s._el = el;
+});
+
+const slideEls = [...deck.querySelectorAll('.slide')];
+let idx = 0;
+
+// Dots
+const dotsWrap = document.getElementById('dots');
+SLIDES.forEach((_, i) => {
+  const d = document.createElement('span');
+  d.className = 'dot';
+  d.addEventListener('click', (e) => { e.stopPropagation(); go(i); });
+  dotsWrap.appendChild(d);
+});
+const dots = [...dotsWrap.children];
+
+const curEl = document.getElementById('cur');
+document.getElementById('tot').textContent = SLIDES.length;
+
+function render(){
+  slideEls.forEach((el, i) => el.classList.toggle('active', i === idx));
+  dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+  curEl.textContent = idx + 1;
+
+  // play only the active video; pause/reset the others
+  SLIDES.forEach((s, i) => {
+    if (!s._v) return;
+    if (i === idx){ s._v.currentTime = 0; const p = s._v.play(); if (p) p.catch(()=>{}); }
+    else { s._v.pause(); }
+  });
+
+  location.hash = 'd' + (idx+1);
+}
+
+function go(n){ idx = Math.max(0, Math.min(SLIDES.length-1, n)); render(); }
+function next(){ if (idx < SLIDES.length-1) go(idx+1); }
+function prev(){ if (idx > 0) go(idx-1); }
+
+// Controls
+document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); next(); });
+document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); prev(); });
+stage.addEventListener('click', () => next());
+
+const btnFs = document.getElementById('btnFs');
+btnFs.addEventListener('click', e => { e.stopPropagation(); toggleFs(); });
+function toggleFs(){
+  if (!document.fullscreenElement){ (document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen).call(document.documentElement); }
+  else { (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+}
+
+document.addEventListener('keydown', e => {
+  switch(e.key){
+    case 'ArrowRight': case 'PageDown': case ' ': case 'Enter': e.preventDefault(); next(); break;
+    case 'ArrowLeft':  case 'PageUp': e.preventDefault(); prev(); break;
+    case 'Home': e.preventDefault(); go(0); break;
+    case 'End': e.preventDefault(); go(SLIDES.length-1); break;
+    case 'f': case 'F': toggleFs(); break;
+    default:
+      if (e.key >= '1' && e.key <= '9') go(parseInt(e.key,10)-1);
+      if (e.key === '0') go(9);
+  }
+});
+
+// Touch swipe
+let tx=0, ty=0;
+stage.addEventListener('touchstart', e => { tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+stage.addEventListener('touchend', e => {
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)){ dx<0 ? next() : prev(); }
+}, {passive:true});
+
+// Auto-hide UI / load hint
+const ui = document.getElementById('ui');
+const hint = document.getElementById('hint');
+let idleTimer;
+function wake(){
+  ui.classList.remove('hide');
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => ui.classList.add('hide'), 3000);
+}
+['mousemove','keydown','touchstart','click'].forEach(ev => document.addEventListener(ev, wake));
+setTimeout(() => { hint.style.opacity = '0'; }, 4500);
+
+// Preload all images
+SLIDES.forEach(s => { const im = new Image(); im.src = s.img; });
+
+// Start (respect deep link #dN)
+const m = (location.hash.match(/^#d(\d+)$/));
+if (m){ const n = parseInt(m[1],10)-1; if (n>=0 && n<SLIDES.length) idx = n; }
+render();
+wake();
+</script>
+</body>
+</html>
