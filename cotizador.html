@@ -190,11 +190,11 @@
         const KASTON_UNITS_PER_FT2 = 3.90; // 42 / 10.7639
 
         /* ─────────────────────────────────────────────────────────────
-           PRECIOS POR m²  ·  actualizado agosto 2026
+           PRECIOS POR m²  ·  costos actualizados septiembre 2026
            ─────────────────────────────────────────────────────────────
            SOLO TEJA: precio único, no depende de la ubicación.
-             Costo: teja 42 × $1.073 = $45.066 + costal $210 = $45.276/m²
-             Venta: $85.000/m²  →  margen ~47%
+             Costo: teja 42 × $1.500 = $63.000 + costal $210 = $63.210/m²
+             Venta: $85.000/m²  →  te quedan $21.790/m² (25,6%)
 
            TODO COSTO: se arma sumando, no aplicando un markup al costo.
            La teja entra al PRECIO DE VENTA de $85.000 (no a costo): si el
@@ -212,9 +212,10 @@
              Hasta 25 km:  85.000 + 54.335,41 × 1,25 = $152.919  →  $153.000
              25 a 60 km:   85.000 + 64.335,41 × 1,25 = $165.419  →  $165.500
 
-           OJO: dos costos que TODAVÍA NO están incluidos: el traslapo de la
-           malla (sube el $6.345,41 si hay solape entre láminas) y el caballete.
-           Si entran, hay que recalcular estos precios hacia arriba.
+           OJO: dos costos que TODAVÍA NO están incluidos: el caballete (lo fabrica
+           el mismo proveedor de la teja; falta su precio) y el traslapo de la malla
+           (sube el $6.345,41 si hay solape entre láminas). Si entran, hay que
+           recalcular estos precios hacia arriba.
         ───────────────────────────────────────────────────────────────── */
         const PRECIO_SOLO_TEJA_M2 = 85000;
 
@@ -229,15 +230,15 @@
                 id: 'metro',
                 maxKm: 25,
                 instalador: 45000,
-                costoM2: 99611.41,   // lo que REALMENTE pagas: teja $45.066 + insumos $9.545,41 + instalador
-                precioM2: 153000     // 85.000 + (9.335,41 + 45.000) × 1,25  →  te quedan $53.389/m²
+                costoM2: 117545.41,  // lo que REALMENTE pagas: teja $63.000 + insumos $9.545,41 + instalador
+                precioM2: 153000     // 85.000 + (9.335,41 + 45.000) × 1,25  →  te quedan $35.455/m²
             },
             {
                 id: 'afueras',
                 maxKm: 60,
                 instalador: 55000,
-                costoM2: 109611.41,  // lo que REALMENTE pagas: teja $45.066 + insumos $9.545,41 + instalador
-                precioM2: 165500     // 85.000 + (9.335,41 + 55.000) × 1,25  →  te quedan $55.889/m²
+                costoM2: 127545.41,  // lo que REALMENTE pagas: teja $63.000 + insumos $9.545,41 + instalador
+                precioM2: 165500     // 85.000 + (9.335,41 + 55.000) × 1,25  →  te quedan $37.955/m²
             },
             {
                 id: 'lejana',
@@ -309,302 +310,466 @@
   { id: "otro", name: "Otro / Diseño Especial", nameEn: "Other / Special Design", imagePath: null, description: "Estructuras personalizadas, techos curvos o configuraciones arquitectónicas complejas que no entran en los modelos estándar.", descEn: "Custom structures, curved roofs or complex architectural configurations outside the standard models." },
 ];
 
-        /* ── Carga una imagen local para el PDF ── */
-        const loadImageAsBase64 = (imageUrl) => new Promise((resolve) => {
-            if (!imageUrl) { resolve(null); return; }
-            try {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width || 300; canvas.height = img.height || 188;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        resolve(canvas.toDataURL('image/png'));
-                    } catch(e) { resolve(null); }
-                };
-                img.onerror = () => resolve(null);
-                img.src = new URL(imageUrl, window.location.href).href;
-            } catch(e) { resolve(null); }
+        /* ─────────────────────────────────────────────────────────────
+           PDF DE LA COTIZACIÓN
+           Una hoja A4 con la marca: Oswald en títulos, Inter en el texto,
+           negro y cobre. Si las fuentes no cargan, sale en Helvetica.
+           Las imágenes se reducen antes de meterlas: el logo SVG a tamaño
+           completo inflaba el PDF a más de 10 MB.
+           ───────────────────────────────────────────────────────────── */
+        const PDF_FUENTES = [
+            { archivo: 'oswald-600.ttf', nombre: 'Oswald', estilo: 'normal' },
+            { archivo: 'inter-400.ttf',  nombre: 'Inter',  estilo: 'normal' },
+            { archivo: 'inter-600.ttf',  nombre: 'Inter',  estilo: 'bold' },
+        ];
+
+        const bufferABase64 = (buffer) => {
+            const bytes = new Uint8Array(buffer);
+            let binario = '';
+            for (let i = 0; i < bytes.length; i += 0x8000) {
+                binario += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+            }
+            return btoa(binario);
+        };
+
+        // Se descargan una sola vez por visita; si fallan, se reintenta en la siguiente descarga.
+        let fuentesPDFPromesa = null;
+        const cargarFuentesPDF = () => {
+            if (!fuentesPDFPromesa) {
+                fuentesPDFPromesa = Promise.all(PDF_FUENTES.map(f =>
+                    fetch(new URL(`fonts/${f.archivo}`, window.location.href).href)
+                        .then(r => { if (!r.ok) throw new Error(f.archivo); return r.arrayBuffer(); })
+                        .then(buffer => ({ ...f, base64: bufferABase64(buffer) }))
+                )).catch(() => { fuentesPDFPromesa = null; return null; });
+            }
+            return fuentesPDFPromesa;
+        };
+
+        /* ── Carga una imagen y la reduce. Con `fondo` se aplana la transparencia y sale en JPG (pesa mucho menos) ── */
+        const cargarImagenPDF = (url, { maxLado = 600, fondo = null } = {}) => new Promise((resolve) => {
+            if (!url) { resolve(null); return; }
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                try {
+                    const escala = Math.min(1, maxLado / Math.max(img.naturalWidth, img.naturalHeight));
+                    const w = Math.max(1, Math.round(img.naturalWidth * escala));
+                    const h = Math.max(1, Math.round(img.naturalHeight * escala));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    if (fondo) { ctx.fillStyle = fondo; ctx.fillRect(0, 0, w, h); }
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve({
+                        data: fondo ? canvas.toDataURL('image/jpeg', 0.88) : canvas.toDataURL('image/png'),
+                        formato: fondo ? 'JPEG' : 'PNG',
+                        aspecto: w / h
+                    });
+                } catch (e) { resolve(null); }
+            };
+            img.onerror = () => resolve(null);
+            img.src = new URL(url, window.location.href).href;
         });
 
-        /* ── Carga el logo KASTON como PNG para incrustar en el PDF ── */
-        const loadLogoForPDF = () => new Promise((resolve) => {
-            try {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        // Usar las dimensiones intrínsecas para preservar el aspect ratio real
-                        const w = img.width || 360;
-                        const h = img.height || 100;
-                        canvas.width = w; 
-                        canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        resolve({ data: canvas.toDataURL('image/png'), aspect: w / h });
-                    } catch(e) { resolve(null); }
-                };
-                img.onerror = () => resolve(null);
-                img.src = new URL('logo-kaston.svg', window.location.href).href;
-            } catch(e) { resolve(null); }
-        });
+        // 9240 → "9.240" · 85.5 → "85,5": coma decimal, como pide el manual de marca.
+        const numeroPDF = (valor, decimales = 0) => {
+            const n = Number(valor) || 0;
+            const [entero, fraccion = ''] = Math.abs(n).toFixed(decimales).split('.');
+            const frac = fraccion.replace(/0+$/, '');
+            return (n < 0 ? '-' : '') + entero.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (frac ? ',' + frac : '');
+        };
 
-        /* ── Constructor de PDF premium KASTON ── */
-        const buildPremiumPDF = (doc, data, logoDataUrl) => {
+        const dineroPDF = (valor, currency) => {
+            const [entero, fraccion] = (Number(valor) || 0).toFixed(currency === 'COP' ? 0 : 2).split('.');
+            return `${currency === 'EUR' ? '€' : '$'} ${entero.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${fraccion ? ',' + fraccion : ''}`;
+        };
+
+        // Datos del cliente que salen en la cotización; sin sesión no se imprime nada.
+        const clientePDF = (session) => {
+            if (!session?.user) return null;
+            const meta = session.user.user_metadata || {};
+            return {
+                nombre: meta.full_name || meta.name || session.user.email || '',
+                telefono: meta.phone || '',
+                documento: meta.id_number ? `${meta.id_type || ''} ${meta.id_number}`.trim() : '',
+                rol: meta.role || ''
+            };
+        };
+
+        /* ── Arma la hoja de la cotización ── */
+        const buildPremiumPDF = (doc, data, recursos = {}) => {
             const {
-                flow, area, unit, areaM2, material, currency, metrics, modality,
-                roofType, pendiente, selectedColor, constructionType,
-                clientName, clientPhone, clientDoc, clientRole,
-                withObservation, includeZincWaiver, t, isSpecialDesign, roofPngUrl, selectedColorHex,
-                zone, geoKm
+                t, area, unit, areaM2, currency, metrics, modality,
+                roofType, pendiente, selectedColor, constructionType, isSpecialDesign,
+                zone, geoKm, cliente, withObservation, includeZincWaiver, fotos = []
             } = data;
+            const { logo, techo, fuentes } = recursos;
+            const enIngles = t.pdfLocale === 'en-US';
 
             const C = {
-                dark:   [13,  13,  13 ],
-                bronze: [193, 138, 104],
-                white:  [255, 255, 255],
-                offWhite:[248,247,245 ],
-                mid:    [160, 160, 160],
-                dim:    [110, 110, 110],
-                ink:    [30,  30,  30 ],
-                stripe: [245, 244, 242],
-                red:    [180, 60,  60 ],
+                negro:  [0, 0, 0],
+                tarjeta:[17, 17, 17],
+                filo:   [42, 42, 42],
+                cobre:  [193, 138, 104],
+                verde:  [74, 91, 56],
+                tinta:  [26, 26, 26],
+                gris:   [105, 105, 105],
+                grisCl: [188, 188, 188],
+                claro:  [244, 244, 244],
+                linea:  [228, 228, 228],
+                blanco: [255, 255, 255],
             };
-            const pageW = 210;
-            const col1 = 18, col2 = 110;
+            const W = 210, M = 18, CW = W - M * 2;
+            const LIMITE = 278; // de aquí para abajo va el pie de página
 
-            /* ── HEADER ── */
-            doc.setFillColor(...C.dark);
-            doc.rect(0, 0, pageW, 44, 'F');
-            doc.setFillColor(...C.bronze);
-            doc.rect(0, 44, pageW, 1.5, 'F');
-
-            if (logoDataUrl) {
-                // Soportar el nuevo objeto {data, aspect} o fallback a string viejo
-                const data = typeof logoDataUrl === 'string' ? logoDataUrl : logoDataUrl.data;
-                const aspect = logoDataUrl.aspect || 3.6; // Valor por defecto aproximado
-                const logoH = 12; // Altura fija (h-12 equivalente)
-                const logoW = logoH * aspect; // Ancho automático preservando proporción
-                doc.addImage(data, 'PNG', col1, 10 + (13.3 - logoH)/2, logoW, logoH);
-            } else {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(20);
-                doc.setTextColor(...C.white);
-                doc.text('KASTON', col1, 22);
+            if (fuentes) {
+                fuentes.forEach(f => { doc.addFileToVFS(f.archivo, f.base64); doc.addFont(f.archivo, f.nombre, f.estilo); });
             }
+            const F = fuentes
+                ? { titulo: ['Oswald', 'normal'], texto: ['Inter', 'normal'], fuerte: ['Inter', 'bold'] }
+                : { titulo: ['helvetica', 'bold'], texto: ['helvetica', 'normal'], fuerte: ['helvetica', 'bold'] };
+            const fuente = (tipo, tam, color) => { doc.setFont(...F[tipo]); doc.setFontSize(tam); doc.setTextColor(...color); };
 
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(...C.bronze);
-            doc.text(t.pdfReportTitle, col1, logoDataUrl ? 27 : 30);
-
-            const dateStr = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
-            doc.setFontSize(7.5);
-            doc.setTextColor(...C.mid);
-            doc.text(dateStr, pageW - col1, 38, { align: 'right' });
-
-            /* ── BANDA CLIENTE ── */
-            doc.setFillColor(...C.stripe);
-            doc.rect(0, 45.5, pageW, 14, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(6.5);
-            doc.setTextColor(...C.dim);
-            doc.text(t.pdfClientData, col1, 51);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7.5);
-            doc.setTextColor(...C.ink);
-            const clientLine = `${t.pdfClientName} ${clientName}  ·  ${t.pdfClientPhone} ${clientPhone}  ·  ${t.pdfClientDoc} ${clientDoc}  ·  ${clientRole}`;
-            doc.text(clientLine, col1, 56.5);
-
-            /* ── helper: cabecera de sección ── */
-            let y = 65;
-            const sectionHeader = (label) => {
-                doc.setFillColor(...C.bronze);
-                doc.rect(col1, y, 3, 5, 'F');
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.setTextColor(...C.ink);
-                doc.text(label, col1 + 5, y + 4);
-                y += 10;
-            };
-            const row = (label, value, bold = false) => {
-                doc.setFont('helvetica', bold ? 'bold' : 'normal');
-                doc.setFontSize(8.5);
-                doc.setTextColor(...C.dim);
-                doc.text(label, col1 + 4, y);
-                doc.setFont('helvetica', bold ? 'bold' : 'normal');
-                doc.setTextColor(...C.ink);
-                doc.text(String(value), col2, y);
-                y += 6;
-            };
-            const divider = () => {
-                doc.setDrawColor(...C.bronze);
-                doc.setLineWidth(0.3);
-                doc.line(col1, y, pageW - col1, y);
-                y += 5;
+            // Títulos en Oswald, mayúsculas y con interletra de 0,04 em, como en la web.
+            const titulo = (texto, x, y, tam, color, align = 'left') => {
+                fuente('titulo', tam, color);
+                const espacio = tam * 0.04 * 0.3528;
+                const ancho = doc.getTextWidth(texto) + espacio * (texto.length - 1);
+                doc.setCharSpace(espacio);
+                doc.text(texto, align === 'right' ? x - ancho : x, y);
+                doc.setCharSpace(0);
+                return ancho;
             };
 
-            const activeRoof = ROOF_TYPES.find(r => r.id === roofType);
-            const pendienteLabel = pendiente === null || pendiente === undefined
-                ? t.pitchUnknown
-                : `${pendiente}%`;
-            const colorLabel = KASTON_COLORS.find(c => c.id === selectedColor)?.nameEs || 'Sin definir';
-            const matLabel = MATERIAL_CONSTANTS[material]?.label || material;
+            const modalidadTxt = isSpecialDesign ? t.pdfModSpecial : (modality === 'full' ? t.pdfModFull : t.pdfModSupply);
+            const fecha = new Date().toLocaleDateString(t.pdfLocale, { year: 'numeric', month: 'long', day: 'numeric' });
 
-            /* ── SECCIÓN 1: CONFIGURACIÓN ── */
-            sectionHeader(t.pdfP1);
-            row(t.pdfRoofArea, `${area} ${unit}  (≈ ${areaM2.toFixed(1)} m²)`);
-            row(t.pdfConstrType, constructionType);
-            if (flow === 'A') row(t.pdfP1TradMat, matLabel);
-            row(t.pdfRoofTypeLabel, activeRoof ? (activeRoof.name) : 'Sin definir');
-            row(t.pdfPendienteLabel, pendienteLabel);
-            
-            // Render color with a hex block if available
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8.5);
-            doc.setTextColor(...C.dim);
-            doc.text(t.pdfColorLabel, col1 + 4, y);
-            doc.setTextColor(...C.ink);
-            doc.text(colorLabel, col2, y);
-            if (selectedColorHex) {
-                doc.setFillColor(selectedColorHex);
-                doc.rect(col2 + doc.getTextWidth(colorLabel) + 3, y - 2.5, 4, 4, 'F');
-                doc.setDrawColor(...C.mid);
-                doc.setLineWidth(0.1);
-                doc.rect(col2 + doc.getTextWidth(colorLabel) + 3, y - 2.5, 4, 4, 'S');
-            }
-            y += 6;
-
-            if (roofPngUrl) {
-                y += 4;
-                doc.setDrawColor(230, 230, 230);
-                doc.setFillColor(250, 250, 250);
-                doc.setLineWidth(0.5);
-                doc.rect(col1, y, pageW - col1 * 2, 45, 'FD'); // Caja contenedora
-                
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
-                doc.setTextColor(...C.dim);
-                doc.text('ILUSTRACIÓN DE REFERENCIA', col1 + 5, y + 6);
-                
-                // Centrar la imagen dentro del contenedor
-                const imgW = 60;
-                const imgH = 37;
-                doc.addImage(roofPngUrl, 'PNG', (pageW - imgW) / 2, y + 4, imgW, imgH);
-                y += 50;
-            }
-
-            divider();
-
-            /* ── SECCIÓN 2: INVENTARIO & FINANCIERO ── */
-            if (isSpecialDesign) {
-                sectionHeader('DISEÑO ARQUITECTÓNICO ESPECIAL');
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(9);
-                doc.setTextColor(...C.ink);
-                doc.text('Este proyecto requiere una Revisión de Consultoría de Ingeniería Personalizada. Debido a la complejidad y características únicas de su estructura, hemos omitido los cálculos estándar. Un ingeniero especializado de KASTON se pondrá en contacto con usted para realizar una evaluación técnica detallada.', col1 + 4, y, { maxWidth: pageW - col1 * 2 - 8, lineHeightFactor: 1.5 });
-                y += 20;
-                divider();
-            } else {
-                if (flow === 'A') {
-                    sectionHeader(t.pdfP2);
-                    row(t.pdfReqUnits, `${metrics.units} uds`, true);
-                    divider();
-                    sectionHeader(t.pdfP3);
-                    row(t.pdfDeadLoadRelief, `${metrics.weightSavedTons} ${t.pdfTonsEl}`, true);
-                    divider();
+            /* ── Encabezado: completo en la primera hoja, delgado en las siguientes ── */
+            const encabezado = (primera) => {
+                const alto = primera ? 34 : 18;
+                doc.setFillColor(...C.negro);
+                doc.rect(0, 0, W, alto, 'F');
+                doc.setFillColor(...C.cobre);
+                doc.rect(0, alto, W, 0.8, 'F');
+                const logoH = primera ? 8.5 : 5.5;
+                const logoY = primera ? 13.75 : (alto - logoH) / 2;
+                if (logo) doc.addImage(logo.data, logo.formato, M, logoY, logoH * logo.aspecto, logoH);
+                else titulo('KASTON', M, logoY + logoH, primera ? 18 : 11, C.blanco);
+                if (primera) {
+                    titulo(t.pdfDocTitle, W - M, 15.5, 20, C.blanco, 'right');
+                    titulo(modalidadTxt.toUpperCase(), W - M, 21.5, 8.5, C.cobre, 'right');
+                    fuente('texto', 7.5, C.grisCl);
+                    doc.text(fecha, W - M, 26.5, { align: 'right' });
                 } else {
-                    sectionHeader(t.pdfSpecTitle);
-                    row(t.pdfRollThick, '8 mm espesor, estabilizado UV');
-                    divider();
-                    sectionHeader(t.pdfP2Req);
-                    row(t.pdfNetVol, `${metrics.units} uds`, true);
-                    divider();
-                    sectionHeader(t.pdfCapExtStab);
-                    row(t.pdfIzodConf, '29.4 J/m');
-                    divider();
+                    titulo(t.pdfDocTitle, W - M, 11, 10, C.blanco, 'right');
                 }
+                return alto + 0.8;
+            };
 
-                /* ── SECCIÓN 3: FINANCIERO & ESG ── */
-                sectionHeader(t.pdfESGTitle);
-                const sym = currency === 'EUR' ? '€' : '$';
-                const invAmount = modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost;
-                const invLabel  = modality === 'full' ? t.pdfInvAllInc : t.pdfInvTileOnly;
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(11);
-                doc.setTextColor(...C.bronze);
-                doc.text(`${sym} ${formatCurrency(invAmount, currency)} ${currency}`, col1 + 4, y);
+            let y = encabezado(true) + 9;
+            const asegurar = (alto) => {
+                if (y + alto <= LIMITE) return;
+                doc.addPage();
+                y = encabezado(false) + 10;
+            };
+
+            const seccion = (texto, color = C.cobre) => {
+                asegurar(22);
+                titulo(texto, M, y, 10.5, C.tinta);
+                y += 2.6;
+                doc.setDrawColor(...C.linea);
+                doc.setLineWidth(0.3);
+                doc.line(M, y, W - M, y);
+                doc.setDrawColor(...color);
+                doc.setLineWidth(0.7);
+                doc.line(M, y, M + 12, y);
                 y += 6;
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7.5);
-                doc.setTextColor(...C.dim);
-                doc.text(invLabel, col1 + 4, y);
-                y += 4.5;
-                const tarifaM2 = modality === 'full' ? metrics.tarifaTodoCosto : PRECIO_SOLO_TEJA_M2;
-                if (tarifaM2) {
-                    const tarifaConv = currency === 'COP' ? tarifaM2 : tarifaM2 * (exchangeRates[currency] || 1);
-                    doc.text(`${sym} ${formatCurrency(tarifaConv, currency)} / m2`, col1 + 4, y);
-                    y += 4.5;
-                }
-                // La zona solo aparece en todo costo: es lo que explica la tarifa del instalador.
-                if (modality === 'full' && zone) {
-                    const zonaLbl = zone.id === 'metro' ? t.zoneMetro : (zone.id === 'afueras' ? t.zoneAfueras : t.zoneLejana);
-                    doc.text(`${t.pdfZoneLabel} ${zonaLbl}${geoKm !== null && geoKm !== undefined ? ` (~${geoKm} km)` : ''}`, col1 + 4, y);
-                    y += 4.5;
-                }
-                y += 2.5;
-                row(t.pdfUpcycledTitle, `${metrics.plasticUpcycled.toFixed(1)} kg`);
-                row(t.pdfCO2RedTitle,   `${metrics.co2Reduced.toFixed(1)} kg`);
-                divider();
-            }
+            };
 
-            /* ── SECCIÓN 4: ALCANCE Y VISITA TÉCNICA ── */
-            sectionHeader(t.pdfExecProt);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8.5);
-            doc.setTextColor(...C.ink);
-            doc.text(`· ${t.pdfKastonOp}`,   col1 + 4, y); y += 5.5;
-            doc.text(`· ${t.pdfMampos}`,      col1 + 4, y); y += 5.5;
-            doc.text(`· ${t.pdfStructPort}`,  col1 + 4, y); y += 5.5;
-            doc.setFontSize(7.5);
-            doc.setTextColor(...C.dim);
-            doc.text(t.pdfVisitNote,   col1 + 4, y); y += 4.5;
-            doc.text(t.pdfClientAuton, col1 + 4, y); y += 4.5;
-            doc.text(t.pdfKastonTeam,  col1 + 4, y); y += 8;
-
-            /* ── CLÁUSULA ZINC ── */
-            if (includeZincWaiver) {
-                doc.setFillColor(254, 242, 242);
-                doc.rect(col1, y, pageW - col1*2, 38, 'F');
-                doc.setFontSize(7);
-                doc.setTextColor(...C.red);
-                const zinc = [t.pdfZincObs1,t.pdfZincObs2,t.pdfZincObs3,t.pdfZincObs4,t.pdfZincObs5,t.pdfZincObs6];
-                zinc.forEach(line => { doc.text(line, col1 + 3, y + 5); y += 5; });
+            /* ── Para quién es: nombre y datos en un renglón si caben ── */
+            if (cliente && cliente.nombre) {
+                titulo(t.pdfPreparedFor, M, y, 7.5, C.gris);
+                y += 5.5;
+                fuente('fuerte', 10.5, C.tinta);
+                doc.text(cliente.nombre, M, y);
+                const anchoNombre = doc.getTextWidth(cliente.nombre);
+                const extras = [
+                    cliente.telefono && `${t.pdfPhoneShort} ${cliente.telefono}`,
+                    cliente.documento,
+                    cliente.rol
+                ].filter(Boolean).join('   ·   ');
+                if (extras) {
+                    fuente('texto', 8.5, C.gris);
+                    if (anchoNombre + 8 + doc.getTextWidth(extras) <= CW) {
+                        doc.text(extras, M + anchoNombre + 8, y);
+                    } else {
+                        y += 4.8;
+                        doc.text(extras, M, y);
+                    }
+                }
                 y += 8;
             }
 
-            /* ── OBSERVACIÓN ESTRUCTURAL ── */
-            if (withObservation) {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(...C.ink);
-                doc.text(t.pdfObs, col1, y); y += 6;
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-                doc.text(t.pdfObsText, col1, y); y += 8;
+            /* ── Precio ── */
+            const monto = modality === 'full' ? metrics.finalCostTodoCosto : metrics.finalCost;
+            const hayPrecio = !isSpecialDesign && monto !== null && monto !== undefined && !isNaN(monto);
+            {
+                const alto = isSpecialDesign ? 30 : 34;
+                doc.setFillColor(...C.tarjeta);
+                doc.rect(M, y, CW, alto, 'F');
+                doc.setFillColor(...C.cobre);
+                doc.rect(M, y, 1.2, alto, 'F');
+                const xIzq = M + 9;
+                if (isSpecialDesign) {
+                    titulo(t.pdfModSpecial.toUpperCase(), xIzq, y + 11, 15, C.cobre);
+                    fuente('texto', 9, C.claro);
+                    doc.text(doc.splitTextToSize(t.pdfSpecialBody, CW - 18), xIzq, y + 18.5, { lineHeightFactor: 1.5 });
+                } else {
+                    titulo(t.pdfPriceLabel, xIzq, y + 9, 7.5, C.grisCl);
+                    if (hayPrecio) {
+                        const precio = dineroPDF(monto, currency);
+                        const anchoPrecio = titulo(precio, xIzq, y + 20.5, 25, C.cobre);
+                        titulo(currency, xIzq + anchoPrecio + 2, y + 20.5, 10, C.grisCl);
+                        fuente('texto', 8.5, C.grisCl);
+                        const tarifa = areaM2 > 0 ? monto / areaM2 : 0;
+                        doc.text(`${numeroPDF(areaM2, 1)} m²  ×  ${dineroPDF(tarifa, currency)} ${t.pdfPerM2}`, xIzq, y + 27.5);
+                    } else {
+                        titulo(t.pdfPriceTbd.toUpperCase(), xIzq, y + 20, 15, C.cobre);
+                    }
+
+                    const xDer = M + 108;
+                    doc.setDrawColor(...C.filo);
+                    doc.setLineWidth(0.3);
+                    doc.line(xDer - 7, y + 7, xDer - 7, y + alto - 7);
+                    titulo(t.pdfCoversLabel, xDer, y + 9, 7.5, C.grisCl);
+                    fuente('fuerte', 10, C.blanco);
+                    doc.text(modalidadTxt, xDer, y + 15);
+                    fuente('texto', 8.3, C.claro);
+                    doc.text(doc.splitTextToSize(modality === 'full' ? t.pdfCoversFull : t.pdfCoversSupply, W - M - 8 - xDer),
+                        xDer, y + 20.5, { lineHeightFactor: 1.45 });
+                }
+                y += alto + 9;
             }
 
-            /* ── FOOTER ── */
-            doc.setFillColor(...C.dark);
-            doc.rect(0, 282, pageW, 15, 'F');
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7);
-            doc.setTextColor(...C.mid);
-            doc.text('KASTON® · kaston.proyectos@gmail.com · kastonproyectos.com', col1, 291);
-            doc.text(t.pdfReportTitle, pageW - col1, 291, { align: 'right' });
+            /* ── Tu proyecto: datos a la izquierda, ilustración del techo a la derecha ── */
+            seccion(t.pdfProjectTitle);
+            const activeRoof = ROOF_TYPES.find(r => r.id === roofType);
+            const colorObj = KASTON_COLORS.find(c => c.id === selectedColor);
+            const areaTxt = unit === 'ft2'
+                ? `${numeroPDF(area, 2)} ft²  (${numeroPDF(areaM2, 1)} m²)`
+                : `${numeroPDF(area, 2)} m²`;
+            const filas = [
+                [t.pdfArea, areaTxt],
+                [t.pdfConstr, constructionType || t.pdfColorTbd],
+                [t.pdfRoofType, activeRoof ? (enIngles ? activeRoof.nameEn : activeRoof.name) : t.pdfColorTbd],
+            ];
+            if (!isSpecialDesign) {
+                filas.push([t.pdfPitch, pendiente === null || pendiente === undefined ? t.pdfPitchTbd : `${numeroPDF(pendiente, 1)} %`]);
+            }
+            filas.push([t.pdfColor, colorObj ? (enIngles ? colorObj.nameEn : colorObj.nameEs) : t.pdfColorTbd, colorObj ? colorObj.hex : null]);
+            if (modality === 'full' && zone) {
+                const zonaTxt = zone.id === 'metro' ? t.zoneMetro : (zone.id === 'afueras' ? t.zoneAfueras : t.zoneLejana);
+                const kmTxt = geoKm !== null && geoKm !== undefined && !isNaN(geoKm) ? ` (${[t.pdfAt, `${numeroPDF(geoKm, 1)} km`, t.pdfFromPlant].filter(Boolean).join(' ')})` : '';
+                filas.push([t.pdfZone, zonaTxt + kmTxt]);
+            }
+            if (fotos.length) {
+                filas.push([t.pdfPhotosRow, fotos.length === 1 ? t.pdfPhotosRowOne : t.pdfPhotosRowMany.replace('{n}', fotos.length)]);
+            }
+
+            const anchoImg = techo ? 58 : 0;
+            const xValor = M + 44;
+            const anchoValor = (techo ? W - M - anchoImg - 8 : W - M) - xValor;
+            const altoFilas = filas.reduce((s, f) => {
+                fuente('fuerte', 9, C.tinta);
+                return s + doc.splitTextToSize(String(f[1]), anchoValor).length * 4.3 + 2.3;
+            }, 0);
+            const altoImg = techo ? 42 : 0;
+            asegurar(Math.max(altoFilas, altoImg));
+            const yInicio = y;
+            if (techo) {
+                const xImg = W - M - anchoImg;
+                doc.setFillColor(...C.claro);
+                doc.rect(xImg, yInicio - 4, anchoImg, altoImg, 'F');
+                const cajaW = anchoImg - 10, cajaH = altoImg - 13;
+                let iw = cajaW, ih = cajaW / techo.aspecto;
+                if (ih > cajaH) { ih = cajaH; iw = cajaH * techo.aspecto; }
+                doc.addImage(techo.data, techo.formato, xImg + (anchoImg - iw) / 2, yInicio + (cajaH - ih) / 2, iw, ih);
+                fuente('texto', 6.5, C.gris);
+                doc.text(t.pdfIllustration, xImg + anchoImg / 2, yInicio - 4 + altoImg - 4, { align: 'center' });
+            }
+            filas.forEach(([etiqueta, valor, hex], i) => {
+                fuente('texto', 8.5, C.gris);
+                doc.text(etiqueta, M, y);
+                fuente('fuerte', 9, C.tinta);
+                const lineas = doc.splitTextToSize(String(valor), anchoValor);
+                doc.text(lineas, xValor, y, { lineHeightFactor: 1.35 });
+                if (hex) {
+                    const xMuestra = xValor + doc.getTextWidth(lineas[0]) + 2.5;
+                    doc.setFillColor(hex);
+                    doc.setDrawColor(...C.grisCl);
+                    doc.setLineWidth(0.2);
+                    doc.rect(xMuestra, y - 3, 3.6, 3.6, 'FD');
+                }
+                y += (lineas.length - 1) * 4.3 + 2.2;
+                if (i < filas.length - 1) {
+                    doc.setDrawColor(...C.linea);
+                    doc.setLineWidth(0.2);
+                    doc.line(M, y, xValor + anchoValor, y);
+                }
+                y += 4.4;
+            });
+            y = Math.max(y, yInicio - 4 + altoImg + 4) + 4;
+
+            /* ── Cifras del techo ── */
+            if (!isSpecialDesign) {
+                seccion(t.pdfRoofTitle);
+                const cifras = [
+                    [numeroPDF(metrics.units), t.pdfTiles, t.pdfTilesSub],
+                    [`${numeroPDF(areaM2 * KASTON_WEIGHT)} kg`, t.pdfWeight, t.pdfWeightSub],
+                    ['225 km/h', t.pdfWind, t.pdfWindSub],
+                    ['8 mm', t.pdfThick, t.pdfThickSub],
+                ];
+                const sep = 4, tw = (CW - sep * 3) / 4, th = 21;
+                asegurar(th + 26);
+                cifras.forEach(([valor, etiqueta, sub], i) => {
+                    const x = M + i * (tw + sep);
+                    doc.setFillColor(...C.claro);
+                    doc.rect(x, y - 3, tw, th, 'F');
+                    titulo(valor, x + 5, y + 6.5, 14, C.cobre);
+                    fuente('fuerte', 7.8, C.tinta);
+                    doc.text(etiqueta, x + 5, y + 12.2);
+                    fuente('texto', 7, C.gris);
+                    doc.text(sub, x + 5, y + 15.8);
+                });
+                y += th + 2.5;
+                fuente('texto', 8, C.gris);
+                const producto = doc.splitTextToSize(t.pdfProductLine, CW);
+                doc.text(producto, M, y, { lineHeightFactor: 1.45 });
+                y += (producto.length - 1) * 4.1 + 8;
+
+                /* ── Impacto ambiental: el verde solo aparece aquí ── */
+                doc.setFillColor(...C.verde);
+                doc.rect(M, y - 3.6, 1.2, 5, 'F');
+                const anchoEnv = titulo(t.pdfEnvTitle, M + 4, y, 8.5, C.verde);
+                let xEnv = M + 4 + anchoEnv + 8;
+                [
+                    [`${numeroPDF(metrics.plasticUpcycled)} kg`, t.pdfEnvPolymer],
+                    [`${numeroPDF(metrics.co2Reduced)} kg`, t.pdfEnvCO2],
+                ].forEach(([valor, etiqueta]) => {
+                    const ancho = titulo(valor, xEnv, y + 0.3, 12, C.verde);
+                    fuente('texto', 8.5, C.tinta);
+                    doc.text(etiqueta, xEnv + ancho + 2.5, y);
+                    xEnv += ancho + 2.5 + doc.getTextWidth(etiqueta) + 10;
+                });
+                y += 10;
+            }
+
+            /* ── Condiciones ── */
+            seccion(t.pdfTermsTitle);
+            const condiciones = isSpecialDesign ? t.pdfTermsSpecial : (modality === 'full' ? t.pdfTermsFull : t.pdfTermsSupply);
+            condiciones.forEach(texto => {
+                fuente('texto', 8.5, C.tinta);
+                const lineas = doc.splitTextToSize(texto, CW - 6);
+                asegurar(lineas.length * 4.3 + 2);
+                fuente('texto', 8.5, C.tinta); // el encabezado de una hoja nueva cambia la letra
+                doc.setFillColor(...C.cobre);
+                doc.rect(M, y - 2.3, 1.6, 1.6, 'F');
+                doc.text(lineas, M + 5, y, { lineHeightFactor: 1.45 });
+                y += lineas.length * 4.3 + 2.2;
+            });
+
+            /* ── Observación técnica (cliente que asume su propia estructura) ── */
+            const notas = [includeZincWaiver && t.pdfZincWaiver, withObservation && t.pdfObsText].filter(Boolean);
+            if (notas.length) {
+                y += 3;
+                fuente('texto', 8, C.tinta);
+                const lineas = doc.splitTextToSize(notas.join(' '), CW - 14);
+                const alto = 14 + lineas.length * 3.9;
+                asegurar(alto + 4);
+                doc.setFillColor(...C.claro);
+                doc.rect(M, y, CW, alto, 'F');
+                doc.setFillColor(...C.tinta);
+                doc.rect(M, y, 1.2, alto, 'F');
+                titulo(t.pdfObsTitle, M + 7, y + 7, 8.5, C.tinta);
+                fuente('texto', 8, C.tinta);
+                doc.text(lineas, M + 7, y + 12.5, { lineHeightFactor: 1.4 });
+                y += alto + 2;
+            }
+
+            /* ── Letra pequeña y llamado a la acción: en la primera hoja van pegados al pie ── */
+            const letraPequena = [isSpecialDesign ? null : t.pdfFinePrint, colorObj ? t.pdfColorNote : null].filter(Boolean).join(' ');
+            fuente('texto', 7, C.gris);
+            const lineasPequenas = letraPequena ? doc.splitTextToSize(letraPequena, CW) : [];
+            const altoCta = 14;
+            const altoCierre = (lineasPequenas.length ? lineasPequenas.length * 3.2 + 2.5 : 0) + altoCta;
+            asegurar(altoCierre + 4);
+            y = doc.getNumberOfPages() === 1 ? Math.max(y + 4, LIMITE - altoCierre) : y + 4;
+            if (lineasPequenas.length) {
+                fuente('texto', 7, C.gris);
+                doc.text(lineasPequenas, M, y, { lineHeightFactor: 1.35 });
+                y += (lineasPequenas.length - 1) * 3.2 + 3.5;
+            }
+
+            doc.setFillColor(...C.tarjeta);
+            doc.rect(M, y, CW, altoCta, 'F');
+            doc.setFillColor(...C.cobre);
+            doc.rect(M, y, 1.2, altoCta, 'F');
+            const anchoCta = titulo(t.pdfCtaTitle, M + 9, y + 9, 12, C.cobre);
+            fuente('texto', 8.5, C.claro);
+            const lineasCta = doc.splitTextToSize(t.pdfCtaBody, CW - anchoCta - 24);
+            doc.text(lineasCta, M + 9 + anchoCta + 8, y + (lineasCta.length > 1 ? 6 : 8.4), { lineHeightFactor: 1.4 });
+            doc.link(M, y, CW, altoCta, { url: 'https://wa.me/573188978552' });
+
+            /* ── Fotos del techo que subió el cliente: hoja aparte, dos por fila ── */
+            if (fotos.length) {
+                doc.addPage();
+                y = encabezado(false) + 10;
+                seccion(t.pdfPhotosTitle);
+                const sep = 6, celdaW = (CW - sep) / 2, celdaH = 70, pieFoto = 6;
+                fotos.forEach((foto, i) => {
+                    const col = i % 2;
+                    if (col === 0 && i > 0) y += celdaH + pieFoto + 4;
+                    if (col === 0 && y + celdaH + pieFoto > LIMITE) {
+                        doc.addPage();
+                        y = encabezado(false) + 10;
+                    }
+                    const x = M + col * (celdaW + sep);
+                    doc.setFillColor(...C.claro);
+                    doc.rect(x, y, celdaW, celdaH, 'F');
+                    let iw = celdaW, ih = celdaW / foto.aspecto;
+                    if (ih > celdaH) { ih = celdaH; iw = celdaH * foto.aspecto; }
+                    doc.addImage(foto.data, 'JPEG', x + (celdaW - iw) / 2, y + (celdaH - ih) / 2, iw, ih);
+                    fuente('texto', 7.5, C.gris);
+                    doc.text(`${t.pdfPhoto} ${i + 1}`, x, y + celdaH + 4.5);
+                });
+            }
+
+            /* ── Pie en todas las hojas ── */
+            const total = doc.getNumberOfPages();
+            for (let p = 1; p <= total; p++) {
+                doc.setPage(p);
+                doc.setFillColor(...C.negro);
+                doc.rect(0, 284, W, 13, 'F');
+                fuente('texto', 7, C.grisCl);
+                doc.text(`KASTON  ·  ${t.pdfAddress}`, M, 291.5);
+                doc.text(`kastonproyectos.com  ·  kaston.proyectos@gmail.com  ·  +57 318 897 8552${total > 1 ? `   ·   ${p}/${total}` : ''}`, W - M, 291.5, { align: 'right' });
+            }
+        };
+
+        /* ── Carga logo, ilustración y fuentes, arma el PDF y lo descarga ── */
+        const descargarCotizacionPDF = async (datos) => {
+            const activeRoof = ROOF_TYPES.find(r => r.id === datos.roofType);
+            const [logo, techo, fuentes] = await Promise.all([
+                cargarImagenPDF('email/kaston-logo.png', { maxLado: 880 }),
+                cargarImagenPDF(activeRoof?.imagePath, { maxLado: 600, fondo: '#F4F4F4' }),
+                cargarFuentesPDF(),
+            ]);
+            const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+            doc.setProperties({ title: datos.t.pdfFileName, author: 'KASTON', creator: 'kastonproyectos.com' });
+            buildPremiumPDF(doc, datos, { logo, techo, fuentes });
+            const nombre = datos.cliente?.nombre ? ` - ${datos.cliente.nombre.replace(/[\\/:*?"<>|]/g, '')}` : '';
+            doc.save(`${datos.t.pdfFileName} ${numeroPDF(datos.areaM2, 1)} m2${nombre}.pdf`);
+            return doc;
         };
 
         const formatCurrency = (value, currency = 'COP') => {
@@ -1013,19 +1178,25 @@
         // No bloquea ni avisa: si el envio no esta configurado (sin RESEND_API_KEY) o
         // falla, guardar sigue funcionando igual. Mismo formato que apiProyectos:
         // token en el cuerpo, text/plain y sin cookies, por Safari y Cloudflare.
-        function enviarCotizacionPorCorreo(projectId, token) {
+        // Las fotos del techo viajan mas pequeñas que en el PDF: Vercel corta los
+        // mensajes de mas de 4,5 MB, y seis fotos asi quedan alrededor de 1 MB.
+        async function enviarCotizacionPorCorreo(projectId, token, fotos = []) {
             if (!projectId || !token) return;
+            const adjuntos = [];
+            for (const foto of (fotos || []).slice(0, MAX_FOTOS_TECHO)) {
+                try { adjuntos.push((await reducirImagen(foto.data, 1024, 0.72)).data.split(',')[1]); } catch (e) { /* esa foto no va */ }
+            }
             fetch('/api/send-quote', {
                 method: 'POST',
                 credentials: 'omit',
                 headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-                body: JSON.stringify({ projectId, token })
+                body: JSON.stringify({ projectId, token, fotos: adjuntos })
             }).then(r => {
                 if (!r.ok) r.text().then(t => console.warn('Correo de cotización no enviado:', r.status, t));
             }).catch(e => console.warn('Correo de cotización no enviado:', e));
         }
 
-        async function apiProyectos(payload) {
+        async function tokenActual() {
             if (!supabase) throw new Error('El servicio de cuentas no está disponible.');
 
             // getSession puede salir a la red a renovar el token, y esa llamada va
@@ -1040,6 +1211,57 @@
             }
             if (!token) token = tokenGuardado();
             if (!token) throw new Error('No hay sesión activa. Inicia sesión de nuevo.');
+            return token;
+        }
+
+        // Fotos del techo de los proyectos guardados (api/project-photos.js), con el
+        // mismo formato que apiProyectos: token en el cuerpo, text/plain y sin cookies.
+        async function apiFotos(payload, comoImagen = false) {
+            const token = await tokenActual();
+            const resp = await fetch('/api/project-photos', {
+                method: 'POST',
+                credentials: 'omit',
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                body: JSON.stringify({ ...payload, token })
+            });
+            if (!resp.ok) throw new Error((await resp.text()) || ('HTTP ' + resp.status));
+            return comoImagen ? resp.blob() : resp.json();
+        }
+
+        // Sube las fotos de un proyecto; al editar, primero borra las que tenía.
+        async function guardarFotosProyecto(projectId, fotos, reemplazar) {
+            if (reemplazar) await apiFotos({ action: 'clear', projectId });
+            const lista = (fotos || []).slice(0, MAX_FOTOS_TECHO);
+            for (let i = 0; i < lista.length; i++) {
+                await apiFotos({ action: 'upload', projectId, indice: i + 1, foto: lista[i].data.split(',')[1] });
+            }
+        }
+
+        // Una foto guardada, tal cual llega (ya es un JPG reducido): no se vuelve a comprimir.
+        const blobAFoto = (blob) => new Promise((resolve, reject) => {
+            const lector = new FileReader();
+            lector.onload = () => {
+                const img = new Image();
+                img.onload = () => resolve({ id: crypto.randomUUID(), data: lector.result, aspecto: img.naturalWidth / img.naturalHeight });
+                img.onerror = reject;
+                img.src = lector.result;
+            };
+            lector.onerror = reject;
+            lector.readAsDataURL(blob);
+        });
+
+        // Trae las fotos guardadas de un proyecto, listas para el cotizador y el PDF.
+        async function leerFotosProyecto(projectId) {
+            const { fotos = [] } = await apiFotos({ action: 'list', projectId });
+            const leidas = [];
+            for (const nombre of fotos) {
+                leidas.push(await blobAFoto(await apiFotos({ action: 'get', projectId, nombre }, true)));
+            }
+            return leidas;
+        }
+
+        async function apiProyectos(payload) {
+            const token = await tokenActual();
 
             let resp;
             try {
@@ -1137,33 +1359,32 @@
             );
             const handleDownloadPDF = async (proj, includeZincWaiver = false) => {
                 try {
-                    const doc = new window.jsPDF();
-                    const logoDataUrl = await loadLogoForPDF();
-                    const meta = session?.user?.user_metadata || {};
                     const unit = proj.unidad || 'm2';
-                    const inputValue = proj.area || 0;
+                    const inputValue = Number(proj.area) || 0;
                     const areaM2 = unit === 'ft2' ? inputValue / 10.7639 : inputValue;
-                    const material = proj.material || proj.tipoConstruccion || 'clay';
                     const currency = proj.divisa || 'COP';
-                    const metrics = calculateMetrics(areaM2, material, currency, rates);
+                    const modality = proj.modality || 'supply';
+                    // Sin la zona guardada, el todo costo saldría en $0: con ella se recalcula su precio.
+                    const zone = modality === 'full' ? zonaPorId(proj.zoneId) : null;
+                    const metrics = calculateMetrics(areaM2, proj.material || 'clay', currency, rates, zone);
+                    // Si no se pueden traer las fotos, el PDF sale igual, sin ellas.
+                    let fotos = [];
+                    if (session) {
+                        try { fotos = await leerFotosProyecto(proj.id); } catch (e) { console.warn('PDF sin fotos:', e); }
+                    }
 
-                    const clientName = meta.full_name || session?.user?.email?.split('@')[0] || t.pdfClientUnreg;
-                    buildPremiumPDF(doc, {
-                        t, flow: proj.flow || 'A',
-                        area: inputValue, unit, areaM2,
-                        material, currency, metrics,
-                        modality: proj.modality || 'supply',
+                    await descargarCotizacionPDF({
+                        t, area: inputValue, unit, areaM2, currency, metrics, modality,
+                        zone, geoKm: proj.geoKm !== undefined ? proj.geoKm : null,
                         roofType: proj.roofType || null,
                         pendiente: proj.pendiente !== undefined ? proj.pendiente : null,
                         selectedColor: proj.selectedColor || null,
                         constructionType: proj.tipoConstruccion || 'Residencial',
-                        clientName,
-                        clientPhone: meta.phone       || t.pdfClientUnreg,
-                        clientDoc:   meta.id_number ? `${meta.id_type||''} ${meta.id_number}`.trim() : t.pdfClientUnreg,
-                        clientRole:  meta.role        || t.pdfClientUnreg,
+                        isSpecialDesign: proj.roofType === 'otro',
+                        cliente: clientePDF(session),
+                        fotos,
                         withObservation: false, includeZincWaiver,
-                    }, logoDataUrl);
-                    doc.save(`Cotización Kaston - ${clientName}.pdf`);
+                    });
                 } catch (err) {
                     console.error("Error regenerando PDF: ", err);
                     alert(t.pdfGenError);
@@ -1181,10 +1402,7 @@
                         <div className="w-full glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
                             <div className="relative z-10 flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-bronze text-lg font-heading font-black">[PLAN C]</span>
-                                    <h4 className="text-lg font-bold text-white uppercase tracking-wider">{t.needStruct}</h4>
-                                </div>
+                                <h4 className="text-lg font-bold text-white uppercase tracking-wider mb-2">{t.needStruct}</h4>
                                 <p className="text-white/60 text-sm tracking-wide mb-3">{t.contactUs}</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-white/40 uppercase tracking-wider font-sans">
                                     <span>▸ Ubicación / Municipio</span>
@@ -1306,14 +1524,11 @@
                             </div>
                         ))}
                     </div>
-                    {/* Advisory Banner - Plan C Structural Engineering */}
+                    {/* Aviso: asesoría de estructura */}
                     <div className="w-full glass-panel border-l-4 border-l-bronze p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl relative overflow-hidden mt-2">
                         <div className="absolute inset-0 bg-gradient-to-r from-bronze/5 to-transparent pointer-events-none"></div>
                         <div className="relative z-10 flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-bronze text-lg font-heading font-black">[PLAN C]</span>
-                                <h4 className="text-lg font-bold text-white uppercase tracking-wider">{t.needStruct}</h4>
-                            </div>
+                            <h4 className="text-lg font-bold text-white uppercase tracking-wider mb-2">{t.needStruct}</h4>
                             <p className="text-white/60 text-sm tracking-wide mb-3">{t.contactUs}</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-white/40 uppercase tracking-wider font-sans">
                                 <span>▸ Ubicación / Municipio</span>
@@ -1911,6 +2126,102 @@
             );
         }
 
+        /* ── Fotos del techo: opcionales. Salen en el PDF y, al guardar, quedan con el proyecto
+              (bucket privado fotos-techo) y van adjuntas en el correo a KASTON. ── */
+        const MAX_FOTOS_TECHO = 6;
+
+        // Las fotos de celular pesan 3 a 8 MB: se reducen en el navegador antes de usarlas.
+        // `fuente` puede ser un archivo elegido por el cliente o una foto ya reducida (data URL).
+        const reducirImagen = (fuente, maxLado = 1280, calidad = 0.8) => new Promise((resolve, reject) => {
+            const esArchivo = fuente instanceof Blob;
+            const url = esArchivo ? URL.createObjectURL(fuente) : fuente;
+            const img = new Image();
+            img.onload = () => {
+                if (esArchivo) URL.revokeObjectURL(url);
+                const escala = Math.min(1, maxLado / Math.max(img.naturalWidth, img.naturalHeight));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(img.naturalWidth * escala));
+                canvas.height = Math.max(1, Math.round(img.naturalHeight * escala));
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve({ id: crypto.randomUUID(), data: canvas.toDataURL('image/jpeg', calidad), aspecto: canvas.width / canvas.height });
+            };
+            img.onerror = () => {
+                if (esArchivo) URL.revokeObjectURL(url);
+                reject(new Error('No se pudo abrir la imagen'));
+            };
+            img.src = url;
+        });
+
+        function FotosTecho({ language, fotos, onChange, cargandoGuardadas }) {
+            const t = T[language] || T['es'];
+            const inputRef = useRef(null);
+            const [cargando, setCargando] = useState(false);
+            const [aviso, setAviso] = useState('');
+
+            const agregar = async (e) => {
+                const archivos = Array.from(e.target.files || []);
+                e.target.value = ''; // deja volver a elegir la misma foto después de quitarla
+                if (!archivos.length) return;
+                const cupo = MAX_FOTOS_TECHO - fotos.length;
+                setCargando(true);
+                const nuevas = [];
+                let fallidas = 0;
+                for (const archivo of archivos.slice(0, cupo)) {
+                    try { nuevas.push(await reducirImagen(archivo)); } catch (err) { fallidas++; }
+                }
+                setCargando(false);
+                setAviso(fallidas ? t.photosError : (archivos.length > cupo ? t.photosMax : ''));
+                if (nuevas.length) onChange(prev => [...prev, ...nuevas].slice(0, MAX_FOTOS_TECHO));
+            };
+
+            const quitar = (id) => {
+                setAviso('');
+                onChange(prev => prev.filter(f => f.id !== id));
+            };
+
+            return (
+                <div className="glass-panel rounded-2xl p-6 flex flex-col gap-4 mt-2">
+                    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-3">
+                        <div>
+                            <div className="text-[10px] text-bronze uppercase tracking-[0.15em] font-bold">{t.photosTitle}</div>
+                            <p className="text-xs text-white/60 leading-relaxed mt-2">{t.photosHint}</p>
+                        </div>
+                        <span className="text-[10px] text-white/40 uppercase tracking-widest flex-shrink-0 mt-0.5">{t.optional}</span>
+                    </div>
+
+                    {cargandoGuardadas && <p className="text-xs text-white/50">{t.photosLoadingSaved}</p>}
+
+                    {fotos.length > 0 && (
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                            {fotos.map((f, i) => (
+                                <div key={f.id} className="relative aspect-square rounded-lg overflow-hidden border border-white/10 bg-black">
+                                    <img src={f.data} alt={`${t.photoAlt} ${i + 1}`} className="w-full h-full object-cover" />
+                                    <button type="button" onClick={() => quitar(f.id)} aria-label={`${t.photosRemove} ${i + 1}`} title={t.photosRemove}
+                                        className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/75 border border-white/20 text-white text-base leading-none flex items-center justify-center hover:bg-bronze hover:text-graphite transition-colors">
+                                        &times;
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {fotos.length < MAX_FOTOS_TECHO && !cargandoGuardadas && (
+                        <button type="button" onClick={() => inputRef.current && inputRef.current.click()} disabled={cargando}
+                            className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-xs font-bold uppercase tracking-widest bg-bronze/10 border border-bronze/40 text-bronze hover:bg-bronze hover:text-graphite transition-all disabled:opacity-50 disabled:cursor-wait">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            {cargando ? t.photosLoading : (fotos.length ? t.photosAddMore : t.photosAdd)}
+                            {fotos.length > 0 && !cargando && <span className="font-normal opacity-70">· {fotos.length}/{MAX_FOTOS_TECHO}</span>}
+                        </button>
+                    )}
+                    <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={agregar} />
+                    {aviso && <p className="text-xs text-[#D49B76] leading-relaxed">{aviso}</p>}
+                </div>
+            );
+        }
+
         function CalculatorTab({ defaults, onSaveProject, editingProject, defaultFlow, session, setCurrentTab, setTriageFlow, rates, language }) {
             const t = T[language] || T['es'];
             // defaultFlow ahora transporta la MODALIDAD elegida en la pantalla de inicio: 'supply' (solo tejas) o 'full' (todo costo)
@@ -1928,6 +2239,28 @@
             const [roofType, setRoofType] = useState(editingProject ? (editingProject.roofType || null) : null);
             const [pendiente, setPendiente] = useState(editingProject ? (editingProject.pendiente !== undefined ? editingProject.pendiente : null) : undefined);
             const [selectedColor, setSelectedColor] = useState(editingProject ? (editingProject.selectedColor || null) : null);
+            const [fotosTecho, setFotosTecho] = useState([]);
+            const [cargandoFotos, setCargandoFotos] = useState(false);
+            // Solo si el cliente tocó las fotos hay que reemplazar las guardadas del proyecto.
+            const fotosCambiadas = useRef(false);
+            // Si cambian las fotos después de descargar, el PDF ya no las trae: se pide descargarlo de nuevo.
+            const cambiarFotos = (actualizar) => {
+                fotosCambiadas.current = true;
+                setFotosTecho(actualizar);
+                setIsPdfDownloaded(false);
+            };
+
+            // Al editar un proyecto guardado, se traen sus fotos.
+            useEffect(() => {
+                if (!editingProject || !editingProject.id || !session) return;
+                let vigente = true;
+                setCargandoFotos(true);
+                leerFotosProyecto(editingProject.id)
+                    .then(fotos => { if (vigente && !fotosCambiadas.current) setFotosTecho(fotos); })
+                    .catch(e => console.warn('No se pudieron traer las fotos del proyecto:', e))
+                    .finally(() => { if (vigente) setCargandoFotos(false); });
+                return () => { vigente = false; };
+            }, [editingProject && editingProject.id]);
 
             /* Ubicación de la obra: solo se usa en la modalidad "todo costo",
                porque ahí el precio cambia según lo que cobre el instalador por la distancia. */
@@ -2010,31 +2343,19 @@
                 const withObservation = options && options.withObservation === true;
                 setIsSaving(true);
                 try {
-                    const doc = new jsPDF();
-                    const logoDataUrl = await loadLogoForPDF();
-                    const activeRoofObjForSvg = ROOF_TYPES.find(r => r.id === roofType);
-                    const roofPngUrl = activeRoofObjForSvg?.imagePath ? await loadImageAsBase64(activeRoofObjForSvg.imagePath) : null;
-                    const colorObj = KASTON_COLORS.find(c => c.id === selectedColor);
-                    const selectedColorHex = colorObj ? colorObj.hex : null;
-
-                    const meta = session?.user?.user_metadata || {};
-                    const clientName = meta.full_name || session?.user?.email?.split('@')[0] || t.pdfClientUnreg;
-                    buildPremiumPDF(doc, {
-                        t, flow: flowActive, area: inputValue, unit, areaM2,
-                        material, currency, metrics, modality,
+                    await descargarCotizacionPDF({
+                        t, area: inputValue, unit, areaM2, currency, metrics, modality,
                         zone, geoKm,
                         roofType, pendiente, selectedColor,
-                        constructionType, isSpecialDesign, roofPngUrl, selectedColorHex,
-                        clientName,
-                        clientPhone: meta.phone       || t.pdfClientUnreg,
-                        clientDoc:   meta.id_number ? `${meta.id_type||''} ${meta.id_number}`.trim() : t.pdfClientUnreg,
-                        clientRole:  meta.role        || t.pdfClientUnreg,
+                        constructionType, isSpecialDesign,
+                        cliente: clientePDF(session),
+                        fotos: fotosTecho,
                         withObservation, includeZincWaiver: false,
-                    }, logoDataUrl);
-                    doc.save(`Cotización Kaston - ${clientName}.pdf`);
+                    });
                     setIsPdfDownloaded(true);
                 } catch (err) {
                     console.error("Error durante el proceso:", err);
+                    alert(t.pdfGenError);
                 } finally {
                     setIsSaving(false);
                 }
@@ -2070,7 +2391,7 @@
                     co2_kg: metrics.co2Reduced,
                     fecha: editingProject ? editingProject.fecha : new Date().toISOString().split('T')[0],
                     hasOwnStructure
-                });
+                }, { fotos: fotosTecho, fotosCambiadas: fotosCambiadas.current }); // las fotos se guardan aparte, no dentro del proyecto
 
                 alert(modality === 'full' ? t.transportNoticeAlertFull : t.transportNoticeAlert);
             };
@@ -2357,6 +2678,8 @@
                     </>
                     )}
 
+                    <FotosTecho language={language} fotos={fotosTecho} onChange={cambiarFotos} cargandoGuardadas={cargandoFotos} />
+
                     {!isFormComplete && !isPdfDownloaded && (
                         <div className="w-full mt-4 p-4 rounded-xl border border-white/10 bg-white/5 flex items-start gap-3">
                             <svg className="w-5 h-5 text-white/30 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -2460,7 +2783,17 @@
             });
             const [editingProject, setEditingProject] = useState(null);
 
-            const handleSaveProject = async (proj) => {
+            // Si las fotos fallan, el proyecto ya quedó guardado: solo se avisa.
+            const guardarFotosDelProyecto = async (projectId, fotos, reemplazar) => {
+                try {
+                    await guardarFotosProyecto(projectId, fotos, reemplazar);
+                } catch (err) {
+                    console.error('Error guardando las fotos del proyecto:', err);
+                    alert(T[language]?.photosSaveError || T['es'].photosSaveError);
+                }
+            };
+
+            const handleSaveProject = async (proj, extras = {}) => {
                 const fullProj = { ...proj };
                 const userId = session?.user?.id;
 
@@ -2483,6 +2816,7 @@
                             console.error('Error actualizando proyecto:', err);
                             alert((T[language]?.updateError || T['es'].updateError) + '\n\n(' + (err.message || '') + ')');
                         }
+                        if (extras.fotosCambiadas) await guardarFotosDelProyecto(proj.id, extras.fotos, true);
                     }
                     setEditingProject(null);
                 } else {
@@ -2529,7 +2863,8 @@
                                 const fila = Array.isArray(filas) ? filas[0] : filas;
                                 if (fila && fila.id) {
                                     setProjects(prev => prev.map(p => p.id === fullProj.id ? { ...p, id: fila.id } : p));
-                                    enviarCotizacionPorCorreo(fila.id, token);
+                                    enviarCotizacionPorCorreo(fila.id, token, extras.fotos);
+                                    if (extras.fotos && extras.fotos.length) await guardarFotosDelProyecto(fila.id, extras.fotos, false);
                                 }
                             } catch (e) {
                                 console.error('No se pudo leer el id del proyecto guardado:', e);
@@ -2554,6 +2889,8 @@
                             // La respuesta trae las filas borradas: si viene vacia, el proyecto
                             // no era de esta cuenta o ya no existe, y hay que decirlo.
                             const borradas = await apiProyectos({ action: 'delete', id });
+                            // Sus fotos se van con él; si falla, quedan huérfanas pero no estorban.
+                            apiFotos({ action: 'clear', projectId: id }).catch(e => console.warn('No se borraron las fotos del proyecto:', e));
                             if (!borradas || borradas.length === 0) {
                                 // No estaba en la base: es una copia local vieja. Se avisa,
                                 // pero se quita igual de la lista; si no, el proyecto fantasma
@@ -3309,7 +3646,6 @@
                 zoneOutBody: "Estás fuera de las zonas donde podemos calcular el precio automáticamente. Escríbenos y en poco tiempo te pasamos el valor exacto para tu obra, con el desplazamiento del instalador incluido.",
                 zoneOutWhatsapp: "¡Hola! Quiero cotizar mi techo en modalidad todo costo, pero mi obra queda fuera del área metropolitana y del Oriente. ¿Me ayudan con el precio?",
                 zoneOutMailSubject: "Cotización todo costo: obra fuera de cobertura",
-                pdfZoneLabel: "Zona de instalación:",
                 manualNote: "Con tu compra recibirás un manual de instalación detallado paso a paso.",
                 supplyPriceNote: "En esta modalidad el precio es el mismo estés donde estés: $85.000/m². No cambia por tu ubicación porque el transporte no va incluido, se cobra aparte según a dónde haya que llevar las tejas.",
                 specialTitle: "Diseño arquitectónico especial",
@@ -3451,41 +3787,76 @@
                 zincAlertBody5: "en su techo. ¿Desea que lo asesoremos personalizadamente para conocer sus necesidades técnicas? ¿O prefiere usted asumir la adecuación de la estructura por su cuenta?",
                 adviseBtn: "ASESORÍA",
                 assumeStrBtn: "ASUMIR ESTRUCTURA",
-                pdfReportTitle: "REPORTE DE INGENIERIA Y SOSTENIBILIDAD",
-                pdfP1: "1. PARAMETROS DEL PROYECTO",
-                pdfRoofArea: "Area Total del Techo:",
-                pdfP1TradMat: "Material Tradicional a Reemplazar:",
-                pdfP2: "2. CALCULO DE INVENTARIO (K-LOCK SYSTEM)",
-                pdfReqUnits: "Unidades requeridas (Kaston):",
-                pdfP3: "3. ANALISIS ESTRUCTURAL",
-                pdfDeadLoadRelief: "Alivio de Carga Muerta:",
-                pdfTonsEl: "Toneladas eliminadas",
-                pdfSpecTitle: "1. ESPECIFICACION TECNICA DE BLINDAJE",
-                pdfEstArea: "Area Estimada:",
-                pdfRollThick: "Rollo: Grueso Masivo de 8mm de espesor estabilizado a UV",
-                pdfP2Req: "2. REQUERIMIENTOS KASTON",
-                pdfNetVol: "Volumen Neto Demandado:",
-                pdfReqUdsC: "uds calculadas a pedido",
-                pdfCapExtStab: "3. CAPACIDAD DE ESTABILIZACION EXTREMA",
-                pdfIzodConf: "Resistencia Izod Confirmada: 29.4 J/m a impactos mecánicos",
-                pdfESGTitle: "4. IMPACTO FINANCIERO Y ESG",
-                pdfInvTileOnly: "Inversión (Únicamente Teja):",
-                pdfNodeOnlyTile1: "NOTA: Este valor corresponde al suministro neto en sitio de obra.",
-                pdfNodeOnlyTile2: "Excluye mano de obra, mallas u otros accesorios de refuerzo adicionales.",
-                pdfUpcycledTitle: "Plastico Industrial Recuperado:",
-                pdfCO2RedTitle: "Reduccion de Huella de Carbono (CO2):",
-                pdfInvAllInc: "Inversión (Todo Costo / Instalado):",
-                pdfNodeAllInc1: "NOTA: Solución integral cubierta bajo el estándar de Ingeniería de Protección.",
-                pdfNodeAllInc2: "Incluye malla, alambre y ejecución por cuadrilla especializada.",
-                pdfExecProt: "5. ALCANCE DE LA INSTALACIÓN KASTON",
-                pdfKastonOp: "KASTON instala exclusivamente el Sistema KASTON sobre la estructura existente.",
-                pdfMampos: "No realizamos mampostería ni construcción de techo desde cero.",
-                pdfStructPort: "Ruta C: Si requiere diseño/montaje de estructura portante, escríbanos para asesoría integral.",
+                pdfLocale: "es-CO",
+                pdfDocTitle: "COTIZACIÓN",
+                pdfFileName: "Cotización KASTON",
+                pdfModSupply: "Solo tejas",
+                pdfModFull: "Todo costo instalado",
+                pdfModSpecial: "Proyecto especial",
+                pdfPreparedFor: "PREPARADA PARA",
+                pdfPhoneShort: "Tel.",
+                pdfPriceLabel: "VALOR ESTIMADO",
+                pdfPerM2: "por m²",
+                pdfPriceTbd: "Por cotizar con un asesor",
+                pdfCoversLabel: "QUÉ INCLUYE",
+                pdfCoversSupply: "El suministro de las tejas KASTON. Tú las instalas con nuestro manual paso a paso.",
+                pdfCoversFull: "Las tejas, los materiales de instalación y el instalador. No tienes que conseguir nada más.",
+                pdfSpecialBody: "Tu techo tiene un diseño especial, así que no le calculamos un precio automático. Un ingeniero de KASTON te contacta para visitarte sin costo y darte el valor exacto.",
+                pdfProjectTitle: "TU PROYECTO",
+                pdfArea: "Área del techo",
+                pdfConstr: "Tipo de construcción",
+                pdfRoofType: "Tipo de techo",
+                pdfPitch: "Pendiente",
+                pdfPitchTbd: "Por confirmar",
+                pdfColor: "Color",
+                pdfColorTbd: "Por definir",
+                pdfZone: "Zona de instalación",
+                pdfAt: "a",
+                pdfFromPlant: "de nuestra planta",
+                pdfIllustration: "Ilustración de referencia",
+                pdfRoofTitle: "TU TECHO KASTON",
+                pdfTiles: "Tejas Cola de Castor",
+                pdfTilesSub: "42 por m²",
+                pdfWeight: "Peso total del techo",
+                pdfWeightSub: "12,6 kg por m²",
+                pdfWind: "Resistencia al viento",
+                pdfWindSub: "Sistema de anclaje K-LOCK",
+                pdfThick: "Espesor de cada teja",
+                pdfThickSub: "300 g por teja",
+                pdfProductLine: "Teja Cola de Castor con sistema K-LOCK, fabricada en Itagüí con polímero recuperado. No absorbe agua, no se oxida y tiene una vida útil proyectada de más de 500 años. 17 años comprobados en Medellín.",
+                pdfEnvTitle: "IMPACTO AMBIENTAL",
+                pdfEnvPolymer: "de polímero recuperado",
+                pdfEnvCO2: "de CO2 evitado",
+                pdfTermsTitle: "CONDICIONES",
+                pdfTermsSupply: [
+                    "La instalación va por tu cuenta. Con tu compra recibes nuestro manual de instalación paso a paso.",
+                    "El precio de $85.000 por m² es el mismo en cualquier parte del país.",
+                    "El transporte no está incluido. Escríbenos con la ubicación de tu obra y lo calculamos.",
+                    "Tu techo necesita una pendiente mínima de 15 % para que el agua corra bien."
+                ],
+                pdfTermsFull: [
+                    "Tu estructura debe soportar 12,6 kg por m² y estar lista con el manto asfáltico instalado. KASTON no construye estructura ni instala manto.",
+                    "El transporte de las tejas hasta tu obra no está incluido. Lo calculamos con la ubicación de tu obra.",
+                    "Antes de instalar hacemos una visita técnica para confirmar las medidas y los detalles de tu techo."
+                ],
+                pdfTermsSpecial: [
+                    "Un ingeniero de KASTON revisa tu techo en una visita técnica sin costo.",
+                    "El precio final depende del diseño de tu techo y de la ubicación de la obra."
+                ],
+                pdfFinePrint: "Valores calculados con el área que ingresaste en el cotizador. La cantidad final se confirma con las medidas reales de tu techo.",
+                pdfColorNote: "Color: vista de referencia, el tono final puede variar según la luz del día y la pantalla.",
+                pdfObsTitle: "OBSERVACIÓN TÉCNICA",
+                pdfObsText: "El cliente manifiesta que cuenta con una empresa para la ejecución de la estructura.",
+                pdfZincWaiver: "Suministro únicamente de material. El cliente manifiesta que ya cuenta con una empresa que le construirá la estructura, certificada para soportar los 12,6 kg por m² del sistema KASTON. La responsabilidad de KASTON se limita a la calidad y la entrega de las tejas; KASTON no asume garantía ni responsabilidad legal sobre la estabilidad, el diseño o la ejecución de estructuras hechas por terceros.",
+                pdfCtaTitle: "¿SEGUIMOS?",
+                pdfCtaBody: "Escríbenos por WhatsApp al +57 318 897 8552 con esta cotización y la ubicación de tu obra.",
+                pdfAddress: "Carrera 46 #50-75, Los Naranjos, Itagüí",
+                pdfPhotosTitle: "FOTOS DE TU TECHO",
+                pdfPhoto: "Foto",
+                pdfPhotosRow: "Fotos del techo",
+                pdfPhotosRowOne: "1 foto, al final de la cotización",
+                pdfPhotosRowMany: "{n} fotos, al final de la cotización",
                 pdfVisitNote: "Esta cotización sirve para programar una visita técnica presencial de diagnóstico final.",
-                pdfClientAuton: "En la visita se revisarán detalles como nivelación de culatas y se concluirá",
-                pdfKastonTeam: "el plan definitivo de instalación sin hacerle perder tiempo en papeleos previos.",
-                pdfObs: "6. OBSERVACIONES",
-                pdfObsText: "El cliente manifiesta que cuenta con una empresa para la ejecucion de la estructura portante.",
                 pdfCancelName: "Se canceló el guardado. El proyecto debe tener un nombre.",
                 pdfProjName: "Nombre del Proyecto:",
                 mailStr1: "ESPECIFÍQUENOS SU PROYECTO PARA NOSOTROS ASESORARLOS, CUÉNTENOS DEL CASO DENOS MEDIDAS:",
@@ -3510,6 +3881,17 @@
                 roofPitchTitle: "Pendiente del Techo",
                 mandatory: "Obligatorio",
                 optional: "Opcional",
+                photosTitle: "Fotos de tu techo",
+                photosHint: "Sube hasta 6 fotos del techo actual o de la estructura donde irán las tejas. Nos ayudan a darte un valor más exacto y a preparar la visita. Salen en tu PDF y, si guardas el proyecto, quedan guardadas con él y también nos llegan a nosotros. Solo las usamos para cotizar tu techo.",
+                photosAdd: "Agregar fotos",
+                photosAddMore: "Agregar más fotos",
+                photosLoading: "Preparando fotos…",
+                photosRemove: "Quitar foto",
+                photoAlt: "Foto del techo",
+                photosMax: "Puedes subir máximo 6 fotos. Agregamos las que cabían.",
+                photosError: "Alguna foto no se pudo abrir. Intenta con una foto en JPG o PNG.",
+                photosLoadingSaved: "Cargando tus fotos guardadas…",
+                photosSaveError: "Tu proyecto quedó guardado, pero las fotos no se pudieron guardar. Edítalo y guárdalo de nuevo para intentarlo otra vez.",
                 pitchKnown: "Conozco la pendiente",
                 pitchUnknown: "No lo sé, me gustaría asesorarme y conocerla",
                 pitchUnit: "% Pendiente",
@@ -3527,28 +3909,13 @@
                 specialRoofTitle: "Diseño Personalizado: Asesoría Sin Costo",
                 specialRoofAdvisory: "¡Tu techo suena único! Para estructuras con diseños arquitectónicos especiales, preferimos darte una asesoría completamente personalizada. Déjanos tus datos al finalizar y un ingeniero de nuestro equipo te contactará directamente para evaluar tu estructura mediante una visita técnica sin costo.",
                 colorLabel: "Color de Teja Deseado",
-                pdfRoofTypeLabel: "Tipo de Techo:",
-                pdfPendienteLabel: "Pendiente:",
-                pdfColorLabel: "Color Seleccionado:",
-                pdfConstrType: "Tipo de Construcción:",
                 colorTooltipTitle: "Variación de Color por Polímero",
                 colorTooltipDesc: "Al fabricar con polímero recuperado del sector industrial, el tono final real será lo más cercano posible al render mostrado, pero puede presentar variaciones naturales según la mezcla de materiales en cada lote de producción. Esto no afecta las propiedades técnicas del producto.",
                 awaitConfirm: "Registro exitoso! Por favor revisa tu bandeja de entrada para confirmar tu cuenta antes de iniciar sesión.",
                 selectImg: "Seleccionar imagen",
                 svcBannerTitle: "¡Advertencia Estructural!",
                 svcBannerDesc: "El peso de KASTON (12.6 kg/m²) excede el límite de soporte configurado para esta simulación. Requiere un análisis técnico.",
-                svcBannerAction: "kaston.proyectos@gmail.com",
-                pdfClientData: "DATOS DEL CLIENTE",
-                pdfClientName: "Nombre:",
-                pdfClientPhone: "Teléfono:",
-                pdfClientDoc: "Documento:",
-                pdfClientUnreg: "No registrado",
-                pdfZincObs1: "OBSERVACIÓN TÉCNICA: Suministro únicamente de material. El cliente manifiesta que ya",
-                pdfZincObs2: "cuenta con una empresa que les haga la estructura portante certificada para soportar la",
-                pdfZincObs3: "masa de estabilidad de 12.6 kg/m2 del sistema KASTON. La responsabilidad de la compañía",
-                pdfZincObs4: "se limita exclusivamente a la calidad y entrega del suministro neto de tejas; KASTON no",
-                pdfZincObs5: "asume garantía ni responsabilidad legal sobre la estabilidad, diseño o ejecución de",
-                pdfZincObs6: "soportes instalados por terceros."
+                svcBannerAction: "kaston.proyectos@gmail.com"
             },
             en: {
                 logout: "Logout",
@@ -3624,7 +3991,6 @@
                 zoneOutBody: "You're outside the zones where we can price automatically. Message us and we'll send you the exact figure for your site, installer travel included.",
                 zoneOutWhatsapp: "Hi! I want an all-inclusive quote for my roof, but my site is outside the metropolitan area and Eastern Antioquia. Can you help me with the price?",
                 zoneOutMailSubject: "All-inclusive quote: site outside coverage",
-                pdfZoneLabel: "Installation zone:",
                 manualNote: "With your purchase you'll receive a detailed step-by-step installation manual.",
                 supplyPriceNote: "In this option the price is the same wherever you are: $85,000/m². It doesn't change with your location because shipping isn't included; it's charged separately based on where the tiles need to go.",
                 specialTitle: "Special architectural design",
@@ -3766,41 +4132,76 @@
                 zincAlertBody5: "on your roof. Would you like personalized advice for your technical needs, or do you prefer to handle the structural adaptations on your own?",
                 adviseBtn: "ADVICE",
                 assumeStrBtn: "ASSUME STRUCTURE",
-                pdfReportTitle: "ENGINEERING AND SUSTAINABILITY REPORT",
-                pdfP1: "1. PROJECT PARAMETERS",
-                pdfRoofArea: "Total Roof Area:",
-                pdfP1TradMat: "Traditional Material to Replace:",
-                pdfP2: "2. INVENTORY CALCULATION (K-LOCK SYSTEM)",
-                pdfReqUnits: "Required Units (Kaston):",
-                pdfP3: "3. STRUCTURAL ANALYSIS",
-                pdfDeadLoadRelief: "Dead Load Relief:",
-                pdfTonsEl: "Tons eliminated",
-                pdfSpecTitle: "1. SHIELDING TECHNICAL SPECIFICATION",
-                pdfEstArea: "Estimated Area:",
-                pdfRollThick: "Roll: Massive 8mm thickness UV stabilized",
-                pdfP2Req: "2. KASTON REQUIREMENTS",
-                pdfNetVol: "Net Volume Demanded:",
-                pdfReqUdsC: "units calculated upon request",
-                pdfCapExtStab: "3. EXTREME STABILIZATION CAPACITY",
-                pdfIzodConf: "Confirmed Izod Resistance: 29.4 J/m to mechanical impacts",
-                pdfESGTitle: "4. FINANCIAL AND ESG IMPACT",
-                pdfInvTileOnly: "Investment (Only Tile):",
-                pdfNodeOnlyTile1: "NOTE: This value corresponds to the net supply at the site.",
-                pdfNodeOnlyTile2: "Excludes labor, meshes, or other additional reinforcement accessories.",
-                pdfUpcycledTitle: "Recovered Industrial Plastic:",
-                pdfCO2RedTitle: "Carbon Footprint (CO2) Reduction:",
-                pdfInvAllInc: "Investment (All-Inclusive / Installed):",
-                pdfNodeAllInc1: "NOTE: Integral solution covered by the Protection Engineering standard.",
-                pdfNodeAllInc2: "Includes mesh, wire, and execution by a specialized crew.",
-                pdfExecProt: "5. KASTON INSTALLATION SCOPE",
-                pdfKastonOp: "KASTON installs exclusively the KASTON System over the existing structure.",
-                pdfMampos: "We do not perform masonry or build roofs from scratch.",
-                pdfStructPort: "Route C: If you need structure design/installation, contact us for full engineering support.",
+                pdfLocale: "en-US",
+                pdfDocTitle: "QUOTE",
+                pdfFileName: "KASTON Quote",
+                pdfModSupply: "Tiles only",
+                pdfModFull: "Fully installed",
+                pdfModSpecial: "Special project",
+                pdfPreparedFor: "PREPARED FOR",
+                pdfPhoneShort: "Phone",
+                pdfPriceLabel: "ESTIMATED PRICE",
+                pdfPerM2: "per m²",
+                pdfPriceTbd: "To be quoted by an advisor",
+                pdfCoversLabel: "WHAT IT INCLUDES",
+                pdfCoversSupply: "Supply of KASTON tiles. You install them with our step-by-step manual.",
+                pdfCoversFull: "The tiles, the installation materials and the installer. You don't need to get anything else.",
+                pdfSpecialBody: "Your roof has a special design, so we don't calculate an automatic price. A KASTON engineer will contact you to visit at no cost and give you the exact price.",
+                pdfProjectTitle: "YOUR PROJECT",
+                pdfArea: "Roof area",
+                pdfConstr: "Construction type",
+                pdfRoofType: "Roof type",
+                pdfPitch: "Pitch",
+                pdfPitchTbd: "To be confirmed",
+                pdfColor: "Color",
+                pdfColorTbd: "To be defined",
+                pdfZone: "Installation zone",
+                pdfAt: "",
+                pdfFromPlant: "from our plant",
+                pdfIllustration: "Reference illustration",
+                pdfRoofTitle: "YOUR KASTON ROOF",
+                pdfTiles: "Beaver Tail tiles",
+                pdfTilesSub: "42 per m²",
+                pdfWeight: "Total roof weight",
+                pdfWeightSub: "12.6 kg per m²",
+                pdfWind: "Wind resistance",
+                pdfWindSub: "K-LOCK anchoring system",
+                pdfThick: "Tile thickness",
+                pdfThickSub: "300 g per tile",
+                pdfProductLine: "Beaver Tail tile with the K-LOCK system, made in Itagüí from recovered polymer. It absorbs no water, does not rust and has a projected service life of over 500 years. 17 proven years in Medellín.",
+                pdfEnvTitle: "ENVIRONMENTAL IMPACT",
+                pdfEnvPolymer: "of recovered polymer",
+                pdfEnvCO2: "of CO2 avoided",
+                pdfTermsTitle: "TERMS",
+                pdfTermsSupply: [
+                    "Installation is up to you. Your purchase includes our step-by-step installation manual.",
+                    "The price of COP 85,000 per m² is the same anywhere in the country.",
+                    "Shipping is not included. Send us your site location and we will calculate it.",
+                    "Your roof needs a minimum pitch of 15% so water runs off properly."
+                ],
+                pdfTermsFull: [
+                    "Your structure must bear 12.6 kg per m² and be ready with the asphalt membrane installed. KASTON does not build structures or install membranes.",
+                    "Shipping the tiles to your site is not included. We calculate it with your site location.",
+                    "Before installing, we make a technical visit to confirm your roof's measurements and details."
+                ],
+                pdfTermsSpecial: [
+                    "A KASTON engineer reviews your roof in a technical visit at no cost.",
+                    "The final price depends on your roof's design and the site location."
+                ],
+                pdfFinePrint: "Values calculated with the area you entered in the quote tool. The final quantity is confirmed with your roof's actual measurements.",
+                pdfColorNote: "Color: reference view, the final shade may vary with daylight and screen.",
+                pdfObsTitle: "TECHNICAL NOTE",
+                pdfObsText: "The client states they have a company to build the structure.",
+                pdfZincWaiver: "Material supply only. The client states they already have a company that will build the structure, certified to bear the 12.6 kg per m² of the KASTON system. KASTON's liability is limited to the quality and delivery of the tiles; KASTON assumes no warranty or legal responsibility for the stability, design or execution of structures built by third parties.",
+                pdfCtaTitle: "NEXT STEP",
+                pdfCtaBody: "Message us on WhatsApp at +57 318 897 8552 with this quote and your site location.",
+                pdfAddress: "Carrera 46 #50-75, Los Naranjos, Itagüí, Colombia",
+                pdfPhotosTitle: "PHOTOS OF YOUR ROOF",
+                pdfPhoto: "Photo",
+                pdfPhotosRow: "Roof photos",
+                pdfPhotosRowOne: "1 photo, at the end of this quote",
+                pdfPhotosRowMany: "{n} photos, at the end of this quote",
                 pdfVisitNote: "This quote serves to schedule an in-person technical diagnostic visit.",
-                pdfClientAuton: "Note: The client retains full autonomy to decide whether to execute the work with the",
-                pdfKastonTeam: "team recommended by KASTON or with external contractors of their choice.",
-                pdfObs: "6. OBSERVATIONS",
-                pdfObsText: "The client declares that they have a company to execute the supporting structure.",
                 pdfCancelName: "Saving canceled. The project must have a name.",
                 pdfProjName: "Project Name:",
                 mailStr1: "SPECIFY YOUR PROJECT SO WE CAN ADVISE YOU. TELL US ABOUT YOUR CASE AND GIVE US MEASUREMENTS:",
@@ -3825,6 +4226,17 @@
                 roofPitchTitle: "Roof Pitch",
                 mandatory: "Required",
                 optional: "Optional",
+                photosTitle: "Photos of your roof",
+                photosHint: "Upload up to 6 photos of your current roof or of the structure where the tiles will go. They help us give you a more accurate price and prepare the visit. They appear in your PDF and, if you save the project, they are saved with it and reach us too. We only use them to quote your roof.",
+                photosAdd: "Add photos",
+                photosAddMore: "Add more photos",
+                photosLoading: "Preparing photos…",
+                photosRemove: "Remove photo",
+                photoAlt: "Roof photo",
+                photosMax: "You can upload up to 6 photos. We added the ones that fit.",
+                photosError: "Some photo could not be opened. Try a JPG or PNG photo.",
+                photosLoadingSaved: "Loading your saved photos…",
+                photosSaveError: "Your project was saved, but the photos could not be saved. Edit it and save it again to retry.",
                 pitchKnown: "I know the pitch",
                 pitchUnknown: "I don't know, I'd like advice on this",
                 pitchUnit: "% Pitch",
@@ -3842,28 +4254,13 @@
                 specialRoofTitle: "Custom Design: Free Technical Consultation",
                 specialRoofAdvisory: "Your roof sounds unique! For structures with special architectural designs, we prefer to give you a fully personalized consultation. Leave your details at the end and one of our engineers will contact you directly to evaluate your structure through a no-cost technical site visit.",
                 colorLabel: "Desired Tile Color",
-                pdfRoofTypeLabel: "Roof Type:",
-                pdfPendienteLabel: "Pitch:",
-                pdfColorLabel: "Selected Color:",
-                pdfConstrType: "Construction Type:",
                 colorTooltipTitle: "Color Variation: Recovered Polymer",
                 colorTooltipDesc: "When manufacturing with polymer recovered from the industrial sector, the final real tone will be as close as possible to the render shown, but may present natural variations based on the material mix in each production batch. This does not affect the product's technical properties.",
                 awaitConfirm: "Registration successful! Please check your inbox to confirm your account before logging in.",
                 selectImg: "Select image",
                 svcBannerTitle: "Structural Warning!",
                 svcBannerDesc: "KASTON's weight (12.6 kg/m²) exceeds the configured support limit for this simulation. Technical analysis required.",
-                svcBannerAction: "kaston.proyectos@gmail.com",
-                pdfClientData: "CLIENT DATA",
-                pdfClientName: "Name:",
-                pdfClientPhone: "Phone:",
-                pdfClientDoc: "Document:",
-                pdfClientUnreg: "Not registered",
-                pdfZincObs1: "TECHNICAL NOTE: Material supply only. The client states they already",
-                pdfZincObs2: "have a company to build the certified supporting structure to bear the",
-                pdfZincObs3: "12.6 kg/m2 stability mass of the KASTON system. The company's liability",
-                pdfZincObs4: "is limited exclusively to the quality and delivery of the net tile supply; KASTON does not",
-                pdfZincObs5: "assume warranty or legal responsibility for the stability, design or execution of",
-                pdfZincObs6: "structures installed by third parties."
+                svcBannerAction: "kaston.proyectos@gmail.com"
             }
         };
 

@@ -16,6 +16,11 @@ const SITIO = 'https://www.kastonproyectos.com';
 const WHATSAPP = '573188978552';
 const TEJAS_POR_M2 = 42;
 
+// Fotos del techo que el cliente sube en el cotizador. Llegan ya reducidas (JPG de
+// unos 150 KB); estos topes solo frenan un envio armado a mano para inflar el correo.
+const MAX_FOTOS = 6;
+const MAX_LARGO_FOTO = 1500000; // caracteres en base64, unos 1,1 MB
+
 const COLORES = { grafito: 'Negro Grafito', basalto: 'Gris Basalto' };
 const ZONAS = {
     metro: 'Hasta 25 km de la planta',
@@ -61,6 +66,9 @@ export default async function handler(req, res) {
         if (!fila) return res.status(404).json({ error: 'Proyecto no encontrado' });
 
         const cotizacion = armarCotizacion(fila, usuario);
+        // Las fotos van solo en la copia a KASTON: el cliente ya las tiene.
+        const fotos = fotosAdjuntas(datos.fotos);
+        cotizacion.fotos = fotos.length;
         const remitente = process.env.RESEND_FROM || 'KASTON <onboarding@resend.dev>';
         const copiaKaston = process.env.KASTON_COPY_EMAIL || 'kaston.proyectos@gmail.com';
 
@@ -79,7 +87,8 @@ export default async function handler(req, res) {
                 reply_to: usuario.email,
                 subject: `Nueva cotización: ${cotizacion.nombre} · ${cotizacion.area} · ${cotizacion.modalidad}`,
                 html: correoKaston(cotizacion),
-                text: textoKaston(cotizacion)
+                text: textoKaston(cotizacion),
+                ...(fotos.length ? { attachments: fotos } : {})
             })
         ]);
 
@@ -104,6 +113,15 @@ async function enviar(apiKey, idempotencia, correo) {
     });
     if (!r.ok) throw new Error(`Resend ${r.status}: ${await r.text()}`);
     return r.json();
+}
+
+// Solo pasan JPG en base64 (empiezan por /9j/) y dentro de los topes; lo demas se descarta.
+function fotosAdjuntas(fotos) {
+    if (!Array.isArray(fotos)) return [];
+    return fotos
+        .filter(f => typeof f === 'string' && f.length <= MAX_LARGO_FOTO && /^\/9j\/[A-Za-z0-9+/]+=*$/.test(f))
+        .slice(0, MAX_FOTOS)
+        .map((f, i) => ({ filename: `foto-techo-${i + 1}.jpg`, content: f }));
 }
 
 function armarCotizacion(fila, usuario) {
@@ -286,6 +304,7 @@ function correoKaston(c) {
           ${fila('Zona', c.zona)}
           ${fila('Distancia a la planta', c.distancia)}
           ${fila('Color', c.color)}
+          ${fila('Fotos del techo', c.fotos ? `${c.fotos} adjunta${c.fotos === 1 ? '' : 's'} en este correo` : '')}
           ${fila('Fecha', c.fecha)}
         </table>
         <p style="${CUERPO}margin:24px 0 0;color:#bcbcbc;font-size:13px;line-height:1.6;">
@@ -333,6 +352,7 @@ function textoKaston(c) {
         c.zona ? `Zona: ${c.zona}` : '',
         c.distancia ? `Distancia a la planta: ${c.distancia}` : '',
         c.color ? `Color: ${c.color}` : '',
+        c.fotos ? `Fotos del techo: ${c.fotos} adjunta${c.fotos === 1 ? '' : 's'} en este correo` : '',
         `Fecha: ${c.fecha}`,
         '',
         'Responde este correo y le llega directo al cliente.'
