@@ -7,5 +7,6 @@ Allow: /
 Disallow: /diagnostico
 Disallow: /auth-callback
 Disallow: /mapa-proceso
+Disallow: /presentacion
 
 Sitemap: https://www.kastonproyectos.com/sitemap.xml
