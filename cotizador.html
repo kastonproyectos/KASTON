@@ -3754,10 +3754,6 @@
                 bottomProf: "Perfil",
                 trTitle: "Cotiza tu proyecto",
                 trSub: "Elige cómo quieres tu cubierta KASTON",
-                trKicker: "Cotizador KASTON",
-                trLead: "Mira cuánto cuesta tu techo en 2 minutos. Eliges la modalidad, nos cuentas de tu techo y descargas tu cotización en PDF.",
-                trChooseKicker: "Modalidades",
-                trHeroAlt: "Techo KASTON instalado en Las Palmas, Medellín",
                 trSealAlt: "Sello 17 años comprobados, Medellín, Colombia",
                 trStatYears: "años",
                 trStat1: "Vida útil proyectada",
@@ -4125,10 +4121,6 @@
                 bottomProf: "Profile",
                 trTitle: "Quote your project",
                 trSub: "Choose how you want your KASTON roof",
-                trKicker: "KASTON quote tool",
-                trLead: "See what your roof costs in 2 minutes. Pick an option, tell us about your roof and download your quote as a PDF.",
-                trChooseKicker: "Options",
-                trHeroAlt: "KASTON roof installed in Las Palmas, Medellín",
                 trSealAlt: "17 proven years seal, Medellín, Colombia",
                 trStatYears: "years",
                 trStat1: "Projected service life",
@@ -4583,23 +4575,11 @@
             ];
             return (
                 <div className="w-full max-w-5xl flex flex-col gap-12 md:gap-16 animate-fade-in pb-12">
-                    {/* Portada: techo real de Las Palmas con capa negra para que el texto se lea */}
-                    <section className="relative overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(193,138,104,0.15)' }}>
-                        <img src="cotizador-techo.jpg" alt={t.trHeroAlt} className="absolute inset-0 w-full h-full object-cover" />
-                        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.45) 100%)' }}></div>
-                        <div className="relative px-6 py-14 md:px-14 md:py-20 max-w-2xl">
-                            <div className="k-kicker mb-4">{t.trKicker}</div>
-                            <h1 className="text-white font-bold text-[2.6rem] md:text-6xl">{t.trTitle}</h1>
-                            <div className="k-divider my-6"></div>
-                            <p className="text-[#F4F4F4] font-light text-base md:text-lg leading-relaxed">{t.trLead}</p>
-                        </div>
-                    </section>
-
                     {/* Modalidades */}
-                    <section className="flex flex-col gap-7">
+                    <section className="flex flex-col gap-8">
                         <div>
-                            <div className="k-kicker mb-2">{t.trChooseKicker}</div>
-                            <h2 className="text-white font-bold text-2xl md:text-3xl">{t.trSub}</h2>
+                            <h1 className="text-white font-bold text-4xl md:text-5xl">{t.trTitle}</h1>
+                            <div className="k-divider mt-5"></div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             {rutas.map(r => (
