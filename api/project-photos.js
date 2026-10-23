@@ -71,9 +71,11 @@ export default async function handler(req, res) {
             const filas = filaRes.ok ? await filaRes.json() : [];
             if (!Array.isArray(filas) || !filas.length) return res.status(404).json({ error: 'Proyecto no encontrado' });
 
+            // x-upsert: si el cotizador reintenta tras un corte de red y la foto ya
+            // alcanzó a guardarse, se reemplaza en vez de fallar con "ya existe".
             const r = await fetch(`${SUPA_URL}/storage/v1/object/${BUCKET}/${carpeta}/${n}.jpg`, {
                 method: 'POST',
-                headers: { ...cabeceras, 'Content-Type': 'image/jpeg', 'x-upsert': 'false' },
+                headers: { ...cabeceras, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
                 body: Buffer.from(foto, 'base64')
             });
             if (!r.ok) return res.status(r.status).json({ error: 'No se pudo guardar la foto', detalle: await r.text() });
