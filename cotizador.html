@@ -295,11 +295,13 @@
         const KASTON_UNITS_PER_FT2 = 3.90; // 42 / 10.7639
 
         /* ─────────────────────────────────────────────────────────────
-           PRECIOS POR m²  ·  costos actualizados septiembre 2026
+           PRECIOS POR m²  ·  costos actualizados octubre 2026
            ─────────────────────────────────────────────────────────────
            SOLO TEJA: precio único, no depende de la ubicación.
-             Costo: teja 42 × $1.500 = $63.000 + costal $210 = $63.210/m²
-             Venta: $85.000/m²  →  te quedan $21.790/m² (25,6%)
+             Costo: teja $63.000/m² (42 tejas, lo que cobra la fábrica)
+                    + costal $126 = $63.126/m²
+                    (costal $300, lleva 100 tejas → $3 por teja × 42)
+             Venta: $85.000/m²  →  te quedan $21.874/m² (25,7%)
 
            TODO COSTO: se arma sumando, no aplicando un markup al costo.
            La teja entra al PRECIO DE VENTA de $85.000 (no a costo): si el
@@ -317,10 +319,13 @@
              Hasta 25 km:  85.000 + 54.335,41 × 1,25 = $152.919  →  $153.000
              25 a 60 km:   85.000 + 64.335,41 × 1,25 = $165.419  →  $165.500
 
-           OJO: dos costos que TODAVÍA NO están incluidos: el caballete (lo fabrica
-           el mismo proveedor de la teja; falta su precio) y el traslapo de la malla
-           (sube el $6.345,41 si hay solape entre láminas). Si entran, hay que
-           recalcular estos precios hacia arriba.
+           CABALLETE: no entra en el precio por m², a propósito. Se cobra por metro
+           lineal y depende de la forma del techo (no todos son a dos aguas), algo
+           que ni el cotizador ni las fotos pueden medir. Se cotiza aparte cuando
+           se revisa el techo; por eso el cotizador da un estimado.
+
+           OJO: el traslapo de la malla tampoco está incluido (sube el $6.345,41 si
+           hay solape entre láminas). Si entra, hay que recalcular estos precios.
         ───────────────────────────────────────────────────────────────── */
         const PRECIO_SOLO_TEJA_M2 = 85000;
 
@@ -335,15 +340,15 @@
                 id: 'metro',
                 maxKm: 25,
                 instalador: 45000,
-                costoM2: 117545.41,  // lo que REALMENTE pagas: teja $63.000 + insumos $9.545,41 + instalador
-                precioM2: 153000     // 85.000 + (9.335,41 + 45.000) × 1,25  →  te quedan $35.455/m²
+                costoM2: 117461.41,  // lo que REALMENTE pagas: teja $63.000 + costal $126 + insumos $9.335,41 + instalador
+                precioM2: 153000     // 85.000 + (9.335,41 + 45.000) × 1,25  →  te quedan $35.539/m²
             },
             {
                 id: 'afueras',
                 maxKm: 60,
                 instalador: 55000,
-                costoM2: 127545.41,  // lo que REALMENTE pagas: teja $63.000 + insumos $9.545,41 + instalador
-                precioM2: 165500     // 85.000 + (9.335,41 + 55.000) × 1,25  →  te quedan $37.955/m²
+                costoM2: 127461.41,  // lo que REALMENTE pagas: teja $63.000 + costal $126 + insumos $9.335,41 + instalador
+                precioM2: 165500     // 85.000 + (9.335,41 + 55.000) × 1,25  →  te quedan $38.039/m²
             },
             {
                 id: 'lejana',
