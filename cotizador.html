@@ -1228,12 +1228,24 @@
             return comoImagen ? resp.blob() : resp.json();
         }
 
+        // Una red de celular inestable no debe dejar fotos por fuera: cada paso se
+        // intenta hasta 4 veces, esperando 1, 2 y 3 segundos entre intentos.
+        async function conReintentos(tarea, intentos = 4) {
+            for (let i = 1; ; i++) {
+                try { return await tarea(); }
+                catch (e) {
+                    if (i >= intentos) throw e;
+                    await new Promise(r => setTimeout(r, 1000 * i));
+                }
+            }
+        }
+
         // Sube las fotos de un proyecto; al editar, primero borra las que tenía.
         async function guardarFotosProyecto(projectId, fotos, reemplazar) {
-            if (reemplazar) await apiFotos({ action: 'clear', projectId });
+            if (reemplazar) await conReintentos(() => apiFotos({ action: 'clear', projectId }));
             const lista = (fotos || []).slice(0, MAX_FOTOS_TECHO);
             for (let i = 0; i < lista.length; i++) {
-                await apiFotos({ action: 'upload', projectId, indice: i + 1, foto: lista[i].data.split(',')[1] });
+                await conReintentos(() => apiFotos({ action: 'upload', projectId, indice: i + 1, foto: lista[i].data.split(',')[1] }));
             }
         }
 
@@ -1252,10 +1264,10 @@
 
         // Trae las fotos guardadas de un proyecto, listas para el cotizador y el PDF.
         async function leerFotosProyecto(projectId) {
-            const { fotos = [] } = await apiFotos({ action: 'list', projectId });
+            const { fotos = [] } = await conReintentos(() => apiFotos({ action: 'list', projectId }));
             const leidas = [];
             for (const nombre of fotos) {
-                leidas.push(await blobAFoto(await apiFotos({ action: 'get', projectId, nombre }, true)));
+                leidas.push(await blobAFoto(await conReintentos(() => apiFotos({ action: 'get', projectId, nombre }, true))));
             }
             return leidas;
         }
@@ -1367,10 +1379,19 @@
                     // Sin la zona guardada, el todo costo saldría en $0: con ella se recalcula su precio.
                     const zone = modality === 'full' ? zonaPorId(proj.zoneId) : null;
                     const metrics = calculateMetrics(areaM2, proj.material || 'clay', currency, rates, zone);
-                    // Si no se pueden traer las fotos, el PDF sale igual, sin ellas.
+                    // Un proyecto con fotos nunca sale sin ellas: si no se pudieron traer
+                    // (ya con reintentos), no se descarga y se pide intentar de nuevo.
                     let fotos = [];
                     if (session) {
-                        try { fotos = await leerFotosProyecto(proj.id); } catch (e) { console.warn('PDF sin fotos:', e); }
+                        try {
+                            fotos = await leerFotosProyecto(proj.id);
+                        } catch (e) {
+                            console.warn('No se pudieron traer las fotos del proyecto:', e);
+                            if (Number(proj.cantidadFotos) > 0) { alert(t.photosPdfError); return; }
+                        }
+                    } else if (Number(proj.cantidadFotos) > 0) {
+                        alert(t.photosPdfError);
+                        return;
                     }
 
                     await descargarCotizacionPDF({
@@ -2155,7 +2176,7 @@
             img.src = url;
         });
 
-        function FotosTecho({ language, fotos, onChange, cargandoGuardadas }) {
+        function FotosTecho({ language, fotos, onChange, cargandoGuardadas, sinCargar }) {
             const t = T[language] || T['es'];
             const inputRef = useRef(null);
             const [cargando, setCargando] = useState(false);
@@ -2193,6 +2214,7 @@
                     </div>
 
                     {cargandoGuardadas && <p className="text-xs text-white/50">{t.photosLoadingSaved}</p>}
+                    {sinCargar && <p className="text-xs text-[#D49B76] leading-relaxed">{t.photosLoadError}</p>}
 
                     {fotos.length > 0 && (
                         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
@@ -2241,6 +2263,7 @@
             const [selectedColor, setSelectedColor] = useState(editingProject ? (editingProject.selectedColor || null) : null);
             const [fotosTecho, setFotosTecho] = useState([]);
             const [cargandoFotos, setCargandoFotos] = useState(false);
+            const [fotosSinCargar, setFotosSinCargar] = useState(false);
             // Solo si el cliente tocó las fotos hay que reemplazar las guardadas del proyecto.
             const fotosCambiadas = useRef(false);
             // Si cambian las fotos después de descargar, el PDF ya no las trae: se pide descargarlo de nuevo.
@@ -2257,7 +2280,10 @@
                 setCargandoFotos(true);
                 leerFotosProyecto(editingProject.id)
                     .then(fotos => { if (vigente && !fotosCambiadas.current) setFotosTecho(fotos); })
-                    .catch(e => console.warn('No se pudieron traer las fotos del proyecto:', e))
+                    .catch(e => {
+                        console.warn('No se pudieron traer las fotos del proyecto:', e);
+                        if (vigente) setFotosSinCargar(true);
+                    })
                     .finally(() => { if (vigente) setCargandoFotos(false); });
                 return () => { vigente = false; };
             }, [editingProject && editingProject.id]);
@@ -2343,13 +2369,25 @@
                 const withObservation = options && options.withObservation === true;
                 setIsSaving(true);
                 try {
+                    // Editando un proyecto cuyas fotos no cargaron: se vuelven a buscar, porque
+                    // el PDF de un proyecto con fotos no puede salir sin ellas.
+                    let fotosPdf = fotosTecho;
+                    if (editingProject && fotosSinCargar && !fotosCambiadas.current) {
+                        try {
+                            fotosPdf = await leerFotosProyecto(editingProject.id);
+                            setFotosTecho(fotosPdf);
+                            setFotosSinCargar(false);
+                        } catch (e) {
+                            if (Number(editingProject.cantidadFotos) > 0) { alert(t.photosPdfError); return; }
+                        }
+                    }
                     await descargarCotizacionPDF({
                         t, area: inputValue, unit, areaM2, currency, metrics, modality,
                         zone, geoKm,
                         roofType, pendiente, selectedColor,
                         constructionType, isSpecialDesign,
                         cliente: clientePDF(session),
-                        fotos: fotosTecho,
+                        fotos: fotosPdf,
                         withObservation, includeZincWaiver: false,
                     });
                     setIsPdfDownloaded(true);
@@ -2390,7 +2428,12 @@
                     plastico_kg: metrics.plasticUpcycled,
                     co2_kg: metrics.co2Reduced,
                     fecha: editingProject ? editingProject.fecha : new Date().toISOString().split('T')[0],
-                    hasOwnStructure
+                    hasOwnStructure,
+                    // Cuántas fotos debe tener: así "Mis proyectos" sabe que no puede sacar el PDF sin ellas.
+                    // Si al editar no se pudieron traer y el cliente no las tocó, siguen siendo las de antes.
+                    cantidadFotos: (editingProject && fotosSinCargar && !fotosCambiadas.current)
+                        ? (Number(editingProject.cantidadFotos) || 0)
+                        : fotosTecho.length
                 }, { fotos: fotosTecho, fotosCambiadas: fotosCambiadas.current }); // las fotos se guardan aparte, no dentro del proyecto
 
                 alert(modality === 'full' ? t.transportNoticeAlertFull : t.transportNoticeAlert);
@@ -2678,7 +2721,7 @@
                     </>
                     )}
 
-                    <FotosTecho language={language} fotos={fotosTecho} onChange={cambiarFotos} cargandoGuardadas={cargandoFotos} />
+                    <FotosTecho language={language} fotos={fotosTecho} onChange={cambiarFotos} cargandoGuardadas={cargandoFotos} sinCargar={fotosSinCargar && !fotosCambiadas.current} />
 
                     {!isFormComplete && !isPdfDownloaded && (
                         <div className="w-full mt-4 p-4 rounded-xl border border-white/10 bg-white/5 flex items-start gap-3">
@@ -3891,6 +3934,8 @@
                 photosMax: "Puedes subir máximo 6 fotos. Agregamos las que cabían.",
                 photosError: "Alguna foto no se pudo abrir. Intenta con una foto en JPG o PNG.",
                 photosLoadingSaved: "Cargando tus fotos guardadas…",
+                photosLoadError: "No pudimos mostrar tus fotos guardadas, pero siguen guardadas: al descargar el PDF las volvemos a buscar. Si agregas fotos nuevas, reemplazan a las anteriores.",
+                photosPdfError: "No pudimos traer las fotos de este proyecto, así que no descargamos el PDF para que no salga incompleto. Revisa tu conexión e inténtalo de nuevo.",
                 photosSaveError: "Tu proyecto quedó guardado, pero las fotos no se pudieron guardar. Edítalo y guárdalo de nuevo para intentarlo otra vez.",
                 pitchKnown: "Conozco la pendiente",
                 pitchUnknown: "No lo sé, me gustaría asesorarme y conocerla",
@@ -4236,6 +4281,8 @@
                 photosMax: "You can upload up to 6 photos. We added the ones that fit.",
                 photosError: "Some photo could not be opened. Try a JPG or PNG photo.",
                 photosLoadingSaved: "Loading your saved photos…",
+                photosLoadError: "We could not show your saved photos, but they are still saved: we will look for them again when you download the PDF. If you add new photos, they replace the previous ones.",
+                photosPdfError: "We could not load this project's photos, so we did not download the PDF to avoid an incomplete one. Check your connection and try again.",
                 photosSaveError: "Your project was saved, but the photos could not be saved. Edit it and save it again to retry.",
                 pitchKnown: "I know the pitch",
                 pitchUnknown: "I don't know, I'd like advice on this",
