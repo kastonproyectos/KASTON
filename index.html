@@ -717,9 +717,11 @@
            ============================================= */
         .comp-table {
             width: 100%;
-            border-collapse: collapse;
+            min-width: 640px;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 32px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .comp-table th,
@@ -759,12 +761,73 @@
             color: var(--muted);
         }
 
+        /* wordmark oficial, en blanco y por encima de su tamaño mínimo (96 px) */
+        .comp-wordmark {
+            display: block;
+            width: 96px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .comp-table th.kcol {
+            border: 1px solid rgba(193, 138, 104, 0.45);
+            border-bottom: 2px solid var(--gold);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .comp-table td.kcol {
+            border-left: 1px solid rgba(193, 138, 104, 0.45);
+            border-right: 1px solid rgba(193, 138, 104, 0.45);
+        }
+
+        .comp-table tbody tr:last-child td.kcol {
+            border-bottom: 1px solid rgba(193, 138, 104, 0.45);
+        }
+
+        .comp-table tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .comp-table tbody tr:hover td.kcol {
+            background: rgba(193, 138, 104, 0.12);
+        }
+
+        /* chulito y equis dibujados, no caracteres */
+        .comp-table .ok,
+        .comp-table .no {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .comp-table .ok {
-            color: #6b8a4e;
+            color: var(--white);
+        }
+
+        .comp-table .ok::before {
+            content: '';
+            width: 11px;
+            height: 6px;
+            border-left: 2px solid var(--gold);
+            border-bottom: 2px solid var(--gold);
+            transform: rotate(-45deg) translateY(-2px);
         }
 
         .comp-table .no {
-            color: #8a4e4e;
+            color: var(--muted);
+        }
+
+        .comp-table .no::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background:
+                linear-gradient(45deg, transparent 44%, #b0605f 44%, #b0605f 56%, transparent 56%),
+                linear-gradient(-45deg, transparent 44%, #b0605f 44%, #b0605f 56%, transparent 56%);
+        }
+
+        .comp-scroll {
+            overflow-x: auto;
         }
 
         /* =============================================
@@ -888,67 +951,6 @@
             .cp-layer {
                 transition: none;
             }
-        }
-
-        /* =============================================
-           QUOTATION PROCESS
-           ============================================= */
-        .process-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 0;
-            margin-top: 48px;
-        }
-
-        .process-step {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-
-        .process-step:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 50px;
-            right: -40px;
-            width: 80px;
-            height: 3px;
-            background: repeating-linear-gradient(90deg, var(--gold) 0, var(--gold) 8px, transparent 8px, transparent 16px);
-        }
-
-        .process-icon {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 24px;
-        }
-
-        .process-num {
-            font-family: var(--font-heading);
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 10px;
-        }
-
-        .process-title {
-            font-family: var(--font-heading);
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--white);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .process-desc {
-            color: var(--muted);
-            font-size: 0.9rem;
-            max-width: 240px;
-            line-height: 1.7;
         }
 
         /* =============================================
@@ -1194,20 +1196,6 @@
                 padding: 10px 8px;
             }
 
-            .process-row {
-                flex-direction: column;
-                align-items: center;
-                gap: 40px;
-            }
-
-            .process-step:not(:last-child)::after {
-                top: auto;
-                bottom: -24px;
-                right: auto;
-                left: 50%;
-                transform: translateX(-50%) rotate(90deg);
-                width: 40px;
-            }
 
             .nav-cta {
                 width: 100%;
@@ -1548,6 +1536,247 @@
 
             .capas-roof {
                 height: 42%;
+            }
+        }
+
+        /* =============================================
+           CARACTERÍSTICAS — tres razones, cada una con su dato
+           ============================================= */
+        .feat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .feat-item {
+            display: flex;
+            flex-direction: column;
+            padding: 36px 32px 0;
+            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            transition: border-color 0.3s, transform 0.3s var(--ease);
+        }
+
+        .feat-item:hover {
+            border-color: rgba(193, 138, 104, 0.45);
+            transform: translateY(-4px);
+        }
+
+        .feat-ico {
+            width: 42px;
+            height: 42px;
+            margin-bottom: 26px;
+            fill: none;
+            stroke: var(--white);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s;
+        }
+
+        .feat-item:hover .feat-ico {
+            stroke: var(--gold);
+        }
+
+        .feat-item h3 {
+            font-size: clamp(1.3rem, 1.8vw, 1.55rem);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feat-item p {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .feat-dato {
+            margin: 28px -32px 0;
+            padding: 22px 32px 26px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .feat-dato b {
+            display: block;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 2rem;
+            line-height: 1;
+            color: var(--gold);
+        }
+
+        .feat-dato span {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        /* =============================================
+           FICHA TÉCNICA — hoja de datos en dos columnas
+           ============================================= */
+        .ficha-head {
+            max-width: 760px;
+        }
+
+        .ficha-sub {
+            margin-top: 10px;
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .ficha-tabla {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 64px;
+            margin-top: 56px;
+        }
+
+        .ficha-col h3 {
+            padding-bottom: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            color: var(--gold);
+            border-bottom: 1px solid rgba(193, 138, 104, 0.5);
+        }
+
+        .ficha-col dl div {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 24px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .ficha-col dt {
+            font-size: 0.98rem;
+            font-weight: 300;
+            color: var(--light);
+        }
+
+        .ficha-col dd {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-align: right;
+            color: var(--white);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ficha-humano {
+            max-width: 900px;
+            margin: 64px 0 0;
+            padding-left: 26px;
+            border-left: 3px solid var(--gold);
+            font-size: clamp(1.1rem, 1.7vw, 1.35rem);
+            line-height: 1.6;
+            color: var(--light);
+        }
+
+        .ficha-humano strong {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* =============================================
+           COTIZAR — riel de cuatro pasos
+           ============================================= */
+        .pasos {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 36px;
+            margin-top: 64px;
+            list-style: none;
+            text-align: left;
+            border-top: 1px solid rgba(193, 138, 104, 0.35);
+        }
+
+        .paso {
+            position: relative;
+            padding-top: 34px;
+        }
+
+        .paso::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 5px var(--surface-light);
+        }
+
+        .paso-num {
+            display: block;
+            margin-bottom: 18px;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 3.2rem;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--gold);
+        }
+
+        .paso h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .paso p {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: var(--muted);
+        }
+
+        @media (max-width: 900px) {
+            .feat-grid,
+            .ficha-tabla {
+                grid-template-columns: 1fr;
+            }
+
+            .ficha-tabla {
+                gap: 40px;
+            }
+
+            .pasos {
+                grid-template-columns: 1fr;
+                gap: 32px;
+                padding-left: 30px;
+                border-top: 0;
+                border-left: 1px solid rgba(193, 138, 104, 0.35);
+            }
+
+            .paso {
+                padding-top: 0;
+            }
+
+            .paso::before {
+                top: 8px;
+                left: -35px;
+            }
+
+            .paso-num {
+                font-size: 2.4rem;
+                margin-bottom: 10px;
+            }
+
+            .comp-table th:first-child,
+            .comp-table td:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 1;
+                background: var(--bg);
             }
         }
 
@@ -2548,53 +2777,28 @@
     <section id="caracteristicas">
         <div class="container">
             <div class="section-label fade-in" style="text-align:center;" data-i18n="feat.label">Características</div>
-            <h2 class="fade-in" style="text-align:center;" data-i18n-html="feat.title">Indestructible. <span
-                    class="gold">En Serio.</span></h2>
+            <h2 class="fade-in" style="text-align:center;" data-i18n-html="feat.title">Indestructible. <span class="gold">En serio.</span></h2>
             <div class="section-divider fade-in" style="margin:24px auto;"></div>
 
-            <div class="card-grid fade-in fade-in-d1" style="margin-top:40px;">
-                <div class="card spot" style="text-align:center;">
-                    <div class="card-icon" style="margin:0 auto 20px;">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="50" r="38" fill="#C18A68" />
-                            <path class="shield-check" d="M35 50 L45 60 L65 40" stroke="#000" stroke-width="6" fill="none"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </div>
-                    <h4 data-i18n="feat.card1.title">Blindaje Total</h4>
-                    <p data-i18n="feat.card1.desc">¿Granizo? ¿Pisar el techo? ¿Golpes? Nuestras tejas absorben el
-                        impacto sin quebrarse. Cero mermas en obra.</p>
-                </div>
-                <div class="card spot" style="text-align:center;">
-                    <div class="card-icon" style="margin:0 auto 20px;">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="20" y="25" width="60" height="50" rx="6" fill="#C18A68" />
-                            <path class="insul-wave" d="M30 60 Q40 40 50 55 Q60 70 70 45" stroke="#000" stroke-width="3" fill="none"
-                                stroke-linecap="round" />
-                            <line x1="20" y1="50" x2="80" y2="50" stroke="#8a6f4e" stroke-width="1"
-                                stroke-dasharray="3,3" />
-                        </svg>
-                    </div>
-                    <h4 data-i18n="feat.card2.title">Aislamiento Superior</h4>
-                    <p data-i18n="feat.card2.desc">A diferencia del Zinc que convierte tu casa en un horno, nuestro
-                        polímero denso aísla mejor la temperatura y el ruido.</p>
-                </div>
-                <div class="card spot" style="text-align:center;">
-                    <div class="card-icon" style="margin:0 auto 20px;">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g class="light-icon">
-                                <ellipse cx="50" cy="50" rx="30" ry="20" fill="none" stroke="#C18A68" stroke-width="3" />
-                                <path d="M50 30 L50 15" stroke="#C18A68" stroke-width="3" stroke-linecap="round" />
-                                <path d="M50 70 L50 85" stroke="#C18A68" stroke-width="3" stroke-linecap="round" />
-                                <circle cx="50" cy="50" r="8" fill="#C18A68" />
-                                <circle cx="50" cy="50" r="4" fill="#000" />
-                            </g>
-                        </svg>
-                    </div>
-                    <h4 data-i18n="feat.card3.title">Ultra Liviana</h4>
-                    <p data-i18n="feat.card3.desc">Mucho más livianas que el barro o el cemento, reduciendo costos en la
-                        estructura de madera o metal de tu casa.</p>
-                </div>
+            <div class="feat-grid fade-in fade-in-d1">
+                <article class="feat-item">
+                    <svg class="feat-ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5l15 6v11c0 10-6.5 17-15 21C15.5 39 9 32 9 22V11z"/><path d="M17 24l5 5 9-10"/></svg>
+                    <h3 data-i18n="feat.card1.title">Blindaje total</h3>
+                    <p data-i18n="feat.card1.desc">¿Granizo? ¿Pisar el techo? ¿Golpes? Nuestras tejas absorben el impacto sin quebrarse. Cero mermas en obra.</p>
+                    <div class="feat-dato"><b data-i18n="feat.d1.v">17 años</b><span data-i18n="feat.d1">comprobados sin una teja rota</span></div>
+                </article>
+                <article class="feat-item">
+                    <svg class="feat-ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M20 28V9a4 4 0 0 1 8 0v19a8 8 0 1 1-8 0z"/><path d="M24 17v14"/><path d="M34 12h6M34 18h4M34 24h6"/></svg>
+                    <h3 data-i18n="feat.card2.title">Aislamiento superior</h3>
+                    <p data-i18n="feat.card2.desc">A diferencia del zinc, que convierte tu casa en un horno, nuestro polímero denso aísla mejor la temperatura y el ruido.</p>
+                    <div class="feat-dato"><b>8 mm</b><span data-i18n="feat.d2">de polímero macizo</span></div>
+                </article>
+                <article class="feat-item">
+                    <svg class="feat-ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M40 8C24 8 13 18 12 36l-4 4"/><path d="M12 36c11 0 21-8 28-28"/><path d="M18 29h9M23 21h8"/></svg>
+                    <h3 data-i18n="feat.card3.title">Ultra liviana</h3>
+                    <p data-i18n="feat.card3.desc">Mucho más livianas que el barro o el cemento, reduciendo costos en la estructura de madera o metal de tu casa.</p>
+                    <div class="feat-dato"><b data-i18n="feat.d3.v">12,6 kg</b><span data-i18n="feat.d3">por m²</span></div>
+                </article>
             </div>
         </div>
     </section>
@@ -2700,72 +2904,40 @@
      ================================================ -->
     <section id="especificaciones" style="background:var(--surface-light);">
         <div class="container">
-            <div class="section-label fade-in" style="text-align:center;" data-i18n="sp.label">Ingeniería de Materiales</div>
-            <h2 class="fade-in" style="text-align:center;" data-i18n-html="sp.title">Ficha técnica de nuestro producto <span class="gold">a tu alcance</span><br><span
-                    style="font-size:0.6em; color:var(--muted);">(SISTEMA KASTON 8MM)</span></h2>
-            <div class="section-divider fade-in" style="margin:24px auto;"></div>
+            <div class="ficha-head">
+                <div class="section-label fade-in" data-i18n="sp.label">Ingeniería de materiales</div>
+                <h2 class="fade-in" data-i18n-html="sp.title">Ficha <span class="gold">técnica</span></h2>
+                <p class="ficha-sub fade-in" data-i18n="sp.sub">Teja Cola de Castor con sistema K-LOCK</p>
+            </div>
 
-            <p class="fade-in"
-                style="max-width:850px; margin:0 auto 40px; text-align:center; font-size:1.05rem; color:var(--light);" data-i18n-html="sp.composition">
-                <strong>Composición:</strong> Matriz termoplástica bifásica.<br><br>
-                <strong>Protección UV Activa:</strong> El grosor masivo de 8mm garantiza que el 96% del núcleo interno
-                permanezca estructuralmente invulnerable a la radiación solar por décadas, limitando la degradación
-                mecánica solo a las micras superficiales.
-            </p>
-
-            <div class="specs-grid fade-in fade-in-d1">
-                <div class="spec-item">
-                    <div class="spec-val">42</div>
-                    <div class="spec-lbl" data-i18n="sp.units">Unidades / m²</div>
+            <div class="ficha-tabla fade-in fade-in-d1">
+                <div class="ficha-col">
+                    <h3 data-i18n="sp.g1">Medidas y material</h3>
+                    <dl>
+                        <div><dt data-i18n="sp.dim">Dimensiones</dt><dd>280 × 170 mm</dd></div>
+                        <div><dt data-i18n="sp.thickness">Espesor</dt><dd>8 mm</dd></div>
+                        <div><dt data-i18n="sp.unitweight">Peso por unidad</dt><dd>300 g</dd></div>
+                        <div><dt data-i18n="sp.units">Unidades por m²</dt><dd>42</dd></div>
+                        <div><dt data-i18n="sp.mass">Masa superficial</dt><dd data-i18n="sp.mass.v">12,6 kg/m²</dd></div>
+                        <div><dt data-i18n="sp.slope">Pendiente mínima</dt><dd>15%</dd></div>
+                        <div><dt data-i18n="sp.comp">Composición</dt><dd data-i18n="sp.comp.v">Matriz termoplástica bifásica</dd></div>
+                    </dl>
                 </div>
-                <div class="spec-item">
-                    <div class="spec-val">8 mm</div>
-                    <div class="spec-lbl" data-i18n="sp.thick">Espesor de Blindaje</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-val">300 g</div>
-                    <div class="spec-lbl" data-i18n="sp.unitweight">Peso por Unidad</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-val">12,6 kg</div>
-                    <div class="spec-lbl" data-i18n="sp.mass">Masa Superficial (m²)</div>
+                <div class="ficha-col">
+                    <h3 data-i18n="sp.g2">Comportamiento</h3>
+                    <dl>
+                        <div><dt data-i18n="sp.hardness">Dureza superficial</dt><dd data-i18n="sp.hardness.v">82,5 Shore D</dd></div>
+                        <div><dt data-i18n="sp.flex">Módulo de flexión</dt><dd data-i18n="sp.flex.v">1.406,1 MPa</dd></div>
+                        <div><dt data-i18n="sp.izod">Impacto (Izod)</dt><dd data-i18n="sp.izod.v">29,4 J/m</dd></div>
+                        <div><dt data-i18n="sp.thermal">Rango térmico</dt><dd data-i18n="sp.thermal.v">−15 °C a 90 °C</dd></div>
+                        <div><dt data-i18n="sp.uv">Protección UV</dt><dd data-i18n="sp.uv.v">96% del núcleo</dd></div>
+                        <div><dt data-i18n="sp.abs">Absorción de agua</dt><dd>0%</dd></div>
+                        <div><dt data-i18n="sp.wind">Resistencia al viento</dt><dd data-i18n="sp.wind.v">Hasta 225 km/h</dd></div>
+                    </dl>
                 </div>
             </div>
 
-            <div style="margin-top:80px;"></div>
-
-            <h3 class="fade-in"
-                style="text-align:center; font-family:var(--font-heading); color:var(--white); margin-bottom:16px;" data-i18n="sp.mechtitle">
-                Resiliencia Mecánica y Operativa</h3>
-            <p class="fade-in"
-                style="max-width:600px; margin:0 auto 32px; text-align:center; color:var(--muted); font-size:0.95rem;" data-i18n="sp.mechdesc">
-                Datos validados para la protección extrema del patrimonio ante condiciones climáticas y geológicas
-                adversas.
-            </p>
-
-            <div class="specs-grid fade-in fade-in-d2">
-                <div class="spec-item">
-                    <div class="spec-val">-15° a 90°C</div>
-                    <div class="spec-lbl" data-i18n="sp.thermal">Rango Térmico (Superficie)</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-val">82,5 <span style="font-size:0.6em">Shore D</span></div>
-                    <div class="spec-lbl" data-i18n="sp.hardness">Dureza Superficial</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-val">1406,1 <span style="font-size:0.6em">MPa</span></div>
-                    <div class="spec-lbl" data-i18n="sp.flex">Módulo de Flexión</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-val">29,4 <span style="font-size:0.6em">J/m</span></div>
-                    <div class="spec-lbl" data-i18n="sp.izod">Resistencia al Impacto (Izod)</div>
-                </div>
-            </div>
-
-            <div class="fade-in" data-i18n-html="sp.human"
-                style="max-width:820px; margin:44px auto 0; padding:22px 28px; border:1px solid rgba(193,138,104,0.30); border-radius:12px; background:rgba(193,138,104,0.06); color:var(--light); font-size:1.05rem; line-height:1.7; text-align:center;">
-                <strong style="color:var(--gold);">Qué significa para ti:</strong> no se quiebran con el granizo, soportan que se paren encima de ellas, no se vuelan con vientos de hasta <strong style="color:var(--white);">225 km/h</strong>, no se oxidan, no absorben agua y pesan tan poco que tu estructura sale más barata.
-            </div>
+            <p class="ficha-humano fade-in" data-i18n-html="sp.human"><strong>Qué significa para ti:</strong> no se quiebran con el granizo, soportan que se paren encima de ellas, no se vuelan con vientos de hasta 225 km/h, no se oxidan, no absorben agua y pesan tan poco que tu estructura sale más barata.</p>
 
             <div class="gallery fade-in" style="margin-top:80px;">
                 <video class="gallery-img" src="gallery-video-1.mp4" autoplay loop muted playsinline></video>
@@ -2859,64 +3031,30 @@
             <div class="section-label fade-in" data-i18n="quote.label">Cómo funciona</div>
             <h2 class="fade-in" data-i18n-html="quote.title">Cotizar es <span class="gold">así de simple</span></h2>
             <div class="section-divider fade-in" style="margin:24px auto;"></div>
-            <p class="fade-in" style="max-width:600px; margin:0 auto;" data-i18n="quote.desc">En pocos minutos obtienes el precio de tu cubierta KASTON, con toda la información técnica de respaldo.</p>
+            <p class="fade-in" style="max-width:600px; margin:0 auto;" data-i18n="quote.desc">En pocos minutos obtienes un estimativo del precio de tu cubierta KASTON, con toda la información técnica de respaldo.</p>
 
-            <div class="process-row fade-in fade-in-d1"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 48px;">
-                <div class="process-step">
-                    <div class="process-icon">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="25" y="20" width="50" height="60" rx="4" fill="#C18A68" />
-                            <path d="M35 35h30M35 50h30M35 65h15" stroke="#000" stroke-width="4"
-                                stroke-linecap="round" />
-                        </svg>
-                    </div>
-                    <div class="process-num" data-i18n="quote.step1.num">PASO 1</div>
-                    <div class="process-title" data-i18n="quote.step1.title">Elige tu modalidad</div>
-                    <p class="process-desc" data-i18n="quote.step1.desc">Escoge cómo quieres tu cubierta: Solo tejas (te las entregamos en obra) o Todo costo (las instalamos por ti).</p>
-                </div>
-
-                <div class="process-step">
-                    <div class="process-icon">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="50" r="30" fill="#C18A68" />
-                            <text x="50" y="58" font-size="24" text-anchor="middle" font-weight="bold"
-                                fill="#000">$</text>
-                            <path d="M75 50a25 25 0 0 1-25 25" stroke="#000" stroke-width="4" stroke-linecap="round" />
-                        </svg>
-                    </div>
-                    <div class="process-num" data-i18n="quote.step2.num">PASO 2</div>
-                    <div class="process-title" data-i18n="quote.step2.title">Cuéntanos tu proyecto</div>
-                    <p class="process-desc" data-i18n="quote.step2.desc">Ingresa el área, el tipo de techo y la pendiente. Con eso calculamos todo al instante.</p>
-                </div>
-
-                <div class="process-step">
-                    <div class="process-icon">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="30" y="25" width="40" height="50" rx="4" fill="#8a6f4e" />
-                            <circle cx="50" cy="45" r="8" fill="#C18A68" />
-                            <path d="M40 60h20" stroke="#000" stroke-width="3" stroke-linecap="round" />
-                        </svg>
-                    </div>
-                    <div class="process-num" data-i18n="quote.step3.num">PASO 3</div>
-                    <div class="process-title" data-i18n="quote.step3.title">Mira tu precio</div>
-                    <p class="process-desc" data-i18n="quote.step3.desc">Ves tu inversión estimada según la modalidad y el área.</p>
-                </div>
-
-                <div class="process-step">
-                    <div class="process-icon">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="20" y="30" width="60" height="40" rx="4" fill="#C18A68" />
-                            <circle cx="80" cy="30" r="12" fill="#8a6f4e" />
-                            <path d="M76 30l3 3 6-6" stroke="#000" stroke-width="3" fill="none"
-                                stroke-linecap="round" />
-                        </svg>
-                    </div>
-                    <div class="process-num" data-i18n="quote.step4.num">PASO 4</div>
-                    <div class="process-title" data-i18n="quote.step4.title">Recibe tu cotización</div>
-                    <p class="process-desc" data-i18n="quote.step4.desc">Descarga el PDF y, si quieres, agenda tu visita técnica por WhatsApp o correo. Crea una cuenta solo si deseas guardar tu proyecto.</p>
-                </div>
-            </div>
+            <ol class="pasos fade-in fade-in-d1">
+                <li class="paso">
+                    <span class="paso-num">01</span>
+                    <h3 data-i18n="quote.step1.title">Elige tu modalidad</h3>
+                    <p data-i18n="quote.step1.desc">Escoge cómo quieres tu cubierta: Solo tejas (te damos el suministro y el manual completo de instalación) o Todo costo (las instalamos por ti).</p>
+                </li>
+                <li class="paso">
+                    <span class="paso-num">02</span>
+                    <h3 data-i18n="quote.step2.title">Cuéntanos tu proyecto</h3>
+                    <p data-i18n="quote.step2.desc">Ingresa el área, el tipo de techo y la pendiente. Con eso calculamos todo al instante.</p>
+                </li>
+                <li class="paso">
+                    <span class="paso-num">03</span>
+                    <h3 data-i18n="quote.step3.title">Mira tu precio</h3>
+                    <p data-i18n="quote.step3.desc">Ves tu inversión estimada según la modalidad y el área.</p>
+                </li>
+                <li class="paso">
+                    <span class="paso-num">04</span>
+                    <h3 data-i18n="quote.step4.title">Recibe tu cotización</h3>
+                    <p data-i18n="quote.step4.desc">Descarga el PDF y, si quieres, agenda tu visita técnica por WhatsApp o correo. Crea una cuenta solo si deseas guardar tu proyecto.</p>
+                </li>
+            </ol>
 
             <div class="fade-in fade-in-d2" style="text-align:center; margin-top: 64px; margin-bottom: 24px;">
                 <a href="/cotizador" class="btn btn-gold"
@@ -2932,16 +3070,15 @@
     <section id="comparativa">
         <div class="container">
             <div class="section-label fade-in" style="text-align:center;" data-i18n="comp.label">¿Por qué KASTON?</div>
-            <h2 class="fade-in" style="text-align:center;" data-i18n-html="comp.title2">Análisis de <span class="gold">Superioridad Técnica</span>
-            </h2>
+            <h2 class="fade-in" style="text-align:center;" data-i18n-html="comp.title2">KASTON frente al <span class="gold">barro y el zinc</span></h2>
             <div class="section-divider fade-in" style="margin:24px auto;"></div>
 
-            <div class="fade-in fade-in-d1" style="overflow-x:auto;">
+            <div class="comp-scroll fade-in fade-in-d1">
                 <table class="comp-table">
                     <thead>
                         <tr>
                             <th style="text-align:left;" data-i18n="comp.th.criteria">Criterio</th>
-                            <th class="kcol">KASTON</th>
+                            <th class="kcol"><img class="comp-wordmark" src="kaston-wordmark.png" alt="KASTON" width="96" height="26"></th>
                             <th data-i18n="comp.th.clay">Teja de Barro</th>
                             <th>Zinc</th>
                         </tr>
@@ -2955,39 +3092,39 @@
                         </tr>
                         <tr>
                             <td data-i18n="comp.weight">Peso</td>
-                            <td class="kcol" data-i18n="comp.weight.k">12.6 kg/m²</td>
-                            <td data-i18n="comp.weight.clay">~44.5 kg/m²</td>
-                            <td data-i18n="comp.weight.zinc">~4 kg/m²</td>
+                            <td class="kcol" data-i18n="comp.weight.k">12,6 kg/m²</td>
+                            <td data-i18n="comp.weight.clay">≈ 44,5 kg/m²</td>
+                            <td data-i18n="comp.weight.zinc">≈ 4 kg/m²</td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.hail">Resistencia a granizo</td>
-                            <td class="kcol"><span class="ok" data-i18n-html="comp.hail.k">&#10004; Total</span></td>
-                            <td><span class="no" data-i18n-html="comp.hail.clay">&#10008; Frágil</span></td>
+                            <td class="kcol"><span class="ok" data-i18n-html="comp.hail.k">Total</span></td>
+                            <td><span class="no" data-i18n-html="comp.hail.clay">Frágil</span></td>
                             <td data-i18n="comp.hail.zinc">Se abolla</td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.moisture">Absorción de humedad</td>
-                            <td class="kcol"><span class="ok" data-i18n-html="comp.moisture.k">&#10004; Cero</span></td>
-                            <td><span class="no" data-i18n-html="comp.moisture.clay">&#10008; Alta</span></td>
+                            <td class="kcol"><span class="ok" data-i18n-html="comp.moisture.k">Cero</span></td>
+                            <td><span class="no" data-i18n-html="comp.moisture.clay">Alta</span></td>
                             <td data-i18n="comp.moisture.zinc">Cero (se oxida)</td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.breakage">Rotura en transporte</td>
-                            <td class="kcol"><span class="ok">&#10004; 0%</span></td>
-                            <td><span class="no">&#10008; 5–15%</span></td>
+                            <td class="kcol"><span class="ok">0%</span></td>
+                            <td><span class="no" data-i18n="comp.breakage.clay">Frecuente</span></td>
                             <td>0%</td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.thermal">Aislamiento térmico</td>
-                            <td class="kcol"><span class="ok" data-i18n-html="comp.thermal.k">&#10004; Alto</span></td>
+                            <td class="kcol"><span class="ok" data-i18n-html="comp.thermal.k">Alto</span></td>
                             <td data-i18n="comp.thermal.clay">Medio</td>
-                            <td><span class="no" data-i18n-html="comp.thermal.zinc">&#10008; Mínimo</span></td>
+                            <td><span class="no" data-i18n-html="comp.thermal.zinc">Mínimo</span></td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.acoustic">Aislamiento acústico</td>
-                            <td class="kcol"><span class="ok" data-i18n-html="comp.acoustic.k">&#10004; Alto</span></td>
+                            <td class="kcol"><span class="ok" data-i18n-html="comp.acoustic.k">Alto</span></td>
                             <td data-i18n="comp.acoustic.clay">Medio</td>
-                            <td><span class="no" data-i18n-html="comp.acoustic.zinc">&#10008; Ruidoso</span></td>
+                            <td><span class="no" data-i18n-html="comp.acoustic.zinc">Ruidoso</span></td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.maintenance">Mantenimiento</td>
@@ -2997,14 +3134,14 @@
                         </tr>
                         <tr>
                             <td data-i18n="comp.sustain">Sostenibilidad</td>
-                            <td class="kcol"><span class="ok" data-i18n-html="comp.sustain.k">&#10004; Recuperado</span>
+                            <td class="kcol"><span class="ok" data-i18n-html="comp.sustain.k">Recuperado</span>
                             </td>
                             <td data-i18n="comp.sustain.clay">Alto consumo energía</td>
                             <td data-i18n="comp.sustain.zinc">Minería</td>
                         </tr>
                         <tr>
                             <td data-i18n="comp.assembly">Sistema de ensamble</td>
-                            <td class="kcol"><span class="ok">&#10004; K-LOCK</span></td>
+                            <td class="kcol"><span class="ok">K-LOCK</span></td>
                             <td data-i18n="comp.assembly.clay">Traslapo simple</td>
                             <td data-i18n="comp.assembly.zinc">Tornillos</td>
                         </tr>
@@ -3133,22 +3270,9 @@
                     'svc.feat1.desc': 'Tu estructura debe llegar terminada y con manto asfáltico ya instalado. KASTON no construye estructura ni instala manto: iniciamos la instalación desde ese punto.',
                     'svc.feat2.title': 'Tú eliges cómo instalar',
                     'svc.feat2.desc': 'Con "Solo tejas" instalas por tu cuenta siguiendo el manual; con "Todo costo" lo hacemos nosotros. KASTON responde por la calidad de sus tejas y de su instalación.',
-                    'sp.label': 'Ingeniería de Materiales',
-                    'sp.title': 'Ficha técnica de nuestro producto <span class="gold">a tu alcance</span><br><span style="font-size:0.6em; color:var(--muted);">(SISTEMA KASTON 8MM)</span>',
-                    'sp.units': 'Unidades / m²',
                     'sp.thick': 'Espesor de Blindaje',
-                    'sp.unitweight': 'Peso por Unidad',
-                    'sp.mass': 'Masa Superficial (m²)',
-                    'sp.mechtitle': 'Resiliencia Mecánica y Operativa',
-                    'sp.mechdesc': 'Datos validados para la protección extrema del patrimonio ante condiciones climáticas y geológicas adversas.',
-                    'sp.thermal': 'Rango Térmico (Superficie)',
-                    'sp.hardness': 'Dureza Superficial',
-                    'sp.flex': 'Módulo de Flexión',
-                    'sp.izod': 'Resistencia al Impacto (Izod)',
-                    'sp.human': '<strong style="color:var(--gold);">Qué significa para ti:</strong> no se quiebran con el granizo, soportan que se paren encima de ellas, no se vuelan con vientos de hasta <strong style="color:var(--white);">225 km/h</strong>, no se oxidan, no absorben agua y pesan tan poco que tu estructura sale más barata.',
                     'col.n1': 'Negro Grafito',
                     'col.n3': 'Gris Basalto',
-                    'comp.title2': 'Análisis de <span class="gold">Superioridad Técnica</span>',
                     'footer.ig': 'Síguenos en Instagram',
                     'footer.priv': 'Política de Privacidad',
                     'footer.specs': 'Ficha técnica',
@@ -3163,7 +3287,6 @@
                     'emp.n6': 'Datos oficiales',
                     'emp.legal.hab.t': 'Tratamiento de datos',
                     'footer.terms': 'Términos y Condiciones',
-                    'sp.composition': '<strong>Composición:</strong> Matriz termoplástica bifásica.<br><br><strong>Protección UV Activa:</strong> El grosor masivo de 8mm garantiza que el 96% del núcleo interno permanezca estructuralmente invulnerable a la radiación solar por décadas, limitando la degradación mecánica solo a las micras superficiales.',
                     'nav.problema': 'Problema',
                     'nav.solucion': 'La teja',
                     'nav.instalacion': 'Cómo se instala',
@@ -3186,12 +3309,7 @@
                     'capas.t3': 'Tu techo, sí.',
                     'capas.t3b': 'Uno que no se quiebra, no gotea y no se vuela, y que protege a tu familia por generaciones.',
                     'feat.label': 'Características',
-                    'feat.title': 'Indestructible. <span class="gold">En Serio.</span>',
-                    'feat.card1.title': 'Blindaje Total',
                     'feat.card1.desc': '¿Granizo? ¿Pisar el techo? ¿Golpes? Nuestras tejas absorben el impacto sin quebrarse. Cero mermas en obra.',
-                    'feat.card2.title': 'Aislamiento Superior',
-                    'feat.card2.desc': 'A diferencia del Zinc que convierte tu casa en un horno, nuestro polímero denso aísla mejor la temperatura y el ruido.',
-                    'feat.card3.title': 'Ultra Liviana',
                     'feat.card3.desc': 'Mucho más livianas que el barro o el cemento, reduciendo costos en la estructura de madera o metal de tu casa.',
                     'klock.title': 'Sistema <span class="gold">K-LOCK</span>',
                     'klock.intro': 'Lo que hace única a KASTON es su ingeniería de conexión. Olvídate de tejas sueltas que vuelan con el viento.',
@@ -3225,6 +3343,49 @@
                     'sol.sp2': 'por teja',
                     'sol.sp3': 'tejas por m²',
                     'sol.obra': 'Cubierta instalada',
+                    'feat.title': 'Indestructible. <span class="gold">En serio.</span>',
+                    'feat.card1.title': 'Blindaje total',
+                    'feat.card2.title': 'Aislamiento superior',
+                    'feat.card3.title': 'Ultra liviana',
+                    'feat.card2.desc': 'A diferencia del zinc, que convierte tu casa en un horno, nuestro polímero denso aísla mejor la temperatura y el ruido.',
+                    'feat.d1.v': '17 años',
+                    'feat.d1': 'comprobados sin una teja rota',
+                    'feat.d2': 'de polímero macizo',
+                    'feat.d3.v': '12,6 kg',
+                    'feat.d3': 'por m²',
+                    'sp.label': 'Ingeniería de materiales',
+                    'sp.title': 'Ficha <span class="gold">técnica</span>',
+                    'sp.sub': 'Teja Cola de Castor con sistema K-LOCK',
+                    'sp.g1': 'Medidas y material',
+                    'sp.g2': 'Comportamiento',
+                    'sp.dim': 'Dimensiones',
+                    'sp.thickness': 'Espesor',
+                    'sp.unitweight': 'Peso por unidad',
+                    'sp.units': 'Unidades por m²',
+                    'sp.mass': 'Masa superficial',
+                    'sp.mass.v': '12,6 kg/m²',
+                    'sp.slope': 'Pendiente mínima',
+                    'sp.comp': 'Composición',
+                    'sp.comp.v': 'Matriz termoplástica bifásica',
+                    'sp.hardness': 'Dureza superficial',
+                    'sp.hardness.v': '82,5 Shore D',
+                    'sp.flex': 'Módulo de flexión',
+                    'sp.flex.v': '1.406,1 MPa',
+                    'sp.izod': 'Impacto (Izod)',
+                    'sp.izod.v': '29,4 J/m',
+                    'sp.thermal': 'Rango térmico',
+                    'sp.thermal.v': '−15 °C a 90 °C',
+                    'sp.uv': 'Protección UV',
+                    'sp.uv.v': '96% del núcleo',
+                    'sp.abs': 'Absorción de agua',
+                    'sp.wind': 'Resistencia al viento',
+                    'sp.wind.v': 'Hasta 225 km/h',
+                    'sp.human': '<strong>Qué significa para ti:</strong> no se quiebran con el granizo, soportan que se paren encima de ellas, no se vuelan con vientos de hasta 225 km/h, no se oxidan, no absorben agua y pesan tan poco que tu estructura sale más barata.',
+                    'comp.title2': 'KASTON frente al <span class="gold">barro y el zinc</span>',
+                    'comp.weight.k': '12,6 kg/m²',
+                    'comp.weight.clay': '≈ 44,5 kg/m²',
+                    'comp.weight.zinc': '≈ 4 kg/m²',
+                    'comp.breakage.clay': 'Frecuente',
                     'inst.label': 'Instalación',
                     'inst.title': 'Así se arma <span class="gold">tu techo</span>',
                     'inst.aria': 'Animación: la instalación de la teja Cola de Castor capa por capa y la casa terminada bajo lluvia, granizo y viento.',
@@ -3274,17 +3435,13 @@
                     'specs.thermal': 'Rango térmico',
                     'quote.label': 'Cómo funciona',
                     'quote.title': 'Cotizar es <span class="gold">así de simple</span>',
-                    'quote.desc': 'En pocos minutos obtienes el precio de tu cubierta KASTON, con toda la información técnica de respaldo.',
-                    'quote.step1.num': 'PASO 1',
+                    'quote.desc': 'En pocos minutos obtienes un estimativo del precio de tu cubierta KASTON, con toda la información técnica de respaldo.',
                     'quote.step1.title': 'Elige tu modalidad',
-                    'quote.step1.desc': 'Escoge cómo quieres tu cubierta: Solo tejas (te las entregamos en obra) o Todo costo (las instalamos por ti).',
-                    'quote.step2.num': 'PASO 2',
+                    'quote.step1.desc': 'Escoge cómo quieres tu cubierta: Solo tejas (te damos el suministro y el manual completo de instalación) o Todo costo (las instalamos por ti).',
                     'quote.step2.title': 'Cuéntanos tu proyecto',
                     'quote.step2.desc': 'Ingresa el área, el tipo de techo y la pendiente. Con eso calculamos todo al instante.',
-                    'quote.step3.num': 'PASO 3',
                     'quote.step3.title': 'Mira tu precio',
                     'quote.step3.desc': 'Ves tu inversión estimada según la modalidad y el área.',
-                    'quote.step4.num': 'PASO 4',
                     'quote.step4.title': 'Recibe tu cotización',
                     'quote.step4.desc': 'Descarga el PDF y, si quieres, agenda tu visita técnica por WhatsApp o correo. Crea una cuenta solo si deseas guardar tu proyecto.',
                     'comp.label': '¿Por qué KASTON?',
@@ -3296,32 +3453,29 @@
                     'comp.lifespan.clay': '20–40 años',
                     'comp.lifespan.zinc': '15–30 años',
                     'comp.weight': 'Peso',
-                    'comp.weight.k': '12.6 kg/m²',
-                    'comp.weight.clay': '~44.5 kg/m²',
-                    'comp.weight.zinc': '~4 kg/m²',
                     'comp.hail': 'Resistencia a granizo',
-                    'comp.hail.k': '&#10004; Total',
-                    'comp.hail.clay': '&#10008; Frágil',
+                    'comp.hail.k': 'Total',
+                    'comp.hail.clay': 'Frágil',
                     'comp.hail.zinc': 'Se abolla',
                     'comp.moisture': 'Absorción de humedad',
-                    'comp.moisture.k': '&#10004; Cero',
-                    'comp.moisture.clay': '&#10008; Alta',
+                    'comp.moisture.k': 'Cero',
+                    'comp.moisture.clay': 'Alta',
                     'comp.moisture.zinc': 'Cero (se oxida)',
                     'comp.breakage': 'Rotura en transporte',
                     'comp.thermal': 'Aislamiento térmico',
-                    'comp.thermal.k': '&#10004; Alto',
+                    'comp.thermal.k': 'Alto',
                     'comp.thermal.clay': 'Medio',
-                    'comp.thermal.zinc': '&#10008; Mínimo',
+                    'comp.thermal.zinc': 'Mínimo',
                     'comp.acoustic': 'Aislamiento acústico',
-                    'comp.acoustic.k': '&#10004; Alto',
+                    'comp.acoustic.k': 'Alto',
                     'comp.acoustic.clay': 'Medio',
-                    'comp.acoustic.zinc': '&#10008; Ruidoso',
+                    'comp.acoustic.zinc': 'Ruidoso',
                     'comp.maintenance': 'Mantenimiento',
                     'comp.maintenance.k': 'Cero',
                     'comp.maintenance.clay': 'Reemplazo parcial',
                     'comp.maintenance.zinc': 'Pintura / anticorrosivo',
                     'comp.sustain': 'Sostenibilidad',
-                    'comp.sustain.k': '&#10004; Recuperado',
+                    'comp.sustain.k': 'Recuperado',
                     'comp.sustain.clay': 'Alto consumo energía',
                     'comp.sustain.zinc': 'Minería',
                     'comp.assembly': 'Sistema de ensamble',
@@ -3347,26 +3501,12 @@
                     'svc.feat1.desc': 'Your structure must arrive finished and with the asphalt membrane already installed. KASTON does not build structure or install the membrane: we start the installation from there.',
                     'svc.feat2.title': 'You choose how to install',
                     'svc.feat2.desc': 'With "Tiles only" you install yourself following the manual; with "All-inclusive" we do it. KASTON is responsible for the quality of its tiles and its installation.',
-                    'sp.label': 'Materials Engineering',
-                    'sp.title': 'Our product\'s technical sheet <span class="gold">within your reach</span><br><span style="font-size:0.6em; color:var(--muted);">(KASTON 8MM SYSTEM)</span>',
-                    'sp.units': 'Units / m²',
                     'sp.thick': 'Shield Thickness',
-                    'sp.unitweight': 'Weight per Unit',
-                    'sp.mass': 'Surface Mass (m²)',
-                    'sp.mechtitle': 'Mechanical & Operational Resilience',
-                    'sp.mechdesc': 'Validated data for extreme protection of your property against adverse climatic and geological conditions.',
-                    'sp.thermal': 'Thermal Range (Surface)',
-                    'sp.hardness': 'Surface Hardness',
-                    'sp.flex': 'Flexural Modulus',
-                    'sp.izod': 'Impact Resistance (Izod)',
-                    'sp.human': '<strong style="color:var(--gold);">What this means for you:</strong> the tiles don\'t crack under hail, they hold your weight when you stand on them, they don\'t blow off in winds up to <strong style="color:var(--white);">225 km/h</strong>, they don\'t rust, they don\'t absorb water, and they\'re so light your structure costs less.',
                     'col.n1': 'Graphite Black',
                     'col.n3': 'Basalt Gray',
-                    'comp.title2': '<span class="gold">Technical Superiority</span> Analysis',
                     'footer.ig': 'Follow us on Instagram',
                     'footer.priv': 'Privacy Policy',
                     'footer.terms': 'Terms & Conditions',
-                    'sp.composition': '<strong>Composition:</strong> Two-phase thermoplastic matrix.<br><br><strong>Active UV Protection:</strong> The massive 8mm thickness ensures that 96% of the inner core remains structurally invulnerable to solar radiation for decades, limiting mechanical degradation to just the surface microns.',
                     'nav.problema': 'Problem',
                     'nav.solucion': 'The tile',
                     'nav.instalacion': 'How it installs',
@@ -3389,12 +3529,7 @@
                     'capas.t3': 'Your roof, you do.',
                     'capas.t3b': 'One that doesn\'t crack, leak or blow away, and protects your family for generations.',
                     'feat.label': 'Features',
-                    'feat.title': 'Indestructible. <span class="gold">Seriously.</span>',
-                    'feat.card1.title': 'Total Armor',
                     'feat.card1.desc': 'Hail? Walking on the roof? Impacts? Our tiles absorb the blow without breaking. Zero waste on site.',
-                    'feat.card2.title': 'Superior Insulation',
-                    'feat.card2.desc': 'Unlike Zinc that turns your home into an oven, our dense polymer insulates temperature and noise better.',
-                    'feat.card3.title': 'Ultra Lightweight',
                     'feat.card3.desc': 'Much lighter than clay or cement, reducing costs in your home\'s wood or metal structure.',
                     'klock.title': '<span class="gold">K-LOCK</span> System',
                     'klock.intro': 'What makes KASTON unique is its connection engineering. Forget loose tiles that blow away in the wind.',
@@ -3428,6 +3563,49 @@
                     'sol.sp2': 'per tile',
                     'sol.sp3': 'tiles per m²',
                     'sol.obra': 'Installed roof',
+                    'feat.title': 'Indestructible. <span class="gold">Seriously.</span>',
+                    'feat.card1.title': 'Total armor',
+                    'feat.card2.title': 'Superior insulation',
+                    'feat.card3.title': 'Ultra light',
+                    'feat.card2.desc': 'Unlike zinc, which turns your home into an oven, our dense polymer insulates heat and noise better.',
+                    'feat.d1.v': '17 years',
+                    'feat.d1': 'proven without a single broken tile',
+                    'feat.d2': 'of solid polymer',
+                    'feat.d3.v': '12.6 kg',
+                    'feat.d3': 'per m²',
+                    'sp.label': 'Materials engineering',
+                    'sp.title': 'Technical <span class="gold">sheet</span>',
+                    'sp.sub': 'Cola de Castor tile with K-LOCK system',
+                    'sp.g1': 'Size and material',
+                    'sp.g2': 'Performance',
+                    'sp.dim': 'Dimensions',
+                    'sp.thickness': 'Thickness',
+                    'sp.unitweight': 'Weight per tile',
+                    'sp.units': 'Tiles per m²',
+                    'sp.mass': 'Surface mass',
+                    'sp.mass.v': '12.6 kg/m²',
+                    'sp.slope': 'Minimum slope',
+                    'sp.comp': 'Composition',
+                    'sp.comp.v': 'Two-phase thermoplastic matrix',
+                    'sp.hardness': 'Surface hardness',
+                    'sp.hardness.v': '82.5 Shore D',
+                    'sp.flex': 'Flexural modulus',
+                    'sp.flex.v': '1,406.1 MPa',
+                    'sp.izod': 'Impact (Izod)',
+                    'sp.izod.v': '29.4 J/m',
+                    'sp.thermal': 'Thermal range',
+                    'sp.thermal.v': '−15 °C to 90 °C',
+                    'sp.uv': 'UV protection',
+                    'sp.uv.v': '96% of the core',
+                    'sp.abs': 'Water absorption',
+                    'sp.wind': 'Wind resistance',
+                    'sp.wind.v': 'Up to 225 km/h',
+                    'sp.human': '<strong>What this means for you:</strong> the tiles don\'t crack under hail, they hold your weight when you stand on them, they don\'t blow off in winds up to 225 km/h, they don\'t rust, they don\'t absorb water, and they\'re so light your structure costs less.',
+                    'comp.title2': 'KASTON vs. <span class="gold">clay and zinc</span>',
+                    'comp.weight.k': '12.6 kg/m²',
+                    'comp.weight.clay': '≈ 44.5 kg/m²',
+                    'comp.weight.zinc': '≈ 4 kg/m²',
+                    'comp.breakage.clay': 'Common',
                     'inst.label': 'Installation',
                     'inst.title': 'How your roof <span class="gold">comes together</span>',
                     'inst.aria': 'Animation: the Cola de Castor tile installed layer by layer, and the finished house under rain, hail and wind.',
@@ -3477,17 +3655,13 @@
                     'specs.thermal': 'Thermal range',
                     'quote.label': 'How it works',
                     'quote.title': 'Quoting is <span class="gold">this simple</span>',
-                    'quote.desc': 'In just a few minutes you get the price of your KASTON roof, with all the technical information to back it up.',
-                    'quote.step1.num': 'STEP 1',
+                    'quote.desc': 'In just a few minutes you get an estimate of your KASTON roof\'s price, with all the technical information to back it up.',
                     'quote.step1.title': 'Choose your option',
-                    'quote.step1.desc': 'Pick how you want your roof: Tiles only (we deliver them to your site) or All-inclusive (we install them for you).',
-                    'quote.step2.num': 'STEP 2',
+                    'quote.step1.desc': 'Pick how you want your roof: Tiles only (we supply the tiles and the full installation manual) or All-inclusive (we install them for you).',
                     'quote.step2.title': 'Tell us about your project',
                     'quote.step2.desc': 'Enter the area, roof type and pitch. With that we calculate everything instantly.',
-                    'quote.step3.num': 'STEP 3',
                     'quote.step3.title': 'See your price',
                     'quote.step3.desc': 'You see your estimated investment based on the option and area.',
-                    'quote.step4.num': 'STEP 4',
                     'quote.step4.title': 'Get your quote',
                     'quote.step4.desc': 'Download the PDF and, if you want, book your technical visit by WhatsApp or email. Create an account only if you want to save your project.',
                     'comp.label': 'Why KASTON?',
@@ -3499,32 +3673,29 @@
                     'comp.lifespan.clay': '20–40 years',
                     'comp.lifespan.zinc': '15–30 years',
                     'comp.weight': 'Weight',
-                    'comp.weight.k': '12.6 kg/m²',
-                    'comp.weight.clay': '~44.5 kg/m²',
-                    'comp.weight.zinc': '~4 kg/m²',
                     'comp.hail': 'Hail resistance',
-                    'comp.hail.k': '&#10004; Total',
-                    'comp.hail.clay': '&#10008; Fragile',
+                    'comp.hail.k': 'Total',
+                    'comp.hail.clay': 'Fragile',
                     'comp.hail.zinc': 'Dents',
                     'comp.moisture': 'Moisture absorption',
-                    'comp.moisture.k': '&#10004; Zero',
-                    'comp.moisture.clay': '&#10008; High',
+                    'comp.moisture.k': 'Zero',
+                    'comp.moisture.clay': 'High',
                     'comp.moisture.zinc': 'Zero (rusts)',
                     'comp.breakage': 'Transport breakage',
                     'comp.thermal': 'Thermal insulation',
-                    'comp.thermal.k': '&#10004; High',
+                    'comp.thermal.k': 'High',
                     'comp.thermal.clay': 'Medium',
-                    'comp.thermal.zinc': '&#10008; Minimal',
+                    'comp.thermal.zinc': 'Minimal',
                     'comp.acoustic': 'Acoustic insulation',
-                    'comp.acoustic.k': '&#10004; High',
+                    'comp.acoustic.k': 'High',
                     'comp.acoustic.clay': 'Medium',
-                    'comp.acoustic.zinc': '&#10008; Noisy',
+                    'comp.acoustic.zinc': 'Noisy',
                     'comp.maintenance': 'Maintenance',
                     'comp.maintenance.k': 'Zero',
                     'comp.maintenance.clay': 'Partial replacement',
                     'comp.maintenance.zinc': 'Paint / anti-corrosion',
                     'comp.sustain': 'Sustainability',
-                    'comp.sustain.k': '&#10004; Recovered',
+                    'comp.sustain.k': 'Recovered',
                     'comp.sustain.clay': 'High energy use',
                     'comp.sustain.zinc': 'Mining',
                     'comp.assembly': 'Assembly system',

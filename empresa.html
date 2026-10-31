@@ -413,26 +413,43 @@
             font-style: normal;
         }
 
-        /* Manifiesto en cobre */
+        /* Manifiesto: negro con filo cobre; el cobre solo en el cierre */
         .manifiesto {
-            background: var(--gold);
-            color: var(--bg);
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.22);
+            border-left: 3px solid var(--gold);
             border-radius: 14px;
             padding: 60px 52px;
             margin: 6px 0 8px;
         }
 
-        .manifiesto .ap-num, .manifiesto h2 { color: var(--bg); opacity: 1; }
-        .manifiesto .ap-divider { background: var(--bg); opacity: 0.35; }
-
-        .manifiesto blockquote {
+        .manifiesto .mani-abre {
             font-family: var(--font-heading);
-            font-size: clamp(1.35rem, 2.9vw, 2.1rem);
-            line-height: 1.3;
-            text-transform: none;
-            letter-spacing: 0;
+            font-size: clamp(1.6rem, 3.2vw, 2.5rem);
             font-weight: 600;
-            max-width: 780px;
+            line-height: 1.15;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--white);
+            max-width: 22ch;
+        }
+
+        .manifiesto .mani-p {
+            margin-top: 22px;
+            max-width: 62ch;
+            font-size: clamp(1rem, 1.4vw, 1.15rem);
+            line-height: 1.7;
+            color: var(--light);
+        }
+
+        .manifiesto .mani-cierre {
+            margin-top: 34px;
+            font-family: var(--font-heading);
+            font-size: clamp(1.4rem, 2.6vw, 2rem);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--gold);
         }
 
         .manifiesto .firma {
@@ -442,7 +459,7 @@
             letter-spacing: 1.5px;
             text-transform: uppercase;
             font-family: var(--font-heading);
-            opacity: 0.75;
+            color: var(--muted);
         }
 
         /* Tarjetas */
@@ -869,8 +886,10 @@
                         <div class="ap-num">02</div>
                         <h2 data-i18n="emp.mani.title">Manifiesto</h2>
                         <div class="ap-divider"></div>
-                        <blockquote data-i18n="emp.mani.quote">De las tejas para arriba está el exterior. De tu techo para
-                            abajo está tu familia. KASTON es lo que hay en medio.</blockquote>
+                        <p class="mani-abre" data-i18n="emp.mani.l1">Nos acostumbramos a que los techos tengan fecha de vencimiento.</p>
+                        <p class="mani-p" data-i18n="emp.mani.p1">A cambiarlos cada diez años. A que un granizo suene como un tiroteo. A que una gotera obligue a levantar medio techo. A que el plástico dure siglos en un vertedero sin que nadie lo aproveche.</p>
+                        <p class="mani-p" data-i18n="emp.mani.p2">KASTON existe para acabar con esa costumbre. Fabricamos, no revendemos. Probamos antes de prometer: 17 años sobre la misma casa, sin una teja rota.</p>
+                        <p class="mani-cierre" data-i18n="emp.mani.cierre">Un techo. Una sola vez. Para siempre.</p>
                         <div class="firma" data-i18n="emp.mani.firma">Juanita Ospina, fundadora</div>
                     </div>
                 </section>
@@ -1121,7 +1140,10 @@
                     'emp.origen.p4': '<strong>KASTON fabrica, no revende.</strong> Cada teja sale de esa planta en Itagüí.',
                     'emp.origen.pie': 'Primera cubierta del sistema. 17 años a la intemperie.',
                     'emp.mani.title': 'Manifiesto',
-                    'emp.mani.quote': 'De las tejas para arriba está el exterior. De tu techo para abajo está tu familia. KASTON es lo que hay en medio.',
+                    'emp.mani.l1': 'Nos acostumbramos a que los techos tengan fecha de vencimiento.',
+                    'emp.mani.p1': 'A cambiarlos cada diez años. A que un granizo suene como un tiroteo. A que una gotera obligue a levantar medio techo. A que el plástico dure siglos en un vertedero sin que nadie lo aproveche.',
+                    'emp.mani.p2': 'KASTON existe para acabar con esa costumbre. Fabricamos, no revendemos. Probamos antes de prometer: 17 años sobre la misma casa, sin una teja rota.',
+                    'emp.mani.cierre': 'Un techo. Una sola vez. Para siempre.',
                     'emp.mani.firma': 'Juanita Ospina, fundadora',
                     'emp.prop.title': 'Misión y visión',
                     'emp.prop.mision.t': 'Misión',
@@ -1200,7 +1222,10 @@
                     'emp.origen.p4': '<strong>KASTON manufactures, it does not resell.</strong> Every tile comes out of that plant in Itagüí.',
                     'emp.origen.pie': 'The first roof of the system. 17 years in the open.',
                     'emp.mani.title': 'Manifesto',
-                    'emp.mani.quote': 'Above the tiles is the outside world. Below your roof is your family. KASTON is what stands in between.',
+                    'emp.mani.l1': 'We got used to roofs having an expiration date.',
+                    'emp.mani.p1': 'To replacing them every ten years. To hail that sounds like gunfire. To a leak that means tearing up half the roof. To plastic that lasts centuries in a landfill without anyone putting it to use.',
+                    'emp.mani.p2': 'KASTON exists to end that habit. We manufacture, we don\'t resell. We test before we promise: 17 years on the same house, without a single broken tile.',
+                    'emp.mani.cierre': 'One roof. Once. Forever.',
                     'emp.mani.firma': 'Juanita Ospina, founder',
                     'emp.prop.title': 'Mission and vision',
                     'emp.prop.mision.t': 'Mission',
