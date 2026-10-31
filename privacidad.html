@@ -314,6 +314,27 @@
 
             .legal-page { padding-top: calc(var(--nav-height) + 40px); }
         }
+
+        /* el menú cabe en una sola línea en pantallas medianas */
+        .nav-links a {
+            white-space: nowrap;
+        }
+
+        @media (min-width: 901px) and (max-width: 1200px) {
+            .nav-links {
+                gap: 18px;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+                letter-spacing: 0.2px;
+            }
+
+            .nav-cta {
+                padding: 10px 16px !important;
+                letter-spacing: 1px !important;
+            }
+        }
     </style>
 </head>
 
@@ -323,8 +344,8 @@
         <div class="container" style="max-width:1200px;">
             <a href="/" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="/#solucion">La teja</a></li>
-                <li><a href="/#instalacion">Cómo se instala</a></li>
+                <li><a href="/#solucion">Nuestras tejas</a></li>
+                <li><a href="/#instalacion">¿Cómo se instala?</a></li>
                 <li><a href="/#colores">Colores</a></li>
                 <li><a href="/#cotizacion">Precios</a></li>
                 <li><a href="/empresa">Empresa</a></li>

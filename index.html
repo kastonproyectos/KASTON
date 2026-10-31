@@ -2421,6 +2421,27 @@
                 margin-left: 8px;
             }
         }
+
+        /* el menú cabe en una sola línea en pantallas medianas */
+        .nav-links a {
+            white-space: nowrap;
+        }
+
+        @media (min-width: 901px) and (max-width: 1200px) {
+            .nav-links {
+                gap: 18px;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+                letter-spacing: 0.2px;
+            }
+
+            .nav-cta {
+                padding: 10px 16px !important;
+                letter-spacing: 1px !important;
+            }
+        }
     </style>
     <!-- Respaldo: si el navegador no ejecuta JS, mostrar todo el contenido igual -->
     <noscript>
@@ -2575,8 +2596,8 @@
         <div class="container">
             <a href="#hero" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#solucion" data-i18n="nav.solucion">La teja</a></li>
-                <li><a href="#instalacion" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                <li><a href="#solucion" data-i18n="nav.solucion">Nuestras tejas</a></li>
+                <li><a href="#instalacion" data-i18n="nav.instalacion">¿Cómo se instala?</a></li>
                 <li><a href="#colores" data-i18n="nav.colores">Colores</a></li>
                 <li><a href="#cotizacion" data-i18n="nav.precios">Precios</a></li>
                 <li><a href="/empresa" data-i18n="nav.empresa">Empresa</a></li>
@@ -3186,8 +3207,8 @@
                     <h4 data-i18n="footer.col.prod">Producto</h4>
                     <ul>
                         <li><a href="#problema" data-i18n="nav.problema">Problema</a></li>
-                        <li><a href="#solucion" data-i18n="nav.solucion">Solución</a></li>
-                        <li><a href="#instalacion" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                        <li><a href="#solucion" data-i18n="footer.solucion">Solución</a></li>
+                        <li><a href="#instalacion" data-i18n="footer.instalacion">Cómo se instala</a></li>
                         <li><a href="#colores" data-i18n="nav.colores">Colores</a></li>
                         <li><a href="#especificaciones" data-i18n="footer.specs">Ficha técnica</a></li>
                         <li><a href="#comparativa" data-i18n="footer.comp">Comparativa</a></li>
@@ -3288,13 +3309,15 @@
                     'emp.legal.hab.t': 'Tratamiento de datos',
                     'footer.terms': 'Términos y Condiciones',
                     'nav.problema': 'Problema',
-                    'nav.solucion': 'La teja',
-                    'nav.instalacion': 'Cómo se instala',
+                    'nav.solucion': 'Nuestras tejas',
+                    'nav.instalacion': '¿Cómo se instala?',
+                    'footer.instalacion': 'Cómo se instala',
+                    'footer.solucion': 'Solución',
                     'nav.precios': 'Precios',
                     'nav.colores': 'Colores',
                     'nav.cotizacion': 'Cotización',
                     'nav.empresa': 'Empresa',
-                    'nav.cta': 'INICIAR COTIZACIÓN TÉCNICA',
+                    'nav.cta': 'Cotiza ahora',
                     'hero.subtitle': 'INNOVACIÓN PARA SIEMPRE',
                     'hero.tagline': 'La primera cubierta de polímero recuperado diseñada para durar <strong style="color:var(--gold);">500 años.</strong>',
                     'hero.cta1': 'INICIAR COTIZACIÓN TÉCNICA',
@@ -3508,13 +3531,15 @@
                     'footer.priv': 'Privacy Policy',
                     'footer.terms': 'Terms & Conditions',
                     'nav.problema': 'Problem',
-                    'nav.solucion': 'The tile',
-                    'nav.instalacion': 'How it installs',
+                    'nav.solucion': 'Our tiles',
+                    'nav.instalacion': 'How is it installed?',
+                    'footer.instalacion': 'How it\'s installed',
+                    'footer.solucion': 'Solution',
                     'nav.precios': 'Pricing',
                     'nav.colores': 'Colors',
                     'nav.cotizacion': 'Quote',
                     'nav.empresa': 'Company',
-                    'nav.cta': 'START TECHNICAL QUOTE',
+                    'nav.cta': 'Get a quote',
                     'hero.subtitle': 'INNOVATION FOREVER',
                     'hero.tagline': 'The first recovered polymer roofing tile designed to last <strong style="color:var(--gold);">500 years.</strong>',
                     'hero.cta1': 'START TECHNICAL QUOTE',

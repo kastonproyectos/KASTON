@@ -434,32 +434,14 @@
             max-width: 22ch;
         }
 
-        .manifiesto .mani-p {
-            margin-top: 22px;
-            max-width: 62ch;
-            font-size: clamp(1rem, 1.4vw, 1.15rem);
-            line-height: 1.7;
-            color: var(--light);
-        }
-
         .manifiesto .mani-cierre {
-            margin-top: 34px;
+            margin-top: 28px;
             font-family: var(--font-heading);
             font-size: clamp(1.4rem, 2.6vw, 2rem);
             font-weight: 600;
             letter-spacing: 0.04em;
             text-transform: uppercase;
             color: var(--gold);
-        }
-
-        .manifiesto .firma {
-            margin-top: 26px;
-            font-size: 0.86rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-family: var(--font-heading);
-            color: var(--muted);
         }
 
         /* Tarjetas */
@@ -721,6 +703,27 @@
             .dato { grid-template-columns: 1fr; gap: 6px; }
             .footer-grid { grid-template-columns: 1fr; gap: 28px; }
         }
+
+        /* el menú cabe en una sola línea en pantallas medianas */
+        .nav-links a {
+            white-space: nowrap;
+        }
+
+        @media (min-width: 901px) and (max-width: 1200px) {
+            .nav-links {
+                gap: 18px;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+                letter-spacing: 0.2px;
+            }
+
+            .nav-cta {
+                padding: 10px 16px !important;
+                letter-spacing: 1px !important;
+            }
+        }
     </style>
     <!-- Datos estructurados: le dicen a Google y a las IA quien es KASTON,
          en vez de dejar que lo deduzcan del texto. -->
@@ -806,8 +809,8 @@
         <div class="container">
             <a href="/" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="/#solucion" data-i18n="nav.solucion">La teja</a></li>
-                <li><a href="/#instalacion" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                <li><a href="/#solucion" data-i18n="nav.solucion">Nuestras tejas</a></li>
+                <li><a href="/#instalacion" data-i18n="nav.instalacion">¿Cómo se instala?</a></li>
                 <li><a href="/#colores" data-i18n="nav.colores">Colores</a></li>
                 <li><a href="/#cotizacion" data-i18n="nav.precios">Precios</a></li>
                 <li><a href="/empresa" class="active" data-i18n="nav.empresa">Empresa</a></li>
@@ -887,10 +890,7 @@
                         <h2 data-i18n="emp.mani.title">Manifiesto</h2>
                         <div class="ap-divider"></div>
                         <p class="mani-abre" data-i18n="emp.mani.l1">Nos acostumbramos a que los techos tengan fecha de vencimiento.</p>
-                        <p class="mani-p" data-i18n="emp.mani.p1">A cambiarlos cada diez años. A que un granizo suene como un tiroteo. A que una gotera obligue a levantar medio techo. A que el plástico dure siglos en un vertedero sin que nadie lo aproveche.</p>
-                        <p class="mani-p" data-i18n="emp.mani.p2">KASTON existe para acabar con esa costumbre. Fabricamos, no revendemos. Probamos antes de prometer: 17 años sobre la misma casa, sin una teja rota.</p>
                         <p class="mani-cierre" data-i18n="emp.mani.cierre">Un techo. Una sola vez. Para siempre.</p>
-                        <div class="firma" data-i18n="emp.mani.firma">Juanita Ospina, fundadora</div>
                     </div>
                 </section>
 
@@ -1070,8 +1070,8 @@
                     <h4 data-i18n="footer.col.prod">Producto</h4>
                     <ul>
                         <li><a href="/#problema" data-i18n="nav.problema">Problema</a></li>
-                        <li><a href="/#solucion" data-i18n="nav.solucion">Solución</a></li>
-                        <li><a href="/#instalacion" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                        <li><a href="/#solucion" data-i18n="footer.solucion">Solución</a></li>
+                        <li><a href="/#instalacion" data-i18n="footer.instalacion">Cómo se instala</a></li>
                         <li><a href="/#colores" data-i18n="nav.colores">Colores</a></li>
                         <li><a href="/#especificaciones" data-i18n="footer.specs">Ficha técnica</a></li>
                         <li><a href="/#comparativa" data-i18n="footer.comp">Comparativa</a></li>
@@ -1115,13 +1115,15 @@
             var T = {
                 es: {
                     'nav.problema': 'Problema',
-                    'nav.solucion': 'La teja',
-                    'nav.instalacion': 'Cómo se instala',
+                    'nav.solucion': 'Nuestras tejas',
+                    'nav.instalacion': '¿Cómo se instala?',
+                    'footer.instalacion': 'Cómo se instala',
+                    'footer.solucion': 'Solución',
                     'nav.precios': 'Precios',
                     'nav.colores': 'Colores',
                     'nav.cotizacion': 'Cotización',
                     'nav.empresa': 'Empresa',
-                    'nav.cta': 'INICIAR COTIZACIÓN TÉCNICA',
+                    'nav.cta': 'Cotiza ahora',
                     'emp.eyebrow': 'La empresa',
                     'emp.title': 'Quién está <span class="gold">detrás</span><br>de la teja',
                     'emp.intro': 'Una fábrica en Itagüí con 35 años de oficio, un apellido que responde y 17 años de instalación comprobada. Aquí está todo lo que no cabe en la ficha técnica, incluidas nuestras políticas y nuestros datos oficiales.',
@@ -1141,10 +1143,7 @@
                     'emp.origen.pie': 'Primera cubierta del sistema. 17 años a la intemperie.',
                     'emp.mani.title': 'Manifiesto',
                     'emp.mani.l1': 'Nos acostumbramos a que los techos tengan fecha de vencimiento.',
-                    'emp.mani.p1': 'A cambiarlos cada diez años. A que un granizo suene como un tiroteo. A que una gotera obligue a levantar medio techo. A que el plástico dure siglos en un vertedero sin que nadie lo aproveche.',
-                    'emp.mani.p2': 'KASTON existe para acabar con esa costumbre. Fabricamos, no revendemos. Probamos antes de prometer: 17 años sobre la misma casa, sin una teja rota.',
                     'emp.mani.cierre': 'Un techo. Una sola vez. Para siempre.',
-                    'emp.mani.firma': 'Juanita Ospina, fundadora',
                     'emp.prop.title': 'Misión y visión',
                     'emp.prop.mision.t': 'Misión',
                     'emp.prop.mision.d': 'Fabricar cubiertas que no haya que volver a cambiar. Convertimos polímero recuperado del sector industrial en tejas que protegen una casa durante generaciones, hechas en nuestra propia planta y respaldadas metro a metro.',
@@ -1197,13 +1196,15 @@
                 },
                 en: {
                     'nav.problema': 'Problem',
-                    'nav.solucion': 'The tile',
-                    'nav.instalacion': 'How it installs',
+                    'nav.solucion': 'Our tiles',
+                    'nav.instalacion': 'How is it installed?',
+                    'footer.instalacion': 'How it\'s installed',
+                    'footer.solucion': 'Solution',
                     'nav.precios': 'Pricing',
                     'nav.colores': 'Colors',
                     'nav.cotizacion': 'Quote',
                     'nav.empresa': 'Company',
-                    'nav.cta': 'START TECHNICAL QUOTE',
+                    'nav.cta': 'Get a quote',
                     'emp.eyebrow': 'The company',
                     'emp.title': 'Who is <span class="gold">behind</span><br>the tile',
                     'emp.intro': 'A factory in Itagüí with 35 years of craft, a family name that answers for it, and 17 years of proven installation. This is everything that does not fit on a spec sheet, including our policies and our official records.',
@@ -1223,10 +1224,7 @@
                     'emp.origen.pie': 'The first roof of the system. 17 years in the open.',
                     'emp.mani.title': 'Manifesto',
                     'emp.mani.l1': 'We got used to roofs having an expiration date.',
-                    'emp.mani.p1': 'To replacing them every ten years. To hail that sounds like gunfire. To a leak that means tearing up half the roof. To plastic that lasts centuries in a landfill without anyone putting it to use.',
-                    'emp.mani.p2': 'KASTON exists to end that habit. We manufacture, we don\'t resell. We test before we promise: 17 years on the same house, without a single broken tile.',
                     'emp.mani.cierre': 'One roof. Once. Forever.',
-                    'emp.mani.firma': 'Juanita Ospina, founder',
                     'emp.prop.title': 'Mission and vision',
                     'emp.prop.mision.t': 'Mission',
                     'emp.prop.mision.d': 'To manufacture roofing that never has to be replaced. We turn recovered industrial polymer into tiles that protect a home for generations, made in our own plant and backed square meter by square meter.',
