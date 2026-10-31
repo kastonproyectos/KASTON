@@ -1004,116 +1004,6 @@
         }
 
         /* =============================================
-           INSTALLATION STEPS
-           ============================================= */
-        .install-steps {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 24px;
-        }
-
-        .install-step {
-            background: var(--surface);
-            border-radius: 10px;
-            padding: 24px 20px;
-            position: relative;
-            border: 1px solid rgba(193, 138, 104, 0.1);
-            border-left: 3px solid var(--gold);
-            transition: border-color 0.3s, transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
-        }
-
-        .install-step:hover {
-            border-color: rgba(193, 138, 104, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(193, 138, 104, 0.1);
-        }
-
-        .install-step .step-num {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            color: var(--gold);
-            opacity: 0.35;
-            position: absolute;
-            top: 12px;
-            right: 16px;
-        }
-
-        .install-step p {
-            font-size: 0.9rem;
-            color: var(--light);
-            padding-right: 24px;
-        }
-
-        /* =============================================
-           K-LOCK: instalación animada por capas
-           ============================================= */
-        .klock-stage {
-            background: var(--surface);
-            border: 1px solid rgba(193, 138, 104, 0.12);
-            border-radius: 12px;
-            padding: 18px 12px 10px;
-            margin-top: 24px;
-        }
-
-        .klock-stage svg {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .klock-layer {
-            opacity: 0;
-            transform: translateY(-16px);
-            transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
-        }
-
-        .klock-layer.on {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .klock-tie {
-            fill: none;
-            stroke: var(--gold);
-            stroke-width: 1.7;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .klock-caption {
-            text-align: center;
-            font-family: var(--font-body);
-            font-size: 0.78rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-top: 6px;
-            min-height: 1.2em;
-        }
-
-        .install-step {
-            cursor: pointer;
-        }
-
-        .install-step.active {
-            border-color: var(--gold);
-            border-left-color: var(--gold);
-            background: rgba(193, 138, 104, 0.07);
-            box-shadow: 0 10px 30px rgba(193, 138, 104, 0.12);
-        }
-
-        .install-step.active .step-num {
-            opacity: 1;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .klock-layer {
-                transition: none;
-            }
-        }
-
-        /* =============================================
            CTA SECTION
            ============================================= */
         .cta-section {
@@ -1345,10 +1235,6 @@
 
             .swatch-row {
                 flex-direction: column;
-            }
-
-            .install-steps {
-                grid-template-columns: 1fr;
             }
 
             .comp-table {
@@ -1727,6 +1613,250 @@
                 height: 42%;
             }
         }
+
+        /* =============================================
+           INSTALACIÓN — animación capa por capa
+           ============================================= */
+        .inst-head {
+            align-items: center;
+        }
+
+        .inst-klock {
+            padding: 28px 30px;
+            background: var(--surface);
+            border: 1px solid rgba(193, 138, 104, 0.12);
+            border-left: 3px solid var(--gold);
+            border-radius: 10px;
+        }
+
+        .inst-klock-nombre {
+            font-family: var(--font-heading);
+            font-size: clamp(1.3rem, 2vw, 1.6rem);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--white);
+            margin-bottom: 14px;
+        }
+
+        .inst-klock strong {
+            display: block;
+            color: var(--white);
+            margin-bottom: 4px;
+        }
+
+        .inst-klock p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .inst-stage {
+            position: relative;
+            margin-top: 48px;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .inst-lienzo {
+            position: relative;
+            aspect-ratio: 16 / 9;
+        }
+
+        .inst-lienzo canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* sombra suave detrás del texto, para que se lea sobre el cielo y el jardín */
+        .inst-lienzo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 55% 50% at 0% 100%, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0) 100%);
+            pointer-events: none;
+        }
+
+        .inst-nota {
+            position: absolute;
+            right: 14px;
+            top: 12px;
+            font-size: 11px;
+            color: var(--muted);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .inst-captions {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            display: grid;
+            max-width: min(46%, 460px);
+            padding: 28px 32px;
+            pointer-events: none;
+        }
+
+        .inst-cap {
+            grid-area: 1 / 1;
+            align-self: end;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        /* el texto nuevo entra cuando el anterior ya salió, para que no se crucen */
+        .inst-cap.on {
+            opacity: 1;
+            transform: none;
+            transition: opacity 0.45s var(--ease) 0.2s, transform 0.45s var(--ease) 0.2s;
+        }
+
+        .inst-num {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            letter-spacing: 0.14em;
+            color: var(--gold);
+        }
+
+        .inst-cap h3 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.4rem, 2.4vw, 2rem);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            line-height: 1.1;
+            color: var(--white);
+            margin: 4px 0 6px;
+        }
+
+        .inst-cap p {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 300;
+            line-height: 1.5;
+            color: var(--light);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .inst-controles {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .inst-play {
+            flex: none;
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--white);
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .inst-play:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .inst-play svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .inst-ico-play,
+        .inst--pausa .inst-ico-pausa {
+            display: none;
+        }
+
+        .inst--pausa .inst-ico-play {
+            display: block;
+        }
+
+        .inst-barra {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            gap: 3px;
+        }
+
+        .inst-seg {
+            flex-basis: 0;
+            min-width: 0;
+            padding: 14px 0;
+            background: none;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .inst-seg--grupo {
+            margin-left: 12px;
+        }
+
+        .inst-seg-pista {
+            display: block;
+            height: 3px;
+            border-radius: 2px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.14);
+            transition: background 0.2s;
+        }
+
+        .inst-seg:hover .inst-seg-pista {
+            background: rgba(255, 255, 255, 0.32);
+        }
+
+        .inst-seg-lleno {
+            display: block;
+            height: 100%;
+            background: var(--gold);
+            transform-origin: left center;
+            transform: scaleX(0);
+        }
+
+        .inst-play:focus-visible,
+        .inst-seg:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 2px;
+        }
+
+        /* en celular el texto va debajo del dibujo, no encima */
+        @media (max-width: 760px) {
+            .inst-lienzo {
+                aspect-ratio: 4 / 3;
+            }
+
+            .inst-lienzo::after {
+                display: none;
+            }
+
+            .inst-captions {
+                position: static;
+                max-width: none;
+                padding: 18px 18px 20px;
+                border-top: 1px solid var(--surface-light);
+            }
+
+            .inst-cap {
+                transform: none;
+            }
+
+            .inst-seg--grupo {
+                margin-left: 8px;
+            }
+        }
     </style>
     <!-- Respaldo: si el navegador no ejecuta JS, mostrar todo el contenido igual -->
     <noscript>
@@ -1882,7 +2012,7 @@
             <a href="#hero" class="nav-logo"><img src="logo-kaston.svg" alt="KASTON" class="nav-logo-img"></a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#solucion" data-i18n="nav.solucion">La teja</a></li>
-                <li><a href="#k-lock" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                <li><a href="#instalacion" data-i18n="nav.instalacion">Cómo se instala</a></li>
                 <li><a href="#colores" data-i18n="nav.colores">Colores</a></li>
                 <li><a href="#cotizacion" data-i18n="nav.precios">Precios</a></li>
                 <li><a href="/empresa" data-i18n="nav.empresa">Empresa</a></li>
@@ -2255,181 +2385,54 @@
     </section>
 
     <!-- ================================================
-     K-LOCK
+     INSTALACIÓN — animación capa por capa (instalacion.js)
      ================================================ -->
-    <section id="k-lock" style="background:var(--surface-light);">
+    <section id="instalacion" class="inst" style="background:var(--surface-light);">
         <div class="container">
-            <div class="section-label fade-in" data-i18n="klock.label">Ingeniería</div>
-            <h2 class="fade-in" data-i18n-html="klock.title">Sistema <span class="gold">K-LOCK</span></h2>
-            <div class="section-divider fade-in"></div>
-            <p class="fade-in" style="font-style:italic; color:var(--muted); margin-bottom:32px; font-size:1.1rem;"
-                data-i18n="klock.quote">
-                "Como un LEGO, pero indestructible."
-            </p>
-
-            <div class="two-col">
-                <div class="fade-in fade-in-d1">
-                    <p style="margin-bottom:24px;" data-i18n="klock.intro">
-                        Lo que hace única a KASTON es su ingeniería de conexión. Olvídate de tejas sueltas que vuelan
-                        con el viento.
-                    </p>
-                    <ul class="feature-list">
-                        <li>
-                            <span><strong data-i18n="klock.f1.title">Sistema Macho / Hembra</strong>
-                                <span data-i18n="klock.f1.desc">Cada teja tiene una pestaña lateral (macho) y una ranura
-                                    receptora (hembra). Al unirse, quedan mecánicamente bloqueadas entre
-                                    sí.</span></span>
-                        </li>
-                        <li>
-                            <span><strong data-i18n="klock.f2.title">Resistencia Eólica</strong>
-                                <span data-i18n="klock.f2.desc">Gracias al encaje y sus dos puntos de anclaje a la
-                                    malla, eliminamos el riesgo de desprendimiento por vientos fuertes.</span></span>
-                        </li>
-                        <li>
-                            <span><strong data-i18n="klock.f3.title">Reparación Fácil</strong>
-                                <span data-i18n="klock.f3.desc">Si necesitas reparar el manto asfáltico, solo levantas
-                                    la malla como la tapa de un baúl.</span>
-                                <ol
-                                    style="margin-top:10px; padding-left:20px; list-style:decimal; color:var(--muted); font-size:0.88rem;">
-                                    <li style="padding:4px 0; border-bottom:none; display:list-item; gap:0;" data-i18n-html="int.l1"><strong
-                                            style="color:var(--gold);">Desmontaje:</strong> Retirar las tejas de abajo
-                                        hacia arriba en el área afectada.</li>
-                                    <li style="padding:4px 0; border-bottom:none; display:list-item; gap:0;" data-i18n-html="int.l2"><strong
-                                            style="color:var(--gold);">Apertura:</strong> Cortar los laterales de la
-                                        malla electrosoldada y levantarla como una tapa de baúl.</li>
-                                    <li style="padding:4px 0; border-bottom:none; display:list-item; gap:0;" data-i18n-html="int.l3"><strong
-                                            style="color:var(--gold);">Intervención:</strong> Reparar el manto asfáltico
-                                        para asegurar la impermeabilización.</li>
-                                    <li style="padding:4px 0; border-bottom:none; display:list-item; gap:0;" data-i18n-html="int.l4"><strong
-                                            style="color:var(--gold);">Cierre:</strong> Bajar la malla y unir nuevamente
-                                        los bordes al resto de la estructura.</li>
-                                    <li style="padding:4px 0; border-bottom:none; display:list-item; gap:0;" data-i18n-html="int.l5"><strong
-                                            style="color:var(--gold);">Reinstalación:</strong> Colocar las tejas
-                                        originales asegurando el anclaje mecánico.</li>
-                                </ol>
-                            </span>
-                        </li>
-                    </ul>
+            <div class="two-col inst-head">
+                <div class="fade-in">
+                    <div class="section-label" data-i18n="inst.label">Instalación</div>
+                    <h2 data-i18n-html="inst.title">Así se arma <span class="gold">tu techo</span></h2>
+                    <div class="section-divider"></div>
+                    <p data-i18n="klock.intro">Lo que hace única a KASTON es su ingeniería de conexión. Olvídate de tejas sueltas que vuelan con el viento.</p>
                 </div>
-
-                <div class="fade-in fade-in-d2">
-                    <h3 style="margin-bottom:20px;" data-i18n="klock.install.title">Instalación en 3 Pasos</h3>
-
-                    <div class="klock-stage" id="klockStage">
-                        <svg viewBox="32 128 400 108" xmlns="http://www.w3.org/2000/svg" role="img"
-                            aria-label="Corte del sistema KASTON: estructura, manto asfáltico, malla electrosoldada y tejas">
-                            <defs>
-                                <linearGradient id="klockTile" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="#4a545f" />
-                                    <stop offset="100%" stop-color="#2b3138" />
-                                </linearGradient>
-                                <!-- Alambre de amarre: lazo torcido arriba + bajada hasta la malla -->
-                                <g id="klockTie" class="klock-tie">
-                                    <circle cx="0" cy="-2.4" r="2.6" />
-                                    <path d="M0 0.4 L0 6 l-2 2.5 l4 2.5 l-2 2.5 L0 29" />
-                                </g>
-                            </defs>
-
-                            <!-- Estructura (base, siempre visible) -->
-                            <g>
-                                <rect x="40" y="196" width="380" height="28" rx="3" fill="#242424"
-                                    stroke="rgba(255,255,255,0.08)" />
-                                <g stroke="rgba(255,255,255,0.07)" stroke-width="1.5">
-                                    <line x1="70" y1="196" x2="55" y2="224" />
-                                    <line x1="130" y1="196" x2="115" y2="224" />
-                                    <line x1="190" y1="196" x2="175" y2="224" />
-                                    <line x1="250" y1="196" x2="235" y2="224" />
-                                    <line x1="310" y1="196" x2="295" y2="224" />
-                                    <line x1="370" y1="196" x2="355" y2="224" />
-                                </g>
-                            </g>
-
-                            <!-- 1. Manto asfáltico -->
-                            <g class="klock-layer" data-layer="1">
-                                <rect x="40" y="178" width="380" height="18" rx="2" fill="#0d0d0d" />
-                                <rect x="40" y="178" width="380" height="18" rx="2" fill="none"
-                                    stroke="rgba(255,255,255,0.14)" />
-                                <line x1="44" y1="181" x2="416" y2="181" stroke="rgba(255,255,255,0.22)"
-                                    stroke-width="1.5" />
-                                <g stroke="rgba(255,255,255,0.09)" stroke-width="1">
-                                    <line x1="80" y1="184" x2="72" y2="193" />
-                                    <line x1="140" y1="184" x2="132" y2="193" />
-                                    <line x1="200" y1="184" x2="192" y2="193" />
-                                    <line x1="260" y1="184" x2="252" y2="193" />
-                                    <line x1="320" y1="184" x2="312" y2="193" />
-                                    <line x1="380" y1="184" x2="372" y2="193" />
-                                </g>
-                            </g>
-
-                            <!-- 2. Malla electrosoldada -->
-                            <g class="klock-layer" data-layer="2">
-                                <line x1="40" y1="170" x2="420" y2="170" stroke="#8f8f8f" stroke-width="3.5"
-                                    stroke-linecap="round" />
-                                <g fill="#a5a5a5" stroke="#5f5f5f" stroke-width="1">
-                                    <circle cx="75" cy="170" r="4" />
-                                    <circle cx="117" cy="170" r="4" />
-                                    <circle cx="159" cy="170" r="4" />
-                                    <circle cx="201" cy="170" r="4" />
-                                    <circle cx="243" cy="170" r="4" />
-                                    <circle cx="285" cy="170" r="4" />
-                                    <circle cx="327" cy="170" r="4" />
-                                    <circle cx="369" cy="170" r="4" />
-                                    <circle cx="411" cy="170" r="4" />
-                                </g>
-                            </g>
-
-                            <!-- 3. Tejas KASTON + alambre de anclaje -->
-                            <g class="klock-layer" data-layer="3">
-                                <g fill="url(#klockTile)" stroke="rgba(0,0,0,0.45)" stroke-width="1">
-                                    <rect x="42" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 84 152.5)" />
-                                    <rect x="84" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 126 152.5)" />
-                                    <rect x="126" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 168 152.5)" />
-                                    <rect x="168" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 210 152.5)" />
-                                    <rect x="210" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 252 152.5)" />
-                                    <rect x="252" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 294 152.5)" />
-                                    <rect x="294" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 336 152.5)" />
-                                    <rect x="336" y="146" width="84" height="13" rx="6.5"
-                                        transform="rotate(-5 378 152.5)" />
-                                </g>
-                                <!-- Un alambre de amarre por teja: de su cabeza hasta la malla -->
-                                <use href="#klockTie" x="117" y="143" />
-                                <use href="#klockTie" x="159" y="143" />
-                                <use href="#klockTie" x="201" y="143" />
-                                <use href="#klockTie" x="243" y="143" />
-                                <use href="#klockTie" x="285" y="143" />
-                                <use href="#klockTie" x="327" y="143" />
-                                <use href="#klockTie" x="369" y="143" />
-                                <use href="#klockTie" x="411" y="143" />
-                            </g>
-                        </svg>
-                        <div class="klock-caption" id="klockCaption"></div>
-                    </div>
-
-                    <div class="install-steps" style="grid-template-columns:1fr;">
-                        <div class="install-step" data-step="1" tabindex="0" role="button">
-                            <div class="step-num">1</div>
-                            <p data-i18n-html="klock.install.s1"><strong style="color:var(--gold);">Manto
-                                    asfáltico</strong> sobre la estructura para impermeabilización total.</p>
-                        </div>
-                        <div class="install-step" data-step="2" tabindex="0" role="button">
-                            <div class="step-num">2</div>
-                            <p data-i18n-html="klock.install.s2"><strong style="color:var(--gold);">Malla
-                                    electrosoldada</strong> estándar fijada sobre el manto.</p>
-                        </div>
-                        <div class="install-step" data-step="3" tabindex="0" role="button">
-                            <div class="step-num">3</div>
-                            <p data-i18n-html="klock.install.s3"><strong style="color:var(--gold);">Tejas
-                                    KASTON</strong> aseguradas con alambre a través de sus orificios de anclaje.</p>
-                        </div>
-                    </div>
+                <div class="inst-klock fade-in fade-in-d1">
+                    <div class="inst-klock-nombre" data-i18n-html="klock.title">Sistema <span class="gold">K-LOCK</span></div>
+                    <strong data-i18n="klock.f1.title">Macho / hembra</strong>
+                    <p data-i18n="klock.f1.desc">Cada teja tiene una pestaña lateral (macho) y una ranura receptora (hembra). Al unirse, quedan mecánicamente bloqueadas entre sí.</p>
                 </div>
+            </div>
+
+            <div class="inst-stage fade-in">
+                <div class="inst-lienzo">
+                    <canvas id="instCanvas" role="img" aria-labelledby="instAria"></canvas>
+                    <span class="capas-sr" id="instAria" data-i18n="inst.aria">Animación: la instalación de la teja Cola de Castor capa por capa y la casa terminada bajo lluvia, granizo y viento.</span>
+                    <span class="inst-nota" data-i18n="inst.nota">Esquema ilustrativo</span>
+                </div>
+                <div class="inst-captions">
+                    <div class="inst-cap"><span class="inst-num">01</span><h3 id="instT1" data-i18n="inst.s1.t">Estructura</h3><p data-i18n="inst.s1.d">Llega terminada, con una pendiente mínima de 15%.</p></div>
+                    <div class="inst-cap"><span class="inst-num">02</span><h3 id="instT2" data-i18n="inst.s2.t">Tablilla</h3><p data-i18n="inst.s2.d">Una base continua sobre las alfardas.</p></div>
+                    <div class="inst-cap"><span class="inst-num">03</span><h3 id="instT3" data-i18n="inst.s3.t">Manto asfáltico</h3><p data-i18n="inst.s3.d">Lo deja listo tu constructor. Desde aquí empieza KASTON.</p></div>
+                    <div class="inst-cap"><span class="inst-num">04</span><h3 id="instT4" data-i18n="inst.s4.t">Malla electrosoldada</h3><p data-i18n="inst.s4.d">Bien derecha: sobre ella se amarra cada teja.</p></div>
+                    <div class="inst-cap"><span class="inst-num">05</span><h3 id="instT5" data-i18n="inst.s5.t">Grapas y silicona</h3><p data-i18n="inst.s5.d">Solo las necesarias, y cada una sellada.</p></div>
+                    <div class="inst-cap"><span class="inst-num">06</span><h3 id="instT6" data-i18n="inst.s6.t">Tejas Cola de Castor</h3><p data-i18n="inst.s6.d">Encajan entre sí con el sistema K-LOCK y se amarran a la malla, una por una.</p></div>
+                    <div class="inst-cap"><span class="inst-num">07</span><h3 id="instT7" data-i18n="inst.s7.t">Caballete</h3><p data-i18n="inst.s7.d">Cierra la cumbrera, pieza por pieza.</p></div>
+                    <div class="inst-cap"><h3 id="instT8" data-i18n="inst.s8.t">Techo terminado</h3><p data-i18n="inst.s8.d">12,6 kg por m², diseñado para durar 500 años.</p></div>
+                    <div class="inst-cap"><h3 id="instT9" data-i18n="inst.s9.t">Lluvia</h3><p data-i18n="inst.s9.d">0% de absorción: el agua se va por la canaleta.</p></div>
+                    <div class="inst-cap"><h3 id="instT10" data-i18n="inst.s10.t">Granizo</h3><p data-i18n="inst.s10.d">17 años comprobados sin una teja rota.</p></div>
+                    <div class="inst-cap"><h3 id="instT11" data-i18n="inst.s11.t">Viento</h3><p data-i18n="inst.s11.d">El K-LOCK y los dos amarres a la malla mantienen cada teja en su sitio.</p></div>
+                    <div class="inst-cap"><h3 id="instT12" data-i18n="inst.s12.t">Tranquilidad</h3><p data-i18n="inst.s12.d">Un techo. Una sola vez. Para siempre.</p></div>
+                </div>
+            </div>
+
+            <div class="inst-controles">
+                <button class="inst-play" id="instPlay" type="button" aria-labelledby="instLblPausa">
+                    <svg class="inst-ico-pausa" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>
+                    <svg class="inst-ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+                </button>
+                <span class="capas-sr" id="instLblPausa" data-i18n="inst.pausa">Pausar animación</span>
+                <span class="capas-sr" id="instLblPlay" data-i18n="inst.play">Reproducir animación</span>
+                <div class="inst-barra" id="instBarra"></div>
             </div>
         </div>
     </section>
@@ -2832,7 +2835,7 @@
                     <ul>
                         <li><a href="#problema" data-i18n="nav.problema">Problema</a></li>
                         <li><a href="#solucion" data-i18n="nav.solucion">Solución</a></li>
-                        <li><a href="#k-lock" data-i18n="nav.instalacion">Cómo se instala</a></li>
+                        <li><a href="#instalacion" data-i18n="nav.instalacion">Cómo se instala</a></li>
                         <li><a href="#colores" data-i18n="nav.colores">Colores</a></li>
                         <li><a href="#especificaciones" data-i18n="footer.specs">Ficha técnica</a></li>
                         <li><a href="#comparativa" data-i18n="footer.comp">Comparativa</a></li>
@@ -2934,11 +2937,6 @@
                     'gen.t2': 'Persistencia Molecular',
                     'gen.d1': 'Garantía de operatividad del sistema instalado: <strong>50–100 años</strong>. Vida química del polímero: <strong style="color:var(--gold);">500 años</strong>. El escudo de 8mm blinda al 96% del núcleo contra la degradación solar.',
                     'gen.d2': '<strong>500 años</strong> de resistencia química. Tu techo es un futuro banco de materia prima 100% recuperable para la economía circular.',
-                    'int.l1': '<strong style="color:var(--gold);">Desmontaje:</strong> Retirar las tejas de abajo hacia arriba en el área afectada.',
-                    'int.l2': '<strong style="color:var(--gold);">Apertura:</strong> Cortar los laterales de la malla electrosoldada y levantarla como una tapa de baúl.',
-                    'int.l3': '<strong style="color:var(--gold);">Intervención:</strong> Reparar el manto asfáltico para asegurar la impermeabilización.',
-                    'int.l4': '<strong style="color:var(--gold);">Cierre:</strong> Bajar la malla y unir nuevamente los bordes al resto de la estructura.',
-                    'int.l5': '<strong style="color:var(--gold);">Reinstalación:</strong> Colocar las tejas originales asegurando el anclaje mecánico.',
                     'comp.title2': 'Análisis de <span class="gold">Superioridad Técnica</span>',
                     'footer.ig': 'Síguenos en Instagram',
                     'footer.priv': 'Política de Privacidad',
@@ -3010,20 +3008,40 @@
                     'feat.card2.desc': 'A diferencia del Zinc que convierte tu casa en un horno, nuestro polímero denso aísla mejor la temperatura y el ruido.',
                     'feat.card3.title': 'Ultra Liviana',
                     'feat.card3.desc': 'Mucho más livianas que el barro o el cemento, reduciendo costos en la estructura de madera o metal de tu casa.',
-                    'klock.label': 'Ingeniería',
                     'klock.title': 'Sistema <span class="gold">K-LOCK</span>',
-                    'klock.quote': '"Como un LEGO, pero indestructible."',
                     'klock.intro': 'Lo que hace única a KASTON es su ingeniería de conexión. Olvídate de tejas sueltas que vuelan con el viento.',
-                    'klock.f1.title': 'Sistema Macho / Hembra',
+                    'klock.f1.title': 'Macho / hembra',
                     'klock.f1.desc': 'Cada teja tiene una pestaña lateral (macho) y una ranura receptora (hembra). Al unirse, quedan mecánicamente bloqueadas entre sí.',
-                    'klock.f2.title': 'Resistencia Eólica',
-                    'klock.f2.desc': 'Gracias al encaje y sus dos puntos de anclaje a la malla, eliminamos el riesgo de desprendimiento por vientos fuertes.',
-                    'klock.f3.title': 'Reparación Fácil',
-                    'klock.f3.desc': 'Si necesitas reparar el manto asfáltico, solo levantas la malla como la tapa de un baúl. 1) Desmontaje de tejas. 2) Apertura de malla. 3) Intervención del manto. 4) Cierre de malla. 5) Reinstalación de tejas.',
-                    'klock.install.title': 'Instalación en 3 Pasos',
-                    'klock.install.s1': '<strong style="color:var(--gold);">Manto asfáltico</strong> sobre la estructura para impermeabilización total.',
-                    'klock.install.s2': '<strong style="color:var(--gold);">Malla electrosoldada</strong> estándar fijada sobre el manto.',
-                    'klock.install.s3': '<strong style="color:var(--gold);">Tejas KASTON</strong> aseguradas con alambre a través de sus orificios de anclaje.',
+                    'inst.label': 'Instalación',
+                    'inst.title': 'Así se arma <span class="gold">tu techo</span>',
+                    'inst.aria': 'Animación: la instalación de la teja Cola de Castor capa por capa y la casa terminada bajo lluvia, granizo y viento.',
+                    'inst.nota': 'Esquema ilustrativo',
+                    'inst.pausa': 'Pausar animación',
+                    'inst.play': 'Reproducir animación',
+                    'inst.s1.t': 'Estructura',
+                    'inst.s1.d': 'Llega terminada, con una pendiente mínima de 15%.',
+                    'inst.s2.t': 'Tablilla',
+                    'inst.s2.d': 'Una base continua sobre las alfardas.',
+                    'inst.s3.t': 'Manto asfáltico',
+                    'inst.s3.d': 'Lo deja listo tu constructor. Desde aquí empieza KASTON.',
+                    'inst.s4.t': 'Malla electrosoldada',
+                    'inst.s4.d': 'Bien derecha: sobre ella se amarra cada teja.',
+                    'inst.s5.t': 'Grapas y silicona',
+                    'inst.s5.d': 'Solo las necesarias, y cada una sellada.',
+                    'inst.s6.t': 'Tejas Cola de Castor',
+                    'inst.s6.d': 'Encajan entre sí con el sistema K-LOCK y se amarran a la malla, una por una.',
+                    'inst.s7.t': 'Caballete',
+                    'inst.s7.d': 'Cierra la cumbrera, pieza por pieza.',
+                    'inst.s8.t': 'Techo terminado',
+                    'inst.s8.d': '12,6 kg por m², diseñado para durar 500 años.',
+                    'inst.s9.t': 'Lluvia',
+                    'inst.s9.d': '0% de absorción: el agua se va por la canaleta.',
+                    'inst.s10.t': 'Granizo',
+                    'inst.s10.d': '17 años comprobados sin una teja rota.',
+                    'inst.s11.t': 'Viento',
+                    'inst.s11.d': 'El K-LOCK y los dos amarres a la malla mantienen cada teja en su sitio.',
+                    'inst.s12.t': 'Tranquilidad',
+                    'inst.s12.d': 'Un techo. Una sola vez. Para siempre.',
                     'colors.label': 'La Colección',
                     'colors.title': 'Paleta <span class="gold">Mineral</span>',
                     'colors.desc': 'Nuestros colores no son pintura superficial. Es el color del polímero fundido, lo que garantiza que <strong style="color:var(--white);">no se descascara con el tiempo.</strong>',
@@ -3135,11 +3153,6 @@
                     'gen.t2': 'Molecular Persistence',
                     'gen.d1': 'Operational warranty of the installed system: <strong>50–100 years</strong>. Chemical life of the polymer: <strong style="color:var(--gold);">500 years</strong>. The 8mm shield protects 96% of the core against solar degradation.',
                     'gen.d2': '<strong>500 years</strong> of chemical resistance. Your roof is a future bank of 100% recoverable raw material for the circular economy.',
-                    'int.l1': '<strong style="color:var(--gold);">Removal:</strong> Take off the tiles from bottom to top in the affected area.',
-                    'int.l2': '<strong style="color:var(--gold);">Opening:</strong> Cut the sides of the welded mesh and lift it like a trunk lid.',
-                    'int.l3': '<strong style="color:var(--gold);">Intervention:</strong> Repair the asphalt membrane to ensure waterproofing.',
-                    'int.l4': '<strong style="color:var(--gold);">Closing:</strong> Lower the mesh and rejoin the edges to the rest of the structure.',
-                    'int.l5': '<strong style="color:var(--gold);">Reinstallation:</strong> Place the original tiles ensuring the mechanical anchoring.',
                     'comp.title2': '<span class="gold">Technical Superiority</span> Analysis',
                     'footer.ig': 'Follow us on Instagram',
                     'footer.priv': 'Privacy Policy',
@@ -3200,20 +3213,40 @@
                     'feat.card2.desc': 'Unlike Zinc that turns your home into an oven, our dense polymer insulates temperature and noise better.',
                     'feat.card3.title': 'Ultra Lightweight',
                     'feat.card3.desc': 'Much lighter than clay or cement, reducing costs in your home\'s wood or metal structure.',
-                    'klock.label': 'Engineering',
                     'klock.title': '<span class="gold">K-LOCK</span> System',
-                    'klock.quote': '"Like a LEGO, but indestructible."',
                     'klock.intro': 'What makes KASTON unique is its connection engineering. Forget loose tiles that blow away in the wind.',
-                    'klock.f1.title': 'Male / Female System',
+                    'klock.f1.title': 'Male / female',
                     'klock.f1.desc': 'Each tile has a lateral tab (male) and a receiving groove (female). When joined, they become mechanically locked together.',
-                    'klock.f2.title': 'Wind Resistance',
-                    'klock.f2.desc': 'Thanks to the interlocking and two anchor points to the mesh, we eliminate the risk of detachment from strong winds.',
-                    'klock.f3.title': 'Easy Repair',
-                    'klock.f3.desc': 'If you need to repair the asphalt membrane, just lift the mesh like a trunk lid. 1) Remove tiles. 2) Open mesh. 3) Repair membrane. 4) Close mesh. 5) Reinstall tiles.',
-                    'klock.install.title': '3-Step Installation',
-                    'klock.install.s1': '<strong style="color:var(--gold);">Asphalt membrane</strong> over the structure for total waterproofing.',
-                    'klock.install.s2': '<strong style="color:var(--gold);">Welded wire mesh</strong> standard fixed over the membrane.',
-                    'klock.install.s3': '<strong style="color:var(--gold);">KASTON tiles</strong> secured with wire through their anchor holes.',
+                    'inst.label': 'Installation',
+                    'inst.title': 'How your roof <span class="gold">comes together</span>',
+                    'inst.aria': 'Animation: the Beaver Tail tile installed layer by layer, and the finished house under rain, hail and wind.',
+                    'inst.nota': 'Illustrative diagram',
+                    'inst.pausa': 'Pause animation',
+                    'inst.play': 'Play animation',
+                    'inst.s1.t': 'Structure',
+                    'inst.s1.d': 'Delivered finished, with a minimum 15% slope.',
+                    'inst.s2.t': 'Decking',
+                    'inst.s2.d': 'A continuous base over the rafters.',
+                    'inst.s3.t': 'Asphalt membrane',
+                    'inst.s3.d': 'Your builder leaves it ready. This is where KASTON begins.',
+                    'inst.s4.t': 'Welded wire mesh',
+                    'inst.s4.d': 'Laid perfectly straight: every tile is tied to it.',
+                    'inst.s5.t': 'Staples and sealant',
+                    'inst.s5.d': 'Only the ones needed, each one sealed.',
+                    'inst.s6.t': 'Beaver Tail tiles',
+                    'inst.s6.d': 'They lock into each other with the K-LOCK system and are tied to the mesh, one by one.',
+                    'inst.s7.t': 'Ridge cap',
+                    'inst.s7.d': 'Closes the ridge, piece by piece.',
+                    'inst.s8.t': 'Finished roof',
+                    'inst.s8.d': '12.6 kg per m², designed to last 500 years.',
+                    'inst.s9.t': 'Rain',
+                    'inst.s9.d': '0% absorption: water runs off to the gutter.',
+                    'inst.s10.t': 'Hail',
+                    'inst.s10.d': '17 proven years without a single broken tile.',
+                    'inst.s11.t': 'Wind',
+                    'inst.s11.d': 'K-LOCK and two ties to the mesh keep every tile in place.',
+                    'inst.s12.t': 'Peace of mind',
+                    'inst.s12.d': 'One roof. Once. Forever.',
                     'colors.label': 'The Collection',
                     'colors.title': '<span class="gold">Mineral</span> Palette',
                     'colors.desc': 'Our colors are not surface paint. It\'s the color of the molten polymer, which guarantees it <strong style="color:var(--white);">won\'t peel over time.</strong>',
@@ -3466,88 +3499,6 @@
                     el.style.setProperty('--my', (e.clientY - r.top) + 'px');
                 });
             });
-        })();
-    </script>
-
-    <!-- K-LOCK: instalación animada por capas -->
-    <script>
-        (function () {
-            var stage = document.getElementById('klockStage');
-            var caption = document.getElementById('klockCaption');
-            if (!stage) return;
-
-            var layers = Array.prototype.slice.call(stage.querySelectorAll('.klock-layer'));
-            var steps = Array.prototype.slice.call(document.querySelectorAll('.install-step[data-step]'));
-            if (!layers.length || !steps.length) return;
-
-            var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            var autoplayed = false;
-            var timers = [];
-
-            function clearTimers() {
-                timers.forEach(clearTimeout);
-                timers = [];
-            }
-
-            function setStep(n) {
-                layers.forEach(function (layer) {
-                    layer.classList.toggle('on', parseInt(layer.getAttribute('data-layer'), 10) <= n);
-                });
-                steps.forEach(function (step) {
-                    var isActive = parseInt(step.getAttribute('data-step'), 10) === n;
-                    step.classList.toggle('active', isActive);
-                    if (isActive && caption) {
-                        var label = step.querySelector('strong');
-                        caption.textContent = label ? label.textContent.replace(/\s+/g, ' ').trim() : '';
-                    }
-                });
-            }
-
-            function autoplay() {
-                if (autoplayed) return;
-                autoplayed = true;
-                if (reduced) { setStep(3); return; }
-                clearTimers();
-                [1, 2, 3].forEach(function (n, i) {
-                    timers.push(setTimeout(function () { setStep(n); }, 400 + i * 900));
-                });
-            }
-
-            steps.forEach(function (step) {
-                var n = parseInt(step.getAttribute('data-step'), 10);
-                step.addEventListener('mouseenter', function () {
-                    autoplayed = true;
-                    clearTimers();
-                    setStep(n);
-                });
-                step.addEventListener('click', function () {
-                    autoplayed = true;
-                    clearTimers();
-                    setStep(n);
-                });
-                step.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        autoplayed = true;
-                        clearTimers();
-                        setStep(n);
-                    }
-                });
-            });
-
-            if ('IntersectionObserver' in window) {
-                var obs = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (entry.isIntersecting) {
-                            autoplay();
-                            obs.disconnect();
-                        }
-                    });
-                }, { threshold: 0.35 });
-                obs.observe(stage);
-            } else {
-                setStep(3);
-            }
         })();
     </script>
 
@@ -3881,6 +3832,7 @@
             if (rm.addEventListener) rm.addEventListener('change', onRM); else if (rm.addListener) rm.addListener(onRM);
         })();
     </script>
+    <script src="instalacion.js" defer></script>
 </body>
 
 </html>
