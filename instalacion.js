@@ -62,7 +62,7 @@ function ajustar(){
   cw=r.width; ch=r.height;
   cv.width=off.width=off2.width=Math.round(cw*dpr); cv.height=off.height=off2.height=Math.round(ch*dpr);
   const pts=[];
-  for(const x of [-0.9,W+0.1]){
+  for(const x of [-0.2,W+0.1]){ // sin rótulos a la izquierda, el dibujo usa todo el ancho
     for(const y of [-0.42,L+0.15]) pts.push([x*UX[0]+y*VY[0],x*UX[1]+y*VY[1]]);
     for(const y of [-0.15,L]) pts.push([x*UX[0]+DD*EY[0]+y*VYb[0], x*UX[1]+DD*EY[1]+y*VYb[1]]);
   }

@@ -724,6 +724,36 @@
                 letter-spacing: 1px !important;
             }
         }
+
+        /* celular: el menú abierto tapa toda la pantalla, sin que el texto de atrás se cuele */
+        @media (max-width: 900px) {
+            .nav-links {
+                height: calc(100vh - var(--nav-height));
+                height: calc(100dvh - var(--nav-height));
+                justify-content: flex-start;
+                gap: 22px;
+                padding: 36px 32px 48px;
+                overflow-y: auto;
+                background: #000;
+                -webkit-backdrop-filter: none;
+                backdrop-filter: none;
+            }
+
+            .nav-links a {
+                font-size: 1.05rem;
+            }
+        }
+
+        /* celular angosto: el idioma y el menú caben sin pegarse al borde */
+        @media (max-width: 480px) {
+            .nav-right {
+                gap: 10px;
+            }
+
+            .lang-toggle button {
+                padding: 7px 9px;
+            }
+        }
     </style>
     <!-- Datos estructurados: le dicen a Google y a las IA quien es KASTON,
          en vez de dejar que lo deduzcan del texto. -->
