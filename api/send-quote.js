@@ -1,16 +1,20 @@
 // Manda la cotizacion recien guardada al correo del cliente, con copia a KASTON.
 //
-// El cotizador la llama justo despues de guardar un proyecto nuevo. El precio y los
-// datos NO llegan desde el navegador: se leen de la base con el token del cliente.
-// Asi nadie puede mandarse (ni mandarle a KASTON) una cotizacion inventada, y las
-// reglas por fila de Supabase garantizan que solo se lee un proyecto propio.
+// El cotizador la llama justo despues de guardar un proyecto nuevo. Los datos se
+// leen de la base con el token del cliente (las reglas por fila garantizan que solo
+// se lee un proyecto propio), pero el PRECIO NO se copia de ahi: el proyecto lo
+// escribe el navegador, y alguien habil podria guardarlo con un precio inventado.
+// Aqui se recalcula con los mismos precios del cotizador (precios.js), en pesos.
 //
 // Mientras no exista RESEND_API_KEY en Vercel responde 503 y no hace nada: el
 // cotizador guarda igual. Sin RESEND_FROM sale desde el remitente de pruebas de
 // Resend, que solo entrega al correo de la cuenta de Resend (la copia a KASTON
 // llega; al cliente no, hasta verificar kastonproyectos.com).
+import '../precios.js'; // deja los precios de venta en globalThis.KASTON_PRECIOS
+
 const SUPA_URL = 'https://naxvanbiwgwfraxqtsof.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heHZhbmJpd2d3ZnJheHF0c29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxODUxNDQsImV4cCI6MjA5MTc2MTE0NH0.jMoSNrVwKHBuPxTDxsqsysuV0I7c0t6DNk-7bFbTwvw';
+const PRECIOS = globalThis.KASTON_PRECIOS;
 
 const SITIO = 'https://www.kastonproyectos.com';
 const WHATSAPP = '573188978552';
@@ -128,10 +132,10 @@ function armarCotizacion(fila, usuario) {
     let p = {};
     try { p = typeof fila.project_data === 'string' ? JSON.parse(fila.project_data) : (fila.project_data || {}); } catch (e) { p = {}; }
 
-    const m2 = Number(fila.project_m2) || Number(p.area) || 0;
+    const m2 = areaEnM2(p, fila);
     const todoCosto = p.modality === 'full';
-    const divisa = p.divisa || 'COP';
-    const precio = p.inversion_tejas === null || p.inversion_tejas === undefined ? null : Number(p.inversion_tejas);
+    const especial = p.roofType === 'otro';
+    const precio = especial ? null : precioVerificado(m2, todoCosto, p.zoneId);
 
     const area = p.unidad === 'ft2'
         ? `${numero(p.area, 0)} ft² (${numero(m2, 1)} m²)`
@@ -144,7 +148,7 @@ function armarCotizacion(fila, usuario) {
         area,
         m2,
         tejas: numero(Math.ceil(m2 * TEJAS_POR_M2), 0),
-        modalidad: todoCosto ? 'Todo costo instalado' : 'Solo tejas',
+        modalidad: especial ? 'Proyecto especial' : (todoCosto ? 'Todo costo instalado' : 'Solo tejas'),
         cubre: todoCosto
             ? 'Las tejas, los materiales y el instalador.'
             : 'El suministro de las tejas. La instalación va por tu cuenta, con nuestro manual.',
@@ -154,9 +158,32 @@ function armarCotizacion(fila, usuario) {
         zona: todoCosto ? (ZONAS[p.zoneId] || '') : '',
         distancia: todoCosto && Number(p.geoKm) ? `${numero(p.geoKm, 1)} km` : '',
         color: COLORES[p.selectedColor] || '',
-        precio: precio === null || isNaN(precio) ? 'Por cotizar con un asesor' : moneda(precio, divisa),
+        precio: precio === null ? 'Por cotizar con un asesor' : moneda(precio, 'COP'),
         fecha: p.fecha || new Date().toISOString().split('T')[0]
     };
+}
+
+// El mismo calculo del cotizador: area × precio por m² de la modalidad (y de la zona
+// en todo costo). Siempre en pesos: la conversion a dolares o euros del cotizador usa
+// la tasa del dia en el navegador y no se puede comprobar aqui.
+// null = sin precio automatico (zona a mas de 60 km, o area sin sentido): lo cotiza
+// un asesor. Los proyectos especiales (techo "otro") tampoco llevan precio, igual
+// que en la pantalla y en el PDF.
+const AREA_MAXIMA_M2 = 100000; // un techo de 10 hectareas: mas que eso es un numero armado a mano
+function precioVerificado(m2, todoCosto, zoneId) {
+    if (!(m2 > 0) || m2 > AREA_MAXIMA_M2) return null;
+    if (!todoCosto) return Math.round(m2 * PRECIOS.soloTejaM2);
+    const zona = PRECIOS.zonasTodoCosto.find(z => z.id === zoneId);
+    return zona && zona.precioM2 ? Math.round(m2 * zona.precioM2) : null;
+}
+
+// El area como la usa la pantalla del cotizador: en pies cuadrados la divide por
+// 10,7639 (la columna project_m2 se guarda con 10,764 y daria unos pesos de mas o
+// de menos frente a lo que el cliente vio).
+function areaEnM2(p, fila) {
+    const area = Number(p.area);
+    if (area > 0) return p.unidad === 'ft2' ? area / 10.7639 : area;
+    return Number(fila.project_m2) || 0;
 }
 
 // Separador de miles con punto y decimales con coma, como en el cotizador.

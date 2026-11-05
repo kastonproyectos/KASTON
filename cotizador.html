@@ -17,6 +17,8 @@
     <!-- Leaflet: mapa para que el cliente marque dónde queda su obra (tiles de Esri, sin API key) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Precios de venta: los mismos que usa el correo de la cotización -->
+    <script src="/precios.js"></script>
     <style>
         /* Oscurece solo las baldosas del mapa para que combinen con el negro KASTON.
            Los anillos y el pin viven en otro pane, asi que no se ven afectados. */
@@ -295,10 +297,23 @@
         const KASTON_UNITS_PER_FT2 = 3.90; // 42 / 10.7639
 
         /* ─────────────────────────────────────────────────────────────
-           PRECIOS POR m²: precios de venta al cliente.
-           Los costos y márgenes no van en este archivo público.
+           PRECIOS POR m²: viven en /precios.js, que también usa el correo de
+           la cotización (api/send-quote.js recalcula el precio con ellos).
+           Si cambia un precio, se cambia allá.
+
+           ESTE ARCHIVO ES PÚBLICO: cualquiera lo ve con "ver código fuente" y
+           en GitHub. Los costos, márgenes y la tarifa del instalador van en el
+           doc "Costos y precios KASTON", nunca aquí.
+
+           CABALLETE: no entra en el precio por m², a propósito. Se cobra por metro
+           lineal y depende de la forma del techo (no todos son a dos aguas), algo
+           que ni el cotizador ni las fotos pueden medir. Se cotiza aparte cuando
+           se revisa el techo; por eso el cotizador da un estimado.
+
+           OJO: el traslapo de la malla tampoco está incluido. Si entra, hay que
+           recalcular los precios.
         ───────────────────────────────────────────────────────────────── */
-        const PRECIO_SOLO_TEJA_M2 = 85000;
+        const PRECIO_SOLO_TEJA_M2 = window.KASTON_PRECIOS.soloTejaM2;
 
         // Origen para medir la distancia: planta KASTON, Carrera 46 #50-75, Itagüí
         // (diagonal a la estación de bomberos). Si la planta se muda, cambiar estas
@@ -306,23 +321,8 @@
         const KASTON_ORIGEN = { lat: 6.1691, lng: -75.6077 };
 
         // Las zonas se evalúan en orden: gana la primera cuyo maxKm alcance.
-        const ZONAS_TODO_COSTO = [
-            {
-                id: 'metro',
-                maxKm: 25,
-                precioM2: 153000
-            },
-            {
-                id: 'afueras',
-                maxKm: 60,
-                precioM2: 165500
-            },
-            {
-                id: 'lejana',
-                maxKm: Infinity,
-                precioM2: null       // sin precio automático: pasa a un asesor
-            }
-        ];
+        // La lejana no tiene precio automático: pasa a un asesor.
+        const ZONAS_TODO_COSTO = window.KASTON_PRECIOS.zonasTodoCosto;
 
         // Fuera de este radio ya no cotizamos solos: lo ve un asesor.
         const RADIO_AFUERAS_KM = 60;
