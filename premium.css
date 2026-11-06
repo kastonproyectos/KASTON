@@ -1,0 +1,946 @@
+/* =====================================================================
+   KASTON · Capa de acabado
+   Solo cambia cómo se ve: letra, espacio, bordes, luz y movimiento.
+   No toca textos, ni precios, ni los dibujos que explican el producto.
+   Se carga después de los estilos de cada página: quitar el <link> la apaga.
+   ===================================================================== */
+
+:root {
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --surface: #111111;
+    --surface-light: #111111;
+    --linea: rgba(255, 255, 255, 0.09);
+    --linea-fuerte: rgba(255, 255, 255, 0.22);
+    --linea-cobre: rgba(193, 138, 104, 0.45);
+    --cobre-claro: #D49B76;
+}
+
+/* ---------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------- */
+html {
+    scrollbar-color: #2a2a2a #000000;
+}
+
+body {
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern", "liga", "calt";
+}
+
+::selection {
+    background: var(--gold);
+    color: #000000;
+}
+
+:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------
+   Letra: titulares menos pesados, párrafos sin palabras sueltas
+   --------------------------------------------------------------------- */
+h1,
+h2,
+h3,
+h4 {
+    font-weight: 500;
+    line-height: 1.08;
+    text-wrap: balance;
+}
+
+p {
+    font-weight: 400;
+    text-wrap: pretty;
+}
+
+.hero-tagline,
+.prob-lead,
+.sol-lead,
+.prob-giro-sub,
+.ficha-humano,
+.hero-claim {
+    font-weight: 300;
+}
+
+.hero-tagline,
+.hero-claim,
+.prob-lead,
+.capas-p {
+    text-wrap: balance;
+}
+
+.section-label,
+.eyebrow {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    opacity: 1;
+    margin-bottom: 20px;
+}
+
+.section-divider,
+.ap-divider {
+    width: 44px;
+    height: 1px;
+    border-radius: 0;
+}
+
+.section-divider {
+    margin-top: 32px !important;
+    margin-bottom: 40px !important;
+}
+
+/* ---------------------------------------------------------------------
+   Barra de arriba
+   --------------------------------------------------------------------- */
+.scroll-progress {
+    height: 1px;
+    background: var(--gold);
+}
+
+.navbar.scrolled {
+    background: rgba(0, 0, 0, 0.88);
+    -webkit-backdrop-filter: blur(22px);
+    backdrop-filter: blur(22px);
+    box-shadow: 0 1px 0 var(--linea);
+}
+
+.nav-logo-img {
+    filter: none;
+    image-rendering: auto;
+}
+
+.nav-logo-img:hover {
+    transform: none;
+}
+
+.nav-links a {
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    transition: color 0.35s var(--ease);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--white);
+}
+
+.nav-links a.active::after {
+    bottom: -7px;
+    height: 1px;
+    border-radius: 0;
+}
+
+.nav-links a.nav-cta {
+    padding: 11px 24px;
+    background: transparent !important;
+    color: var(--white) !important;
+    border: 1px solid var(--linea-cobre);
+    border-radius: 0;
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.22em !important;
+    transition: background-color 0.45s var(--ease), color 0.45s var(--ease), border-color 0.45s var(--ease) !important;
+}
+
+.nav-links a.nav-cta:hover {
+    background: var(--gold) !important;
+    border-color: var(--gold);
+    color: #000000 !important;
+    transform: none;
+}
+
+.lang-toggle {
+    gap: 2px;
+    background: none;
+    border: 0;
+    border-radius: 0;
+}
+
+.lang-toggle button {
+    padding: 7px 8px;
+    background: none;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    transition: color 0.35s var(--ease);
+}
+
+.lang-toggle button.active {
+    background: none;
+    color: var(--white);
+    box-shadow: inset 0 -1px 0 var(--gold);
+}
+
+.lang-toggle button:hover:not(.active) {
+    background: none;
+    color: var(--white);
+}
+
+.hamburger span {
+    height: 1px;
+    border-radius: 0;
+}
+
+/* ---------------------------------------------------------------------
+   Botones: rectos, sin brillo, sin saltos
+   --------------------------------------------------------------------- */
+.btn {
+    padding: 19px 42px !important;
+    border-radius: 0;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.22em;
+    transition: background-color 0.45s var(--ease), color 0.45s var(--ease), border-color 0.45s var(--ease);
+}
+
+.btn-gold:hover {
+    background: var(--cobre-claro);
+    box-shadow: none;
+    transform: none;
+}
+
+.btn-outline {
+    color: var(--white);
+    border: 1px solid var(--linea-fuerte);
+}
+
+.btn-outline:hover {
+    background: transparent;
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: none;
+}
+
+/* ---------------------------------------------------------------------
+   Portada: se ve el techo real y un solo punto de entrada
+   --------------------------------------------------------------------- */
+.hero-bg video {
+    filter: saturate(0.5) contrast(1.06);
+    transition: opacity 1.6s ease;
+}
+
+.hero-bg video.active {
+    opacity: 0.46;
+}
+
+.hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 66% 72% at 50% 42%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.3) 70%, transparent 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.2) 26%, transparent 42%, transparent 60%, #000000 100%);
+}
+
+.hero::after {
+    display: none;
+}
+
+.hero .fade-in > img {
+    height: 116px !important;
+}
+
+.hero-subtitle {
+    padding-left: 0.42em;
+    margin-bottom: 22px;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.42em;
+}
+
+.hero h1 {
+    margin-bottom: 26px;
+    font-size: clamp(3.6rem, 9.5vw, 7.75rem);
+    line-height: 1;
+}
+
+.hero-tagline {
+    margin-bottom: 44px;
+    line-height: 1.6;
+}
+
+.hero-tagline strong {
+    font-weight: 400;
+}
+
+.hero-cta-group {
+    gap: 14px;
+    margin-bottom: 64px;
+}
+
+.hero-stat .number {
+    font-size: 2.5rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.hero-stat .label {
+    margin-top: 12px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+}
+
+.hero-claim {
+    margin-top: 44px;
+}
+
+/* ---------------------------------------------------------------------
+   Bordes rectos y sin sombras de color (manual de marca, sección Color)
+   --------------------------------------------------------------------- */
+.card,
+.feat-item,
+.spec-item,
+.legal-card,
+.cifra,
+.inst-klock,
+.manifiesto,
+.enemigo-box,
+.swatch,
+.sol-teja,
+.inst-stage,
+.color-preview,
+.gallery-img,
+.origen-foto {
+    border-radius: 0;
+}
+
+.card:hover,
+.feat-item:hover,
+.spec-item:hover,
+.legal-card:hover,
+.swatch:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+/* ---------------------------------------------------------------------
+   El problema
+   --------------------------------------------------------------------- */
+.prob-titulo {
+    font-weight: 500;
+    line-height: 1.04;
+}
+
+.prob-lead strong {
+    font-weight: 500;
+}
+
+.prob-item h3 {
+    font-weight: 500;
+}
+
+.prob-giro-titulo {
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------
+   El clima: solo la letra; el dibujo queda igual
+   --------------------------------------------------------------------- */
+.capas-h,
+.capas-num {
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------
+   La solución y la teja
+   --------------------------------------------------------------------- */
+.sol-giro {
+    font-weight: 500;
+}
+
+.sol-dato b,
+.sol-specs b,
+.feat-dato b {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.sol-dato small {
+    letter-spacing: 0.14em;
+}
+
+.sol-teja,
+.inst-stage {
+    border-color: var(--linea);
+}
+
+.sol-teja-texto h3 {
+    font-weight: 500;
+}
+
+.sol-teja-obra {
+    filter: saturate(0.82) contrast(1.04);
+}
+
+.sol-teja-obra span {
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.72);
+    letter-spacing: 0.16em;
+}
+
+/* ---------------------------------------------------------------------
+   Características
+   --------------------------------------------------------------------- */
+.feat-grid {
+    gap: 0;
+}
+
+.feat-item {
+    background: transparent;
+    border: 1px solid var(--linea);
+    transition: background-color 0.45s var(--ease);
+}
+
+.feat-item + .feat-item {
+    border-top: 0;
+}
+
+.feat-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: var(--linea);
+}
+
+.feat-item h3 {
+    font-weight: 500;
+}
+
+.feat-dato {
+    border-top-color: var(--linea);
+}
+
+/* ---------------------------------------------------------------------
+   Instalación: el marco y la letra; la animación queda igual
+   --------------------------------------------------------------------- */
+.inst-klock {
+    background: transparent;
+    border: 1px solid var(--linea);
+}
+
+.inst-klock-nombre,
+.inst-cap h3 {
+    font-weight: 500;
+}
+
+.inst-seg-pista {
+    height: 2px;
+    border-radius: 0;
+}
+
+/* ---------------------------------------------------------------------
+   Colores
+   --------------------------------------------------------------------- */
+.swatch-row {
+    gap: 16px;
+    margin-top: 48px;
+}
+
+.swatch {
+    border: 1px solid var(--linea);
+    transition: border-color 0.45s var(--ease);
+}
+
+.swatch:hover {
+    border-color: var(--linea-fuerte);
+}
+
+.swatch.active,
+.swatch.active:hover {
+    border-color: var(--gold);
+    box-shadow: none;
+    transform: none;
+}
+
+.swatch-color.star::after {
+    font-size: 1rem;
+}
+
+.swatch-info h4 {
+    font-weight: 500;
+    letter-spacing: 0.06em;
+}
+
+.color-preview {
+    border-color: var(--linea);
+}
+
+.color-preview-tag {
+    padding: 9px 14px;
+    background: rgba(0, 0, 0, 0.66);
+    border: 1px solid var(--linea-fuerte);
+    border-radius: 0;
+    color: var(--white);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+}
+
+.color-note {
+    margin-top: 18px;
+    font-style: normal;
+}
+
+/* ---------------------------------------------------------------------
+   Ficha técnica
+   --------------------------------------------------------------------- */
+.ficha-sub {
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+}
+
+.ficha-col h3 {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    border-bottom-color: var(--linea-cobre);
+}
+
+.ficha-col dl div {
+    padding: 18px 0;
+    border-bottom-color: var(--linea);
+}
+
+.ficha-col dt {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--muted);
+}
+
+.ficha-col dd {
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
+}
+
+.ficha-humano {
+    padding-left: 32px;
+    border-left-width: 1px;
+}
+
+.ficha-humano strong {
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------
+   Precios
+   --------------------------------------------------------------------- */
+#modelo-comercial .specs-grid {
+    gap: 16px !important;
+    margin-top: 16px !important;
+    max-width: none !important;
+}
+
+#modelo-comercial .section-divider + .specs-grid {
+    margin-top: 56px !important;
+}
+
+#modelo-comercial .spec-item {
+    background: var(--surface);
+    border: 1px solid var(--linea) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+#modelo-comercial .section-divider + .specs-grid .spec-item:nth-child(2) {
+    border-color: var(--gold) !important;
+}
+
+#modelo-comercial h3,
+#modelo-comercial h4 {
+    font-weight: 500;
+}
+
+#modelo-comercial .section-divider + .specs-grid .spec-item > div:nth-child(1) {
+    margin-bottom: 22px !important;
+    color: var(--muted) !important;
+    font-size: 0.76rem !important;
+    font-weight: 500;
+    letter-spacing: 0.24em !important;
+}
+
+#modelo-comercial .section-divider + .specs-grid .spec-item > div:nth-child(2) {
+    font-size: clamp(2.6rem, 4.6vw, 3.9rem) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+#modelo-comercial .section-divider + .specs-grid .spec-item > div:nth-child(2) span[style] {
+    font-size: 0.85rem !important;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+}
+
+#modelo-comercial .section-divider + .specs-grid .spec-item > div:nth-child(2) span[style*="block"] {
+    margin-bottom: 10px !important;
+}
+
+#modelo-comercial .section-divider + .specs-grid .spec-item > div:nth-child(3) {
+    max-width: 38ch;
+    margin: 22px auto 0 !important;
+    color: var(--muted) !important;
+    text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------------
+   Pasos para cotizar
+   --------------------------------------------------------------------- */
+.pasos {
+    border-top-color: var(--linea-cobre);
+}
+
+.paso::before {
+    width: 7px;
+    height: 7px;
+}
+
+.paso-num {
+    margin-bottom: 22px;
+    color: var(--gold);
+    -webkit-text-stroke: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+}
+
+.paso h3 {
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------
+   Tabla comparativa
+   --------------------------------------------------------------------- */
+.comp-table th,
+.comp-table td {
+    border-bottom-color: var(--linea);
+}
+
+.comp-table th {
+    letter-spacing: 0.2em;
+}
+
+.comp-table th.kcol {
+    border: 1px solid var(--linea-cobre);
+    border-bottom: 1px solid var(--gold);
+    border-radius: 0;
+}
+
+.comp-table .kcol {
+    background: rgba(193, 138, 104, 0.05);
+    font-weight: 500;
+}
+
+.comp-table td:first-child {
+    font-weight: 400;
+}
+
+/* ---------------------------------------------------------------------
+   Cierre y pie de página
+   --------------------------------------------------------------------- */
+.cta-section::before {
+    left: 0;
+    right: 0;
+    background: var(--linea);
+}
+
+.cta-section .fade-in > img {
+    height: 96px !important;
+}
+
+.cta-section .tagline {
+    margin-bottom: 48px;
+    font-size: 0.76rem;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+}
+
+.footer {
+    border-top-color: var(--linea);
+}
+
+.footer-instagram {
+    padding: 15px 28px;
+    background: transparent;
+    border: 1px solid var(--linea-fuerte);
+    border-radius: 0;
+    font-size: 0.76rem;
+    letter-spacing: 0.22em;
+}
+
+.footer-instagram:hover {
+    transform: none;
+}
+
+.footer .footer-brand {
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+}
+
+.footer-map {
+    border-top-color: var(--linea);
+}
+
+.footer-col h4 {
+    margin-bottom: 18px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    opacity: 1;
+}
+
+/* ---------------------------------------------------------------------
+   Botón de WhatsApp: mismo ícono y mismo lugar, sin verde neón
+   --------------------------------------------------------------------- */
+a[href^="https://wa.me"][style*="position:fixed"] {
+    width: 54px !important;
+    height: 54px !important;
+    background: #111111 !important;
+    border: 1px solid var(--linea-fuerte) !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55) !important;
+    transform: none !important;
+    transition: border-color 0.35s var(--ease) !important;
+}
+
+a[href^="https://wa.me"][style*="position:fixed"]:hover {
+    border-color: var(--gold) !important;
+}
+
+/* ---------------------------------------------------------------------
+   Página Empresa
+   --------------------------------------------------------------------- */
+.legal-page h1,
+.legal-page h2,
+.page-head h1,
+.apartado h2,
+.card h3,
+.legal-card h3,
+.cta-empresa h2,
+.enemigo-box .frase,
+.manifiesto .mani-abre,
+.manifiesto .mani-cierre,
+.cifra .n {
+    font-weight: 500;
+}
+
+.toc a {
+    border-left-width: 1px;
+}
+
+.origen-foto {
+    border-color: var(--linea);
+}
+
+.origen-foto img {
+    filter: saturate(0.82) contrast(1.04);
+}
+
+.manifiesto {
+    border: 1px solid var(--linea);
+    border-left: 1px solid var(--gold);
+}
+
+.enemigo-box {
+    border-left-width: 1px;
+    background: linear-gradient(90deg, rgba(193, 138, 104, 0.05), transparent 70%);
+}
+
+.card,
+.legal-card {
+    border-color: var(--linea);
+    transition: border-color 0.45s var(--ease), background-color 0.45s var(--ease);
+}
+
+.card:hover,
+.legal-card:hover {
+    border-color: var(--linea-cobre);
+}
+
+/* ---------------------------------------------------------------------
+   Movimiento: más corto el recorrido, más lenta la llegada
+   --------------------------------------------------------------------- */
+.fade-in {
+    transform: translateY(14px);
+    transition: opacity 1.1s var(--ease), transform 1.1s var(--ease);
+}
+
+.fade-in.visible {
+    transform: translateY(0);
+}
+
+.fade-in-d1 { transition-delay: 0.08s; }
+.fade-in-d2 { transition-delay: 0.16s; }
+.fade-in-d3 { transition-delay: 0.24s; }
+.fade-in-d4 { transition-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .fade-in,
+    .fade-in.visible {
+        transform: none;
+        transition: none;
+    }
+
+    .hero-bg video {
+        transition: none;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   Pantalla grande: más aire y más escala
+   --------------------------------------------------------------------- */
+@media (min-width: 901px) {
+    :root {
+        --nav-height: 88px;
+    }
+
+    body > section {
+        padding: clamp(120px, 11vw, 168px) 0;
+    }
+
+    h2 {
+        font-size: clamp(2.2rem, 3.9vw, 3.6rem);
+    }
+
+    .two-col {
+        gap: 88px;
+    }
+
+    .hero-stats {
+        gap: 0;
+    }
+
+    .hero-stat {
+        padding: 0 44px;
+    }
+
+    .hero-stat + .hero-stat {
+        border-left: 1px solid var(--linea-fuerte);
+    }
+
+    .prob-grid {
+        margin-top: 88px;
+    }
+
+    .prob-item {
+        padding-top: 44px;
+    }
+
+    .prob-giro {
+        margin-top: 144px;
+    }
+
+    .sol-intro {
+        gap: 96px;
+        margin-top: 56px;
+    }
+
+    .sol-teja {
+        margin-top: 96px;
+    }
+
+    .feat-grid {
+        margin-top: 64px;
+    }
+
+    .feat-item {
+        padding: 44px 40px 0;
+    }
+
+    .feat-item + .feat-item {
+        border-top: 1px solid var(--linea);
+        border-left: 0;
+    }
+
+    .feat-dato {
+        margin: 32px -40px 0;
+        padding: 26px 40px 32px;
+    }
+
+    .inst-stage {
+        margin-top: 64px;
+    }
+
+    .color-preview {
+        max-width: none;
+        height: auto;
+        aspect-ratio: 1036 / 390;
+        margin-top: 16px;
+    }
+
+    .ficha-tabla {
+        gap: 88px;
+        margin-top: 72px;
+    }
+
+    .ficha-humano {
+        margin-top: 80px;
+    }
+
+    #modelo-comercial .spec-item {
+        padding: clamp(40px, 4.4vw, 64px) !important;
+    }
+
+    /* los dos precios quedan a la misma altura, con o sin el «Desde» */
+    #modelo-comercial .section-divider + .specs-grid .spec-item:nth-child(1) > div:nth-child(2) {
+        padding-top: calc(0.85rem + 10px);
+    }
+
+    .paso::before {
+        top: -4px;
+    }
+
+    .comp-table th,
+    .comp-table td {
+        padding: 19px 20px;
+    }
+
+    .cta-section {
+        padding: 168px 0 128px;
+    }
+
+    .footer {
+        padding: 88px 0 64px;
+    }
+
+    .footer-map {
+        margin-top: 56px;
+        padding-top: 48px;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   Celular
+   --------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .feat-item + .feat-item {
+        border-left: 1px solid var(--linea);
+    }
+
+    .feat-dato {
+        border-top-color: var(--linea);
+    }
+
+    .paso::before {
+        left: -34px;
+    }
+
+    .nav-links a.nav-cta {
+        padding: 14px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        padding: 17px 26px !important;
+        letter-spacing: 0.18em;
+    }
+
+    .hero .fade-in > img {
+        height: 100px !important;
+    }
+
+    .lang-toggle button {
+        padding: 7px 6px;
+    }
+}

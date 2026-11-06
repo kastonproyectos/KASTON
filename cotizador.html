@@ -47,10 +47,12 @@
                     },
                     /* Bordes rectos, sin esquinas muy redondeadas (manual, sección Color) */
                     borderRadius: {
-                        lg: '6px',
-                        xl: '6px',
-                        '2xl': '8px',
-                        '3xl': '10px',
+                        DEFAULT: '0',
+                        md: '0',
+                        lg: '0',
+                        xl: '0',
+                        '2xl': '0',
+                        '3xl': '0',
                     }
                 }
             }
@@ -77,33 +79,33 @@
         /* Tarjeta de la web: superficie #111 con borde cobre al 15 % */
         .glass-panel {
             background-color: #111111;
-            border: 1px solid rgba(193, 138, 104, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.09);
         }
 
         /* Antetítulo cobre (PASO 01, RESULTADO...) */
         .k-kicker {
             font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 500;
-            letter-spacing: 3px;
+            letter-spacing: 0.3em;
             text-transform: uppercase;
             color: #C18A68;
         }
 
         .k-divider {
-            width: 60px;
-            height: 3px;
+            width: 44px;
+            height: 1px;
             background: #C18A68;
         }
 
         /* Botón cobre y botón de contorno, iguales a los de la web */
         .k-btn {
             font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
-            font-weight: 600;
-            letter-spacing: 2px;
+            font-weight: 500;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            border-radius: 6px;
-            transition: background-color .25s, color .25s, border-color .25s, transform .25s;
+            border-radius: 0;
+            transition: background-color .45s cubic-bezier(.22,1,.36,1), color .45s cubic-bezier(.22,1,.36,1), border-color .45s cubic-bezier(.22,1,.36,1);
         }
 
         .k-btn-gold {
@@ -115,43 +117,57 @@
         .k-btn-gold:hover:not(:disabled) {
             background: #D49B76;
             border-color: #D49B76;
-            transform: translateY(-1px);
         }
 
         .k-btn-outline {
             background: transparent;
-            color: #C18A68;
-            border: 1px solid rgba(193, 138, 104, 0.5);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.22);
         }
 
         .k-btn-outline:hover:not(:disabled) {
-            background: rgba(193, 138, 104, 0.1);
+            background: transparent;
             border-color: #C18A68;
+            color: #C18A68;
         }
 
         /* Tarjetas de modalidad: la .card de la web */
         .k-card {
             background: #111111;
-            border: 1px solid rgba(193, 138, 104, 0.15);
-            border-left: 3px solid rgba(193, 138, 104, 0.4);
-            border-radius: 8px;
-            transition: border-color .35s ease, transform .35s ease, box-shadow .35s ease;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 0;
+            transition: border-color .45s cubic-bezier(.22,1,.36,1);
         }
 
         .k-card-link:hover {
             border-color: #C18A68;
-            border-left-color: #C18A68;
-            transform: translateY(-4px);
-            box-shadow: 0 14px 40px rgba(193, 138, 104, 0.14);
         }
 
         /* Cifra con barra cobre a la izquierda, como los datos de la web */
         .k-stat {
             background: #111111;
-            border: 1px solid rgba(193, 138, 104, 0.12);
-            border-left: 3px solid #C18A68;
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 0;
         }
+
+        /* Titulares menos pesados, sin palabras sueltas, como en la web */
+        h1, h2, h3, h4 { text-wrap: balance; }
+        h1.font-bold, h2.font-bold, h3.font-bold, h4.font-bold { font-weight: 500; }
+
+        /* Botón de WhatsApp: mismo ícono y mismo lugar, sin verde neón */
+        a[title="Chatear con KASTON por WhatsApp"] {
+            background: #111111 !important;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55) !important;
+            transform: none !important;
+            transition: border-color .35s cubic-bezier(.22,1,.36,1) !important;
+        }
+        a[title="Chatear con KASTON por WhatsApp"]:hover { border-color: #C18A68; }
+
+        ::selection { background: #C18A68; color: #000000; }
+
+        /* Filos finos en lugar de barras gruesas a la izquierda */
+        div.border-l-2, div.border-l-4 { border-left-width: 1px; }
 
         .k-num {
             font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif;
